@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "QUAD Framework - Circle of Functions",
   description: "Quick Unified Agentic Development - A modern software development methodology for the AI era",
   keywords: ["QUAD", "software development", "methodology", "AI", "agile alternative", "documentation-first"],
-  authors: [{ name: "A2 Vibe Creators" }],
+  authors: [{ name: "Suman Addanki", url: "mailto:suman.addanki@gmail.com" }],
   openGraph: {
     title: "QUAD Framework",
     description: "Quick Unified Agentic Development - A modern software development methodology for the AI era",
@@ -45,13 +45,6 @@ export default function RootLayout({
                 <Link href="/case-study" className="text-sm text-slate-400 hover:text-white transition-colors">
                   Case Study
                 </Link>
-                <Link
-                  href="https://a2vibecreators.com"
-                  target="_blank"
-                  className="text-sm text-slate-500 hover:text-slate-300 transition-colors"
-                >
-                  A2 Vibe Creators
-                </Link>
               </div>
             </div>
           </div>
@@ -71,11 +64,11 @@ export default function RootLayout({
                 <span className="text-xs text-slate-600">Circle of Functions</span>
               </div>
               <p className="text-sm text-slate-600">
-                A methodology by{" "}
-                <Link href="https://a2vibecreators.com" target="_blank" className="text-blue-400 hover:text-blue-300">
-                  A2 Vibe Creators
-                </Link>
-                {" "}| First Published: December 2025
+                Created by{" "}
+                <a href="mailto:suman.addanki@gmail.com" className="text-blue-400 hover:text-blue-300">
+                  Suman Addanki
+                </a>
+                {" "}| December 2025
               </p>
             </div>
           </div>
