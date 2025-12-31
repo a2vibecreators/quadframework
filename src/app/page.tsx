@@ -66,20 +66,6 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="flex gap-4 justify-center">
-            <Link
-              href="/concept"
-              className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold text-lg"
-            >
-              Read the Concept
-            </Link>
-            <Link
-              href="/case-study"
-              className="px-8 py-4 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors border border-white/20 font-semibold text-lg"
-            >
-              View Case Study
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -217,10 +203,23 @@ export default function Home() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
+                title: "Source of Truth Flow",
+                desc: "Watch how requirements flow through QUAD - animated SVG visualization",
+                href: "/flow",
+                icon: "🔄",
+                badge: "NEW",
+              },
+              {
                 title: "Main Concept",
                 desc: "The complete QUAD methodology - Operators, AI Agents, Docs-First approach",
                 href: "/concept",
                 icon: "💡",
+              },
+              {
+                title: "Agent Architecture",
+                desc: "QACA - How agents communicate, permissions, and execution patterns",
+                href: "/architecture",
+                icon: "🏗️",
               },
               {
                 title: "Technical Details",
@@ -252,12 +251,30 @@ export default function Home() {
                 href: "/demo",
                 icon: "🌐",
               },
+              {
+                title: "QUAD Platform",
+                desc: "Complete deployable solution - Self-hosted or SaaS with enterprise features",
+                href: "/platform",
+                icon: "🏢",
+                badge: "PRODUCT",
+              },
+              {
+                title: "Documentation",
+                desc: "Complete methodology documentation - from concepts to implementation",
+                href: "/docs",
+                icon: "📚",
+              },
             ].map((card) => (
               <Link
                 key={card.href}
                 href={card.href}
-                className="glass-card rounded-xl p-6 hover:bg-white/10 transition-all group"
+                className="glass-card rounded-xl p-6 hover:bg-white/10 transition-all group relative"
               >
+                {card.badge && (
+                  <span className="absolute -top-2 -right-2 px-2 py-0.5 bg-green-500 text-white text-xs font-bold rounded-full">
+                    {card.badge}
+                  </span>
+                )}
                 <div className="text-3xl mb-3">{card.icon}</div>
                 <h3 className="text-lg font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">
                   {card.title}
@@ -276,20 +293,25 @@ export default function Home() {
           <p className="text-slate-400 mb-8">
             Start with the Main Concept for a complete understanding, or explore the Case Study to see QUAD in action.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/concept"
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
             >
-              Read Main Concept
+              Read the Concept
             </Link>
             <Link
-              href="https://a2vibecreators.com"
-              target="_blank"
+              href="/case-study"
               className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors border border-white/20"
             >
-              About A2 Vibe Creators
+              View Case Study
             </Link>
+            <a
+              href="mailto:suman.addanki@gmail.com"
+              className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors border border-white/20"
+            >
+              suman.addanki@gmail.com
+            </a>
           </div>
         </div>
       </section>

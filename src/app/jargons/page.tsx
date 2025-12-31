@@ -1,4 +1,16 @@
+"use client";
+
+import PageNavigation from "@/components/PageNavigation";
+
 export default function QUADJargons() {
+  const sections = [
+    { id: "quick-ref", title: "Quick Reference" },
+    { id: "glossary", title: "Full Glossary" },
+    { id: "circles", title: "4 Circles" },
+    { id: "events", title: "Cycle Events" },
+    { id: "estimation", title: "Estimation" },
+  ];
+
   const glossary = [
     { old: "Sprint", quad: "Cycle", meaning: "4-week period of continuous work" },
     { old: "Daily Standup", quad: "Pulse", meaning: "Optional weekly sync (5-15 min)" },
@@ -24,8 +36,9 @@ export default function QUADJargons() {
   ];
 
   return (
-    <div className="min-h-screen text-white p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen text-white">
+      <PageNavigation sections={sections} />
+      <div className="max-w-4xl mx-auto p-8">
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
@@ -38,7 +51,7 @@ export default function QUADJargons() {
         </div>
 
         {/* Quick Reference Card */}
-        <section className="mb-12">
+        <section id="quick-ref" className="mb-12 scroll-mt-32">
           <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-6 border border-blue-500/20">
             <h2 className="text-xl font-bold mb-4 text-center">Quick Reference Card</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">

@@ -1,9 +1,22 @@
+"use client";
+
 import Link from "next/link";
+import PageNavigation from "@/components/PageNavigation";
 
 export default function QUADSummary() {
+  const sections = [
+    { id: "executive", title: "Executive Summary" },
+    { id: "numbers", title: "Key Numbers" },
+    { id: "circles", title: "4 Circles" },
+    { id: "principles", title: "Core Principles" },
+    { id: "benefits", title: "Benefits" },
+    { id: "when", title: "When to Use" },
+  ];
+
   return (
-    <div className="min-h-screen text-white p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen text-white">
+      <PageNavigation sections={sections} />
+      <div className="max-w-4xl mx-auto p-8">
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
@@ -16,7 +29,7 @@ export default function QUADSummary() {
         </div>
 
         {/* Executive Summary */}
-        <section className="mb-12">
+        <section id="executive" className="mb-12 scroll-mt-32">
           <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-xl p-8 border border-blue-500/20">
             <h2 className="text-2xl font-bold mb-4 text-center">Executive Summary</h2>
             <p className="text-lg text-slate-300 text-center max-w-2xl mx-auto">

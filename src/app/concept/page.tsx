@@ -1,7 +1,22 @@
+"use client";
+
+import PageNavigation from "@/components/PageNavigation";
+
 export default function QUADConcept() {
+  const sections = [
+    { id: "hierarchy", title: "1-2-3-4 Hierarchy" },
+    { id: "what-is", title: "What is QUAD" },
+    { id: "axioms", title: "3 Axioms" },
+    { id: "circles", title: "4 Circles" },
+    { id: "pipeline", title: "Agent Pipeline" },
+    { id: "docs-first", title: "Docs-First" },
+    { id: "cycle", title: "QUAD Cycle" },
+  ];
+
   return (
-    <div className="min-h-screen text-white p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen text-white">
+      <PageNavigation sections={sections} />
+      <div className="max-w-4xl mx-auto p-8">
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
@@ -14,7 +29,7 @@ export default function QUADConcept() {
         </div>
 
         {/* The 1-2-3-4 Hierarchy */}
-        <section className="mb-12">
+        <section id="hierarchy" className="mb-12 scroll-mt-32">
           <h2 className="text-2xl font-bold mb-6 text-blue-300">The 1-2-3-4 Hierarchy</h2>
           <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl p-6 border border-blue-500/20 mb-6">
             <div className="grid grid-cols-4 gap-4 text-center">
@@ -43,7 +58,7 @@ export default function QUADConcept() {
         </section>
 
         {/* What is QUAD */}
-        <section className="mb-12">
+        <section id="what-is" className="mb-12 scroll-mt-32">
           <h2 className="text-2xl font-bold mb-6 text-blue-300">What is QUAD?</h2>
           <div className="bg-white/5 rounded-xl p-6 border border-white/10 mb-6">
             <div className="grid grid-cols-4 gap-4 text-center mb-6">
@@ -64,7 +79,7 @@ export default function QUADConcept() {
         </section>
 
         {/* The 3 Axioms */}
-        <section className="mb-12">
+        <section id="axioms" className="mb-12 scroll-mt-32">
           <h2 className="text-2xl font-bold mb-6 text-blue-300">The 3 Axioms</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
@@ -102,7 +117,7 @@ export default function QUADConcept() {
         </section>
 
         {/* The 4 Circles Detail */}
-        <section className="mb-12">
+        <section id="circles" className="mb-12 scroll-mt-32">
           <h2 className="text-2xl font-bold mb-6 text-blue-300">The 4 Circles in Detail</h2>
 
           {[
@@ -116,7 +131,7 @@ export default function QUADConcept() {
                 { name: "Story Agent", trigger: "BA writes requirement", output: "Enhanced story with specs, acceptance criteria" },
                 { name: "Scheduling Agent", trigger: "Meeting needed", output: "Optimal time, calendar blocks, action items" },
                 { name: "Documentation Agent", trigger: "Feature complete", output: "Auto-generated flow docs, wiki updates" },
-                { name: "Estimation Agent", trigger: "Story ready", output: "Complexity based on historical data" },
+                { name: "Estimation Agent", trigger: "Story ready", output: "Multi-agent pipeline: complexity, confidence, effort" },
               ],
               color: "blue",
             },
@@ -208,7 +223,7 @@ export default function QUADConcept() {
         </section>
 
         {/* AI Agent Pipeline */}
-        <section className="mb-12">
+        <section id="pipeline" className="mb-12 scroll-mt-32">
           <h2 className="text-2xl font-bold mb-6 text-blue-300">AI Agent Pipeline</h2>
           <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
             <div className="flex items-center justify-between overflow-x-auto pb-4">
@@ -239,7 +254,7 @@ export default function QUADConcept() {
         </section>
 
         {/* Docs-First */}
-        <section className="mb-12">
+        <section id="docs-first" className="mb-12 scroll-mt-32">
           <h2 className="text-2xl font-bold mb-6 text-blue-300">Docs-First Approach</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-red-500/10 rounded-xl p-6 border border-red-500/20">
@@ -266,7 +281,7 @@ export default function QUADConcept() {
         </section>
 
         {/* The QUAD Cycle */}
-        <section className="mb-12">
+        <section id="cycle" className="mb-12 scroll-mt-32">
           <h2 className="text-2xl font-bold mb-6 text-blue-300">The QUAD Cycle (4 Weeks)</h2>
           <div className="grid grid-cols-4 gap-4">
             {[

@@ -1,8 +1,19 @@
+"use client";
+
 import Link from "next/link";
+import PageNavigation from "@/components/PageNavigation";
 
 export default function QUADCaseStudy() {
+  const sections = [
+    { id: "project", title: "The Project" },
+    { id: "agile", title: "Agile Approach" },
+    { id: "quad", title: "QUAD Approach" },
+    { id: "comparison", title: "Comparison" },
+  ];
+
   return (
     <div className="min-h-screen text-white">
+      <PageNavigation sections={sections} />
       {/* Hero Section */}
       <section className="pt-8 pb-12 px-6">
         <div className="max-w-4xl mx-auto text-center">

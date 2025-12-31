@@ -84,8 +84,8 @@ deploy_env() {
     fi
 }
 
-# Check if we're on Mac Studio
-if [[ "$(hostname)" != *"Mac-Studio"* && "$(hostname)" != *"mac-studio"* ]]; then
+# Check if we're on Mac Studio (hostname could be "Mac", "Mac-Studio", etc.)
+if [[ "$(hostname)" != *"Mac"* && "$(hostname)" != *"mac"* ]]; then
     print_error "This script must be run on Mac Studio"
     print_status "Current hostname: $(hostname)"
     exit 1

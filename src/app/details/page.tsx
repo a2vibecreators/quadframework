@@ -1,7 +1,24 @@
+"use client";
+
+import PageNavigation from "@/components/PageNavigation";
+
 export default function QUADDetails() {
+  const sections = [
+    { id: "dimensions", title: "2 Dimensions" },
+    { id: "resources", title: "Shared/Dedicated" },
+    { id: "org-structure", title: "Org Structure" },
+    { id: "enabling", title: "Enabling Teams" },
+    { id: "hierarchy", title: "Hierarchy Rules" },
+    { id: "class-object", title: "Class-Object" },
+    { id: "estimation", title: "Estimation" },
+    { id: "flow-doc", title: "Flow Doc" },
+    { id: "source-truth", title: "Source of Truth" },
+  ];
+
   return (
-    <div className="min-h-screen text-white p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen text-white">
+      <PageNavigation sections={sections} />
+      <div className="max-w-4xl mx-auto p-8">
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
@@ -14,7 +31,7 @@ export default function QUADDetails() {
         </div>
 
         {/* The 2 Dimensions */}
-        <section className="mb-12">
+        <section id="dimensions" className="mb-12 scroll-mt-32">
           <h2 className="text-2xl font-bold mb-6 text-blue-300">The 2 Dimensions: Business + Technical</h2>
           <p className="text-slate-400 mb-6">
             Every circle operates along two axes: <strong className="text-white">Business</strong> (understanding requirements, stakeholders, value) and <strong className="text-white">Technical</strong> (code, systems, infrastructure). The B/T ratio defines each circle&apos;s focus.
@@ -408,6 +425,158 @@ export default function QUADDetails() {
               <div className="text-4xl mb-2">→</div>
               <div className="text-sm text-slate-400">assign + setup = object</div>
             </div>
+          </div>
+        </section>
+
+        {/* Estimation Agent Pipeline */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-6 text-blue-300">Estimation Agent Pipeline</h2>
+          <p className="text-slate-400 mb-6">
+            The Estimation Agent is unique - it orchestrates multiple agents in a <strong className="text-white">sequential pipeline</strong> to produce accurate, confidence-based estimates.
+          </p>
+
+          {/* Pipeline Flow */}
+          <div className="bg-slate-800/30 rounded-xl p-6 border border-slate-700 mb-6">
+            <div className="flex items-center justify-between overflow-x-auto pb-4">
+              {[
+                { name: "Code Agent", icon: "💻", analyzes: "Files, components, complexity" },
+                { name: "DB Agent", icon: "🗄️", analyzes: "Tables, migrations, queries" },
+                { name: "Flow Agent", icon: "📊", analyzes: "Screens, APIs, integrations" },
+                { name: "Estimation Agent", icon: "🎯", analyzes: "Aggregates all, final estimate" },
+              ].map((agent, i) => (
+                <div key={agent.name} className="flex items-center">
+                  <div className="text-center min-w-[120px]">
+                    <div className="w-14 h-14 mx-auto rounded-full bg-green-500/20 flex items-center justify-center text-2xl mb-2 border border-green-500/30">
+                      {agent.icon}
+                    </div>
+                    <div className="text-xs font-medium text-white">{agent.name}</div>
+                    <div className="text-xs text-slate-500 mt-1">{agent.analyzes}</div>
+                  </div>
+                  {i < 3 && (
+                    <div className="text-green-400 mx-3 text-xl">→</div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-slate-500 text-center mt-4">
+              <strong className="text-slate-400">Pluggable Design:</strong> Agents can be added/removed (e.g., add Security Agent, remove DB Agent if no DB changes)
+            </p>
+          </div>
+
+          {/* Confidence Calculation */}
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="bg-red-500/10 rounded-xl p-5 border border-red-500/20">
+              <h3 className="font-bold text-red-300 mb-4">Confidence Deductions</h3>
+              <div className="space-y-2 text-sm">
+                {[
+                  { factor: "High code complexity (>50 files)", value: "-15%" },
+                  { factor: "Database migration required", value: "-10%" },
+                  { factor: "External API integration", value: "-10%" },
+                  { factor: "New technology/framework", value: "-15%" },
+                  { factor: "Cross-team dependency", value: "-10%" },
+                  { factor: "Unclear requirements", value: "-20%" },
+                  { factor: "No similar past stories", value: "-10%" },
+                ].map((item) => (
+                  <div key={item.factor} className="flex justify-between">
+                    <span className="text-slate-400">{item.factor}</span>
+                    <span className="text-red-400 font-mono">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-green-500/10 rounded-xl p-5 border border-green-500/20">
+              <h3 className="font-bold text-green-300 mb-4">Confidence Additions</h3>
+              <div className="space-y-2 text-sm">
+                {[
+                  { factor: "Similar story completed before", value: "+10%" },
+                  { factor: "High test coverage in area", value: "+5%" },
+                  { factor: "Clear requirements", value: "+5%" },
+                  { factor: "Same developer did similar", value: "+5%" },
+                ].map((item) => (
+                  <div key={item.factor} className="flex justify-between">
+                    <span className="text-slate-400">{item.factor}</span>
+                    <span className="text-green-400 font-mono">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 pt-4 border-t border-green-500/20">
+                <div className="text-xs text-slate-500">
+                  <strong className="text-white">Formula:</strong> 90% base + additions - deductions
+                </div>
+                <div className="text-xs text-slate-500">Range: 30% (min) to 95% (max)</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Output Example */}
+          <div className="bg-slate-900/50 rounded-xl border border-slate-700 overflow-hidden mb-6">
+            <div className="bg-slate-800/50 px-4 py-3 border-b border-slate-700">
+              <span className="text-green-300 text-sm font-bold">ESTIMATION RESULT</span>
+            </div>
+            <div className="p-4 space-y-4">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="bg-blue-500/10 rounded-lg p-3 border border-blue-500/20">
+                  <div className="text-xs text-slate-500">COMPLEXITY</div>
+                  <div className="text-lg font-bold text-blue-300">Octahedron (8)</div>
+                </div>
+                <div className="bg-green-500/10 rounded-lg p-3 border border-green-500/20">
+                  <div className="text-xs text-slate-500">CONFIDENCE</div>
+                  <div className="text-lg font-bold text-green-300">78%</div>
+                </div>
+                <div className="bg-purple-500/10 rounded-lg p-3 border border-purple-500/20">
+                  <div className="text-xs text-slate-500">EFFORT</div>
+                  <div className="text-lg font-bold text-purple-300">5-6 days</div>
+                </div>
+              </div>
+
+              <div className="bg-slate-800/30 rounded-lg p-3">
+                <div className="text-xs text-slate-500 mb-2">BREAKDOWN BY AGENT</div>
+                <div className="space-y-1 text-sm text-slate-400">
+                  <div>• <span className="text-white">Code Agent:</span> 3 files, 2 components, medium complexity</div>
+                  <div>• <span className="text-white">DB Agent:</span> 1 new column (user_preferences.theme)</div>
+                  <div>• <span className="text-white">Flow Agent:</span> 2 screens affected, 1 API endpoint</div>
+                </div>
+              </div>
+
+              <div className="bg-yellow-500/10 rounded-lg p-3 border border-yellow-500/20">
+                <div className="text-xs text-yellow-300 mb-2">⚠️ RISKS</div>
+                <div className="space-y-1 text-sm text-slate-400">
+                  <div>• CSS variable system not standardized</div>
+                  <div>• No existing theme context in app</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Human Override */}
+          <div className="bg-slate-700/30 rounded-xl p-6 border border-slate-600/50">
+            <h3 className="font-bold text-white mb-4">Human Override with AI Learning</h3>
+            <div className="grid md:grid-cols-5 gap-3 text-center text-sm">
+              {[
+                { step: "1", title: "AI Presents", desc: "Complexity: 8, Confidence: 78%" },
+                { step: "2", title: "Human Reviews", desc: "[Accept] or [Override]" },
+                { step: "3", title: "Override", desc: "Human: 6, Reason: 'Done before'" },
+                { step: "4", title: "Story Done", desc: "Actual: 5 days" },
+                { step: "5", title: "AI Learns", desc: "Human was closer! Adjusting..." },
+              ].map((item, i) => (
+                <div key={item.step} className="relative">
+                  <div className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
+                    <div className="w-6 h-6 mx-auto rounded-full bg-blue-500/20 flex items-center justify-center text-blue-300 text-xs font-bold mb-2">
+                      {item.step}
+                    </div>
+                    <div className="font-medium text-white text-xs">{item.title}</div>
+                    <div className="text-xs text-slate-500 mt-1">{item.desc}</div>
+                  </div>
+                  {i < 4 && (
+                    <div className="absolute top-1/2 -right-2 text-slate-600 hidden md:block">→</div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-slate-500 mt-4 text-center">
+              Override requires a reason (tracked for retrospectives). AI adjusts models based on who was more accurate.
+            </p>
           </div>
         </section>
 
