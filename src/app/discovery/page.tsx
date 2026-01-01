@@ -264,6 +264,45 @@ export default function DiscoveryPage() {
               </span>
             </p>
 
+            {/* Adoption Levels Preview */}
+            <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 mb-8 max-w-3xl mx-auto">
+              <h3 className="font-bold mb-4 text-left">Based on your pain + readiness, we&apos;ll recommend one of:</h3>
+              <div className="grid grid-cols-5 gap-2 mb-4">
+                {adoptionLevels.map((level) => {
+                  const colorMap: Record<string, string> = {
+                    slate: "from-slate-500 to-slate-600",
+                    blue: "from-blue-500 to-blue-600",
+                    green: "from-green-500 to-green-600",
+                    purple: "from-purple-500 to-purple-600",
+                    orange: "from-orange-500 to-orange-600",
+                  };
+                  return (
+                    <div
+                      key={level.level}
+                      className={`bg-gradient-to-b ${colorMap[level.color]} rounded-lg p-3 text-center`}
+                    >
+                      <div className="text-xl font-bold">{level.level}</div>
+                      <div className="text-xs font-medium">{level.name}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="grid grid-cols-5 gap-2 text-xs text-slate-400">
+                <div>Docs First</div>
+                <div>4 Circles</div>
+                <div>Manual Tools</div>
+                <div>AI Agents</div>
+                <div>Full Auto</div>
+              </div>
+              <div className="flex items-center justify-center mt-4 text-sm text-slate-500">
+                <span className="mr-2">←</span>
+                <span>Less AI</span>
+                <div className="w-24 h-1 mx-4 bg-gradient-to-r from-slate-500 via-blue-500 to-orange-500 rounded"></div>
+                <span>More AI</span>
+                <span className="ml-2">→</span>
+              </div>
+            </div>
+
             <div className="grid md:grid-cols-3 gap-6 mb-12">
               <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
                 <div className="text-3xl mb-3">🩺</div>
