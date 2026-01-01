@@ -303,7 +303,7 @@ export default function DashboardPage() {
                   onChange={(e) => setDomainName(e.target.value)}
                   placeholder="e.g., My Project"
                   disabled={creating}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none disabled:bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none disabled:bg-gray-100 text-gray-900 placeholder-gray-400"
                 />
               </div>
 
@@ -315,7 +315,7 @@ export default function DashboardPage() {
                   value={domainType}
                   onChange={(e) => setDomainType(e.target.value)}
                   disabled={creating}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none disabled:bg-gray-100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none disabled:bg-gray-100 text-gray-900"
                 >
                   <option value="project">Project</option>
                   <option value="department">Department</option>
@@ -326,14 +326,15 @@ export default function DashboardPage() {
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-sm text-blue-900">
-                  <strong>Note:</strong> You will be assigned all 4 roles:
+                  <strong>Note:</strong> You will be assigned 2 default roles:
                 </p>
                 <ul className="text-xs text-blue-800 mt-2 ml-4 list-disc">
-                  <li>ADMIN - Full access</li>
-                  <li>DOMAIN_ADMIN - Domain management</li>
-                  <li>DEVELOPER - Development access</li>
+                  <li>DOMAIN_ADMIN - Domain management (100% allocation)</li>
                   <li>VIEWER - Read-only access</li>
                 </ul>
+                <p className="text-xs text-blue-700 mt-2">
+                  You can manually add Circle 1-4 roles later for testing agent personas.
+                </p>
               </div>
 
               <div className="flex gap-3 pt-4">
