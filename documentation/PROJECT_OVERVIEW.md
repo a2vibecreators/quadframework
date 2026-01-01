@@ -1,8 +1,8 @@
 # QUAD Platform - Project Overview
 
-**Date:** December 31, 2025
-**Version:** 1.0
-**Status:** Active Development
+**Date:** January 1, 2026
+**Version:** 2.0
+**Status:** Active Development (60% Backend Complete)
 
 ---
 
@@ -138,10 +138,10 @@ Step 4: Export to development
 
 | Layer | Technology |
 |-------|-----------|
-| **Frontend** | Next.js 14 (React, TypeScript, Tailwind CSS) |
+| **Frontend** | Next.js 15 (React 19, TypeScript, Tailwind CSS) |
 | **Backend** | Next.js API Routes (TypeScript) |
-| **Database** | PostgreSQL 15 |
-| **ORM** | Raw SQL via `pg` library (no ORM) |
+| **Database** | PostgreSQL 15 (15 QUAD_ prefixed tables) |
+| **ORM** | Prisma 7 (type-safe queries, migrations) |
 | **AI** | Google Gemini (dev), AWS Bedrock (prod) |
 | **Deployment** | Docker + Caddy (Mac Studio), GCP Cloud Run (prod) |
 | **Git Analysis** | Node.js exec (git clone + file parsing) |
@@ -156,47 +156,88 @@ Step 4: Export to development
 ✅ **TypeScript** - Type safety across full stack
 
 **vs. Spring Boot (used in NutriNine):**
-- QUAD has ~10-15 tables → Next.js direct SQL is fine
+- QUAD has 15 tables → Next.js + Prisma is ideal
 - NutriNine has 346 tables → Needs JPA/Hibernate
+- Prisma provides type-safe queries and easy migrations
 
-### Database Schema (Simplified)
+### Database Schema (15 Tables)
 
-```sql
-QUAD_companies          -- Top-level organizations
-  └─ QUAD_users         -- People with email/password
-      └─ QUAD_domain_members  -- User roles per domain
-
-QUAD_domains            -- Organizational units (hierarchical)
-  └─ QUAD_domain_resources   -- Projects, integrations, repos
-      └─ QUAD_resource_attributes  -- Key-value attributes (EAV)
-
-QUAD_resource_attribute_requirements  -- Validation rules
+```
+QUAD_companies (root)
+├── QUAD_users (company users)
+│   ├── QUAD_user_sessions (JWT sessions)
+│   ├── QUAD_adoption_matrix (AI adoption level)
+│   ├── QUAD_work_sessions (time tracking)
+│   └── QUAD_workload_metrics (productivity)
+├── QUAD_roles (with Q-U-A-D stage participation)
+└── QUAD_domains (organizational units)
+    ├── QUAD_domain_members (user-domain roles)
+    ├── QUAD_domain_resources (projects, repos)
+    │   └── QUAD_resource_attributes (EAV pattern)
+    ├── QUAD_circles (4 team circles)
+    │   └── QUAD_circle_members
+    └── QUAD_flows (work items)
+        └── QUAD_flow_stage_history
 ```
 
-**Key Tables:**
+**Core Tables (8):**
 - `QUAD_companies` - Customer organizations
-- `QUAD_users` - User accounts
-- `QUAD_domains` - Workspaces (can be nested)
-- `QUAD_domain_resources` - Resources (projects, repos)
+- `QUAD_users` - User accounts with role_id foreign key
+- `QUAD_roles` - Roles with Q-U-A-D stage participation (PRIMARY/SUPPORT/REVIEW/INFORM)
+- `QUAD_user_sessions` - JWT token sessions
+- `QUAD_domains` - Hierarchical workspaces
+- `QUAD_domain_members` - User-domain role assignments
+- `QUAD_domain_resources` - Resources (projects, repos, blueprints)
 - `QUAD_resource_attributes` - Flexible attributes (EAV pattern)
-- `QUAD_resource_attribute_requirements` - Attribute validation rules
+
+**Feature Tables (7):**
+- `QUAD_adoption_matrix` - AI adoption tracking (skill_level, trust_level 1-3)
+- `QUAD_flows` - Work items with Q-U-A-D stage tracking
+- `QUAD_flow_stage_history` - Stage transition audit log
+- `QUAD_circles` - 4 team circles (Management, Development, QA, Infrastructure)
+- `QUAD_circle_members` - Circle membership
+- `QUAD_work_sessions` - Daily time tracking
+- `QUAD_workload_metrics` - Weekly productivity metrics
 
 ---
 
 ## User Roles & Permissions
 
-| Role | Permissions |
-|------|-------------|
-| **QUAD_ADMIN** | Full access to all domains, manage users, billing |
-| **DOMAIN_ADMIN** | Manage specific domain, create sub-domains, invite users |
-| **SUBDOMAIN_ADMIN** | Manage sub-domain, assign resources |
-| **DEVELOPER** | Create/edit resources, run deployments |
-| **QA** | View resources, run tests, view reports |
-| **VIEWER** | Read-only access |
+### Default Roles (6)
 
-**Multi-Domain Users:**
+| Role | Code | Hierarchy | Permissions |
+|------|------|-----------|-------------|
+| **Administrator** | ADMIN | 100 | Full access, manage company, users, billing |
+| **Manager** | MANAGER | 80 | Manage users, domains, flows, view metrics |
+| **Tech Lead** | TECH_LEAD | 60 | Manage domains, flows, circles, resources |
+| **Developer** | DEVELOPER | 40 | Create flows, manage resources |
+| **QA Engineer** | QA | 30 | Manage flows, view metrics |
+| **Observer** | OBSERVER | 10 | View-only access |
+
+### Q-U-A-D Stage Participation Matrix
+
+Each role has participation levels for each stage of the QUAD workflow:
+
+| Role | Q (Question) | U (Understand) | A (Allocate) | D (Deliver) |
+|------|--------------|----------------|--------------|-------------|
+| **Administrator** | PRIMARY | REVIEW | PRIMARY | REVIEW |
+| **Manager** | PRIMARY | PRIMARY | PRIMARY | REVIEW |
+| **Tech Lead** | SUPPORT | PRIMARY | SUPPORT | REVIEW |
+| **Developer** | INFORM | SUPPORT | INFORM | PRIMARY |
+| **QA** | INFORM | INFORM | INFORM | SUPPORT |
+| **Observer** | INFORM | INFORM | INFORM | INFORM |
+
+**Participation Values:**
+- **PRIMARY** - Owns and drives the stage
+- **SUPPORT** - Actively assists the primary owner
+- **REVIEW** - Approves/rejects stage output
+- **INFORM** - Receives status updates only
+
+### Multi-Domain Users
+
 - One user can have different roles in different domains
-- Example: Alice is QUAD_ADMIN in MassMutual root, DEVELOPER in Insurance sub-domain
+- Example: Alice is ADMIN in MassMutual root, DEVELOPER in Insurance sub-domain
+- Roles are auto-created when a new company is registered
 
 ---
 
@@ -348,14 +389,59 @@ Developer Flow:
 
 ---
 
-## Project Goals
+## Implementation Status
 
-### Phase 1 (Current - Dec 2025)
+### Backend API (60% Complete)
+
+| Category | Endpoints | Status |
+|----------|-----------|--------|
+| **Auth** | register, login, logout | ✅ Complete |
+| **Companies** | CRUD | ✅ Complete |
+| **Users** | CRUD + password update | ✅ Complete |
+| **Roles** | CRUD + Q-U-A-D participation | ✅ Complete |
+| **Domains** | CRUD + hierarchy | ✅ Complete |
+| **Domain Members** | CRUD | ✅ Complete |
+| **Resources** | CRUD + attributes | ✅ Complete |
+| **Flows** | CRUD + stage transitions | ✅ Complete |
+| **Circles** | CRUD + members | ✅ Complete |
+| **Adoption Matrix** | GET/PUT per user | ✅ Complete |
+| **Work Sessions** | GET/POST per user | ✅ Complete |
+| **Workload Metrics** | GET/POST per user | ✅ Complete |
+| **Blueprint Agent** | AI interview | 🔜 Pending |
+| **Git Analysis** | Repo parsing | 🔜 Pending |
+
+**Total: 24 API endpoints implemented**
+
+### Database (100% Complete)
+
+- ✅ 15 tables with QUAD_ prefix
+- ✅ 4 auto-init functions (roles, adoption matrix, circles, updated_at)
+- ✅ Prisma schema synced with all tables
+- ✅ Role-stage participation fields (q/u/a/d_participation)
+
+### Frontend (40% Complete)
+
+- ✅ Landing page with concept explanation
+- ✅ Domain creation wizard (AI interview style)
+- ✅ Login/Register pages
+- ✅ Dashboard with domain hierarchy
+- ✅ Adoption Matrix page
+- 🔜 Blueprint upload UI
+- 🔜 Flow board (Kanban style)
+- 🔜 Circle management UI
+
+---
+
+## Project Roadmap
+
+### Phase 1 (Current - Jan 2026)
 ✅ Multi-domain management
-✅ Blueprint Agent (upload + AI interview)
-✅ Git repo analysis
-✅ Resource/Attribute model
-🔜 Frontend UI (domain wizard, blueprint upload)
+✅ Role-stage participation model
+✅ Auto-init triggers (company→roles, user→matrix, domain→circles)
+✅ Resource/Attribute model (EAV)
+✅ Full API for all 15 tables
+🔜 Blueprint Agent (AI interview + upload)
+🔜 Git repo analysis
 
 ### Phase 2 (Q1 2026)
 🔜 AI mockup generation
@@ -364,7 +450,7 @@ Developer Flow:
 🔜 Reports system
 
 ### Phase 3 (Q2 2026)
-🔜 Multi-tenant SaaS
+🔜 Multi-tenant SaaS (O(1)/O(n)/O(n²) modes)
 🔜 Marketplace (templates, components)
 🔜 Collaboration features (real-time editing)
 
@@ -382,6 +468,20 @@ Developer Flow:
 
 ---
 
+## Deployment Modes
+
+QUAD offers three deployment modes using mathematical complexity notation:
+
+| Mode | Name | Target | Who Pays AI |
+|------|------|--------|-------------|
+| **O(1)** | Seed | Startups (1-10 users) | A2Vibe |
+| **O(n)** | Growth | Small Business (10-100 users) | Client (BYOK) |
+| **O(n²)** | Scale | Enterprise (100+ users) | Client (On-Premise) |
+
+**See:** [DEPLOYMENT_MODES.md](DEPLOYMENT_MODES.md) for pricing and details.
+
+---
+
 ## Competitive Landscape
 
 | Competitor | Focus | QUAD Advantage |
@@ -391,23 +491,30 @@ Developer Flow:
 | **Jira** | Project management | We integrate dev tools |
 | **v0.dev** | AI code generation | We add project management |
 | **Retool** | Internal tools | We handle all app types |
+| **Monday.com** | Workflow | No AI adoption tracking |
 
-**QUAD = Design + Development + Deployment in ONE platform**
+**QUAD's Unique Value:**
+- AI Adoption Matrix (skill + trust levels)
+- Q-U-A-D stage workflow with role participation
+- 4 Circles team organization
+- Blueprint-to-code pipeline
+
+**No direct competitor offers this combination.**
 
 ---
 
 ## Getting Started
 
 **For Developers:**
-1. Read [GETTING_STARTED.md](GETTING_STARTED.md)
-2. Set up local environment
-3. Review [ARCHITECTURE.md](ARCHITECTURE.md)
-4. Check [API_OVERVIEW.md](API_OVERVIEW.md)
+1. Read [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for table structure
+2. Review [TECH_STACK.md](TECH_STACK.md) for technology decisions
+3. Check [API_REFERENCE.md](API_REFERENCE.md) for endpoint documentation
+4. See [DEPLOYMENT_MODES.md](DEPLOYMENT_MODES.md) for hosting options
 
-**For Contributors:**
-1. Read [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)
-2. Follow coding standards
-3. Submit pull requests
+**For Business:**
+1. Browse [case-studies/](case-studies/) for industry examples
+2. Review deployment modes for pricing
+3. Schedule demo at calendly.com/a2vibecreators/quad-demo
 
 ---
 
@@ -420,4 +527,4 @@ Developer Flow:
 
 ---
 
-**Next:** Read [ARCHITECTURE.md](ARCHITECTURE.md) for technical deep dive.
+**Last Updated:** January 1, 2026
