@@ -58,20 +58,17 @@ export async function POST(request: NextRequest) {
 
     const domain = domainResult.rows[0];
 
-    // Assign user to domain with default roles (DOMAIN_ADMIN + VIEWER)
-    const defaultRoles = ['DOMAIN_ADMIN', 'VIEWER'];
-
-    for (const role of defaultRoles) {
-      await query(
-        `INSERT INTO quad_domain_members (
-          user_id,
-          domain_id,
-          role,
-          allocation_percentage
-        ) VALUES ($1, $2, $3, $4)`,
-        [user.id, domain.id, role, role === 'DOMAIN_ADMIN' ? 100 : 0]
-      );
-    }
+    // Assign user to domain with DOMAIN_ADMIN role
+    // Note: Database has unique constraint on (user_id, domain_id), so only one row per user per domain
+    await query(
+      `INSERT INTO quad_domain_members (
+        user_id,
+        domain_id,
+        role,
+        allocation_percentage
+      ) VALUES ($1, $2, $3, $4)`,
+      [user.id, domain.id, 'DOMAIN_ADMIN', 100]
+    );
 
     return NextResponse.json({
       success: true,
@@ -80,7 +77,7 @@ export async function POST(request: NextRequest) {
         name: domain.name,
         type: domain.domain_type,
         createdAt: domain.created_at,
-        roles: defaultRoles,
+        roles: ['DOMAIN_ADMIN'],
       },
     });
 

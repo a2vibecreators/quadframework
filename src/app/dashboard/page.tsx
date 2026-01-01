@@ -71,7 +71,7 @@ export default function DashboardPage() {
 
       if (response.ok) {
         const data = await response.json();
-        alert(`Domain "${data.domain.name}" created successfully with all 4 roles!`);
+        alert(`Domain "${data.domain.name}" created successfully as DOMAIN_ADMIN!`);
         setShowCreateDomain(false);
         setDomainName('');
         setDomainType('project');
@@ -326,14 +326,10 @@ export default function DashboardPage() {
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                 <p className="text-sm text-blue-900">
-                  <strong>Note:</strong> You will be assigned 2 default roles:
+                  <strong>Note:</strong> You will be assigned the DOMAIN_ADMIN role (100% allocation).
                 </p>
-                <ul className="text-xs text-blue-800 mt-2 ml-4 list-disc">
-                  <li>DOMAIN_ADMIN - Domain management (100% allocation)</li>
-                  <li>VIEWER - Read-only access</li>
-                </ul>
                 <p className="text-xs text-blue-700 mt-2">
-                  You can manually add Circle 1-4 roles later for testing agent personas.
+                  This gives you full management access to this domain. You can manually add Circle 1-4 roles later for testing different agent personas.
                 </p>
               </div>
 
