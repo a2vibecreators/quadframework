@@ -207,12 +207,12 @@ export default function DashboardPage() {
                 /* Domains List */
                 <div className="space-y-4">
                   {domains.map((domain) => (
-                    <div key={domain.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div key={domain.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-all bg-white">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900">{domain.name}</h3>
+                          <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{domain.name}</h3>
                           <p className="text-sm text-gray-600 mt-1">
-                            Type: <span className="font-medium">{domain.domain_type}</span>
+                            Type: <span className="font-medium text-gray-900">{domain.domain_type}</span>
                           </p>
                           <div className="flex flex-wrap gap-2 mt-2">
                             {domain.roles.map((role) => (
