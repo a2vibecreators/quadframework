@@ -16,6 +16,12 @@ interface StartInterviewRequest {
   projectDescription: string; // User's initial project description
 }
 
+interface ConversationMessage {
+  role: 'user' | 'agent';
+  content: string;
+  timestamp: string;
+}
+
 /**
  * POST: Start new Blueprint Agent conversational interview
  */
@@ -75,18 +81,24 @@ export async function POST(request: NextRequest) {
     const sessionId = randomUUID();
 
     // Create interview data structure
-    const interviewData = {
+    const interviewData: {
+      projectDescription: string;
+      conversation: ConversationMessage[];
+      currentQuestionIndex: number;
+      questionsAsked: string[];
+      answersGiven: string[];
+    } = {
       projectDescription,
       conversation: [
         {
-          role: 'user' as const,
+          role: 'user',
           content: projectDescription,
           timestamp: new Date().toISOString(),
         },
       ],
       currentQuestionIndex: 0,
-      questionsAsked: [] as string[],
-      answersGiven: [] as string[],
+      questionsAsked: [],
+      answersGiven: [],
     };
 
     // Store interview session
