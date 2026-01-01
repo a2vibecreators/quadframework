@@ -1,8 +1,9 @@
 # QUAD Platform - Database Schema Documentation
 
-**Date:** December 31, 2025
+**Date:** January 1, 2026
 **PostgreSQL Version:** 15.x
-**Total Tables:** 10 (current)
+**Total Tables:** 15
+**Total Functions:** 4
 
 ---
 
@@ -10,10 +11,11 @@
 
 1. [Schema Overview](#schema-overview)
 2. [Core Tables](#core-tables)
-3. [Resource/Attribute Tables (EAV Pattern)](#resourceattribute-tables-eav-pattern)
-4. [Helper Functions](#helper-functions)
-5. [Triggers](#triggers)
-6. [Example Queries](#example-queries)
+3. [Feature Tables](#feature-tables)
+4. [Resource/Attribute Tables (EAV Pattern)](#resourceattribute-tables-eav-pattern)
+5. [Helper Functions](#helper-functions)
+6. [Auto-Init Triggers](#auto-init-triggers)
+7. [Example Queries](#example-queries)
 
 ---
 
@@ -21,16 +23,21 @@
 
 ```
 QUAD_companies                               ← Top-level organizations
-  └─ QUAD_users                             ← User accounts
-      ├─ QUAD_domain_members                ← User roles per domain
-      └─ QUAD_user_sessions                 ← Active login sessions
-
-QUAD_domains                                 ← Organizational units (hierarchical)
-  └─ QUAD_domain_resources                  ← Projects, integrations, repos
-      ├─ QUAD_resource_attributes           ← Key-value attributes (EAV)
-      └─ (references) QUAD_resource_attribute_requirements
-
-QUAD_resource_attribute_requirements         ← Attribute validation rules
+  ├─ QUAD_roles                              ← Company-specific roles with Q-U-A-D participation
+  │     └─ QUAD_users                        ← User accounts (linked to role)
+  │           ├─ QUAD_user_sessions          ← Active login sessions
+  │           ├─ QUAD_domain_members         ← User roles per domain
+  │           ├─ QUAD_adoption_matrix        ← AI adoption skill/trust tracking
+  │           ├─ QUAD_work_sessions          ← Daily 4-4-4 work tracking
+  │           ├─ QUAD_workload_metrics       ← Weekly workload summaries
+  │           └─ QUAD_circle_members         ← Team circle assignments
+  └─ QUAD_domains                            ← Organizational units (hierarchical)
+        ├─ QUAD_circles                      ← 4 circles per domain (auto-created)
+        ├─ QUAD_flows                        ← Work items with Q-U-A-D stages
+        │     └─ QUAD_flow_stage_history     ← Stage transition audit log
+        ├─ QUAD_domain_resources             ← Projects, integrations, repos
+        │     └─ QUAD_resource_attributes    ← Key-value attributes (EAV)
+        └─ QUAD_workload_metrics             ← Domain-level metrics
 ```
 
 ---
@@ -47,25 +54,81 @@ CREATE TABLE QUAD_companies (
   name VARCHAR(255) NOT NULL,
   admin_email VARCHAR(255) NOT NULL UNIQUE,
   size VARCHAR(50) DEFAULT 'medium',  -- 'small', 'medium', 'large', 'enterprise'
+  is_active BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
-
-CREATE INDEX idx_companies_admin_email ON QUAD_companies(admin_email);
 ```
 
-**Example Data:**
-```sql
-INSERT INTO QUAD_companies (name, admin_email, size) VALUES
-  ('A2Vibe Creators', 'admin@a2vibecreators.com', 'small'),
-  ('MassMutual', 'admin@massmutual.com', 'enterprise');
-```
+**Auto-Init Trigger:** When a company is created, 6 default roles are automatically created.
 
 ---
 
-### 2. QUAD_users
+### 2. QUAD_roles ✨ NEW
 
-**Purpose:** User accounts with email/password authentication
+**Purpose:** Company-specific role definitions with Q-U-A-D stage participation
+
+```sql
+CREATE TABLE QUAD_roles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES QUAD_companies(id) ON DELETE CASCADE,
+
+  -- Role identification
+  role_code VARCHAR(50) NOT NULL,      -- 'ADMIN', 'MANAGER', 'DEVELOPER', etc.
+  role_name VARCHAR(100) NOT NULL,     -- Display name
+  description TEXT,
+
+  -- Permission flags
+  can_manage_company BOOLEAN DEFAULT FALSE,
+  can_manage_users BOOLEAN DEFAULT FALSE,
+  can_manage_domains BOOLEAN DEFAULT FALSE,
+  can_manage_flows BOOLEAN DEFAULT FALSE,
+  can_view_all_metrics BOOLEAN DEFAULT FALSE,
+  can_manage_circles BOOLEAN DEFAULT FALSE,
+  can_manage_resources BOOLEAN DEFAULT FALSE,
+
+  -- Q-U-A-D Stage Participation
+  -- Values: 'PRIMARY', 'SUPPORT', 'REVIEW', 'INFORM', NULL
+  q_participation VARCHAR(10),  -- Question stage
+  u_participation VARCHAR(10),  -- Understand stage
+  a_participation VARCHAR(10),  -- Allocate stage
+  d_participation VARCHAR(10),  -- Deliver stage
+
+  -- UI display
+  color_code VARCHAR(20),       -- Hex color: '#3B82F6'
+  icon_name VARCHAR(50),        -- Icon name: 'shield', 'code'
+  display_order INTEGER DEFAULT 0,
+
+  -- Hierarchy (higher = more authority)
+  hierarchy_level INTEGER DEFAULT 0,
+
+  -- Status
+  is_system_role BOOLEAN DEFAULT FALSE,
+  is_active BOOLEAN DEFAULT TRUE,
+
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+
+  UNIQUE(company_id, role_code)
+);
+```
+
+**Default Roles (auto-created):**
+
+| Role | Hierarchy | Q | U | A | D |
+|------|-----------|---|---|---|---|
+| ADMIN | 100 | INFORM | INFORM | REVIEW | INFORM |
+| MANAGER | 80 | PRIMARY | PRIMARY | PRIMARY | REVIEW |
+| TECH_LEAD | 60 | SUPPORT | PRIMARY | SUPPORT | REVIEW |
+| DEVELOPER | 40 | INFORM | SUPPORT | INFORM | PRIMARY |
+| QA | 40 | INFORM | SUPPORT | INFORM | REVIEW |
+| OBSERVER | 20 | INFORM | INFORM | INFORM | INFORM |
+
+---
+
+### 3. QUAD_users
+
+**Purpose:** User accounts with role assignment
 
 ```sql
 CREATE TABLE QUAD_users (
@@ -73,101 +136,292 @@ CREATE TABLE QUAD_users (
   company_id UUID NOT NULL REFERENCES QUAD_companies(id) ON DELETE CASCADE,
   email VARCHAR(255) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-  role VARCHAR(50) DEFAULT 'DEVELOPER',  -- 'QUAD_ADMIN', 'DOMAIN_ADMIN', 'DEVELOPER', 'QA', 'VIEWER'
+  role_id UUID REFERENCES QUAD_roles(id) ON DELETE SET NULL,
+  role VARCHAR(50) DEFAULT 'DEVELOPER',  -- Legacy field (deprecated)
   full_name VARCHAR(255),
   is_active BOOLEAN DEFAULT true,
   email_verified BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
-
-  UNIQUE(email)
+  updated_at TIMESTAMP DEFAULT NOW()
 );
-
-CREATE INDEX idx_users_company ON QUAD_users(company_id);
-CREATE INDEX idx_users_email ON QUAD_users(email);
-CREATE INDEX idx_users_role ON QUAD_users(role);
 ```
 
-**Example Data:**
+**Auto-Init Trigger:** When a user is created, an adoption matrix entry is automatically created.
+
+---
+
+### 4. QUAD_user_sessions
+
+**Purpose:** Active login sessions with JWT tracking
+
 ```sql
-INSERT INTO QUAD_users (company_id, email, password_hash, role, full_name) VALUES
-  ('{a2vibe-id}', 'suman@a2vibecreators.com', '$2b$10$...', 'QUAD_ADMIN', 'Suman Addanke'),
-  ('{massmutual-id}', 'alice@massmutual.com', '$2b$10$...', 'DOMAIN_ADMIN', 'Alice Smith');
+CREATE TABLE QUAD_user_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES QUAD_users(id) ON DELETE CASCADE,
+  session_token VARCHAR(255) NOT NULL UNIQUE,
+  expires_at TIMESTAMP NOT NULL,
+  ip_address VARCHAR(50),
+  user_agent TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
 ```
 
 ---
 
-### 3. QUAD_domain_members
+### 5. QUAD_domains
 
-**Purpose:** User membership in domains with roles
+**Purpose:** Organizational units (hierarchical tree structure)
+
+```sql
+CREATE TABLE QUAD_domains (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  company_id UUID NOT NULL REFERENCES QUAD_companies(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  parent_domain_id UUID REFERENCES QUAD_domains(id) ON DELETE CASCADE,
+  domain_type VARCHAR(50),   -- 'healthcare', 'finance', 'e_commerce', 'saas'
+  path TEXT,                 -- Auto-generated: '/company/division/team'
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**Auto-Init Trigger:** When a domain is created, 4 circles are automatically created.
+
+---
+
+### 6. QUAD_domain_members
+
+**Purpose:** User membership in domains with allocation percentage
 
 ```sql
 CREATE TABLE QUAD_domain_members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES QUAD_users(id) ON DELETE CASCADE,
   domain_id UUID NOT NULL REFERENCES QUAD_domains(id) ON DELETE CASCADE,
-  role VARCHAR(50) NOT NULL,  -- 'DOMAIN_ADMIN', 'SUBDOMAIN_ADMIN', 'DEVELOPER', 'QA', 'VIEWER'
-  allocation_percentage INT DEFAULT 100,  -- 50% = working 50% time on this domain
+  role VARCHAR(50) NOT NULL,
+  allocation_percentage INT DEFAULT 100,  -- 50% = half-time on this domain
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
 
   UNIQUE(user_id, domain_id)
 );
-
-CREATE INDEX idx_domain_members_user ON QUAD_domain_members(user_id);
-CREATE INDEX idx_domain_members_domain ON QUAD_domain_members(domain_id);
-```
-
-**Example Data:**
-```sql
--- Alice is DOMAIN_ADMIN in MassMutual root, DEVELOPER in Insurance sub-domain
-INSERT INTO QUAD_domain_members (user_id, domain_id, role, allocation_percentage) VALUES
-  ('{alice-id}', '{massmutual-root-id}', 'DOMAIN_ADMIN', 50),
-  ('{alice-id}', '{massmutual-insurance-id}', 'DEVELOPER', 50);
 ```
 
 ---
 
-### 4. QUAD_domains
+## Feature Tables
 
-**Purpose:** Organizational units (hierarchical)
+### 7. QUAD_adoption_matrix ✨ NEW
+
+**Purpose:** Track user's AI adoption journey (Skill × Trust matrix)
 
 ```sql
-CREATE TABLE QUAD_domains (
+CREATE TABLE QUAD_adoption_matrix (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR(255) NOT NULL,
-  parent_domain_id UUID REFERENCES QUAD_domains(id) ON DELETE CASCADE,  -- NULL = root domain
-  domain_type VARCHAR(50),  -- 'healthcare', 'finance', 'e_commerce', 'saas', 'internal'
-  path TEXT,  -- Auto-generated: '/massmutual/insurance-division/claims'
+  user_id UUID NOT NULL UNIQUE REFERENCES QUAD_users(id) ON DELETE CASCADE,
+  skill_level INT DEFAULT 1,           -- 1-3: Beginner, Intermediate, Expert
+  trust_level INT DEFAULT 1,           -- 1-3: Low, Medium, High
+  previous_skill_level INT,
+  previous_trust_level INT,
+  level_changed_at TIMESTAMP,
+  notes TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
-
-CREATE INDEX idx_domains_parent ON QUAD_domains(parent_domain_id);
-CREATE INDEX idx_domains_type ON QUAD_domains(domain_type);
-CREATE INDEX idx_domains_path ON QUAD_domains(path);
 ```
 
-**Example Data:**
+**Matrix Positions:**
+| Position | Skill | Trust | Label |
+|----------|-------|-------|-------|
+| (1,1) | Beginner | Low | AI Skeptic |
+| (2,2) | Intermediate | Medium | AI Collaborator |
+| (3,3) | Expert | High | AI Champion |
+
+---
+
+### 8. QUAD_circles ✨ NEW
+
+**Purpose:** Team organization within domains (4 circles per domain)
+
 ```sql
--- Root domain
-INSERT INTO QUAD_domains (name, parent_domain_id, domain_type, path) VALUES
-  ('MassMutual', NULL, 'finance', '/massmutual');
+CREATE TABLE QUAD_circles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  domain_id UUID NOT NULL REFERENCES QUAD_domains(id) ON DELETE CASCADE,
+  circle_number INT NOT NULL,          -- 1, 2, 3, 4
+  circle_name VARCHAR(100) NOT NULL,
+  description TEXT,
+  lead_user_id UUID REFERENCES QUAD_users(id),
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
 
--- Sub-domain
-INSERT INTO QUAD_domains (name, parent_domain_id, domain_type, path) VALUES
-  ('Insurance Division', '{massmutual-id}', 'healthcare', '/massmutual/insurance-division');
+  UNIQUE(domain_id, circle_number)
+);
+```
 
--- Sub-sub-domain
-INSERT INTO QUAD_domains (name, parent_domain_id, domain_type, path) VALUES
-  ('Claims Processing', '{insurance-id}', 'healthcare', '/massmutual/insurance-division/claims');
+**Default Circles (auto-created):**
+
+| # | Name | Description |
+|---|------|-------------|
+| 1 | Management | Project management, requirements, stakeholder communication |
+| 2 | Development | Design, coding, code review, architecture |
+| 3 | QA | Testing, quality assurance, bug verification |
+| 4 | Infrastructure | DevOps, deployment, monitoring, security |
+
+---
+
+### 9. QUAD_circle_members ✨ NEW
+
+**Purpose:** User assignments to circles with allocation
+
+```sql
+CREATE TABLE QUAD_circle_members (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  circle_id UUID NOT NULL REFERENCES QUAD_circles(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES QUAD_users(id) ON DELETE CASCADE,
+  role VARCHAR(50) DEFAULT 'member',   -- 'lead', 'member'
+  allocation_pct INT DEFAULT 100,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+
+  UNIQUE(circle_id, user_id)
+);
+```
+
+---
+
+### 10. QUAD_flows ✨ NEW
+
+**Purpose:** Work items that move through Q-U-A-D stages
+
+```sql
+CREATE TABLE QUAD_flows (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  domain_id UUID NOT NULL REFERENCES QUAD_domains(id) ON DELETE CASCADE,
+  title VARCHAR(500) NOT NULL,
+  description TEXT,
+  flow_type VARCHAR(50) DEFAULT 'feature',  -- 'feature', 'bug', 'task', 'spike'
+
+  -- Current position in Q-U-A-D lifecycle
+  quad_stage VARCHAR(1) DEFAULT 'Q',        -- 'Q', 'U', 'A', 'D'
+  stage_status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'in_progress', 'completed'
+
+  -- Stage timestamps
+  question_started_at TIMESTAMP,
+  question_completed_at TIMESTAMP,
+  understand_started_at TIMESTAMP,
+  understand_completed_at TIMESTAMP,
+  allocate_started_at TIMESTAMP,
+  allocate_completed_at TIMESTAMP,
+  deliver_started_at TIMESTAMP,
+  deliver_completed_at TIMESTAMP,
+
+  -- Assignment
+  assigned_to UUID REFERENCES QUAD_users(id),
+  circle_number INT,                        -- Which circle owns this
+  priority VARCHAR(20) DEFAULT 'medium',    -- 'low', 'medium', 'high', 'critical'
+
+  -- Estimation
+  ai_estimate_hours DECIMAL(5,2),
+  buffer_pct INT,
+  actual_hours DECIMAL(5,2),
+
+  -- External linking
+  external_id VARCHAR(100),                 -- Jira ticket ID, etc.
+  external_url TEXT,
+
+  created_by UUID REFERENCES QUAD_users(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+---
+
+### 11. QUAD_flow_stage_history ✨ NEW
+
+**Purpose:** Audit trail for flow stage transitions
+
+```sql
+CREATE TABLE QUAD_flow_stage_history (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  flow_id UUID NOT NULL REFERENCES QUAD_flows(id) ON DELETE CASCADE,
+  from_stage VARCHAR(1),         -- NULL for initial creation
+  to_stage VARCHAR(1) NOT NULL,
+  from_status VARCHAR(20),
+  to_status VARCHAR(20) NOT NULL,
+  changed_by UUID REFERENCES QUAD_users(id),
+  change_reason TEXT,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+---
+
+### 12. QUAD_work_sessions ✨ NEW
+
+**Purpose:** Daily work tracking (4-4-4 model: 4 days, 4 hours, 4 deliverables)
+
+```sql
+CREATE TABLE QUAD_work_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES QUAD_users(id) ON DELETE CASCADE,
+  session_date DATE NOT NULL,
+  hours_worked DECIMAL(4,2) DEFAULT 0,
+  is_workday BOOLEAN DEFAULT true,
+  start_time TIME,
+  end_time TIME,
+  deep_work_pct DECIMAL(5,2),      -- % of time in focused work
+  meeting_hours DECIMAL(4,2),
+  notes TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+
+  UNIQUE(user_id, session_date)
+);
+```
+
+---
+
+### 13. QUAD_workload_metrics ✨ NEW
+
+**Purpose:** Weekly/monthly workload aggregations per user per domain
+
+```sql
+CREATE TABLE QUAD_workload_metrics (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES QUAD_users(id) ON DELETE CASCADE,
+  domain_id UUID REFERENCES QUAD_domains(id) ON DELETE SET NULL,
+  period_start DATE NOT NULL,
+  period_end DATE NOT NULL,
+  period_type VARCHAR(20) DEFAULT 'week',  -- 'week', 'month', 'quarter'
+
+  -- Metrics
+  assignments INT DEFAULT 0,
+  completes INT DEFAULT 0,
+  output_score DECIMAL(5,2),
+  hours_worked DECIMAL(5,2) DEFAULT 0,
+  target_hours DECIMAL(5,2) DEFAULT 16,    -- 4 days × 4 hours
+  days_worked INT DEFAULT 0,
+  target_days INT DEFAULT 4,
+
+  -- Root cause analysis (if underperforming)
+  root_cause VARCHAR(50),                   -- 'meetings', 'interruptions', 'blockers'
+  root_cause_notes TEXT,
+
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+
+  UNIQUE(user_id, domain_id, period_start, period_end)
+);
 ```
 
 ---
 
 ## Resource/Attribute Tables (EAV Pattern)
 
-### 5. QUAD_domain_resources
+### 14. QUAD_domain_resources
 
 **Purpose:** Resources belonging to domains (projects, integrations, repos)
 
@@ -176,8 +430,8 @@ CREATE TABLE QUAD_domain_resources (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   domain_id UUID NOT NULL REFERENCES QUAD_domains(id) ON DELETE CASCADE,
   resource_type VARCHAR(50) NOT NULL,
-  -- Types: 'web_app_project', 'mobile_app_project', 'api_project', 'landing_page_project',
-  --        'git_repository', 'itsm_integration', 'blueprint', 'sso_config', 'integration_method'
+  -- Types: 'web_app_project', 'mobile_app_project', 'api_project',
+  --        'git_repository', 'itsm_integration', 'blueprint', 'sso_config'
 
   resource_name VARCHAR(255) NOT NULL,
   resource_status VARCHAR(50) DEFAULT 'pending_setup',
@@ -187,24 +441,11 @@ CREATE TABLE QUAD_domain_resources (
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
-
-CREATE INDEX idx_resources_domain ON QUAD_domain_resources(domain_id);
-CREATE INDEX idx_resources_type ON QUAD_domain_resources(resource_type);
-CREATE INDEX idx_resources_status ON QUAD_domain_resources(resource_status);
-CREATE INDEX idx_resources_domain_type ON QUAD_domain_resources(domain_id, resource_type);
-```
-
-**Example Data:**
-```sql
-INSERT INTO QUAD_domain_resources (domain_id, resource_type, resource_name, created_by) VALUES
-  ('{claims-domain-id}', 'web_app_project', 'Claims Dashboard', '{alice-id}'),
-  ('{claims-domain-id}', 'git_repository', 'github.com/massmutual/claims-portal', '{alice-id}'),
-  ('{claims-domain-id}', 'blueprint', 'Figma Claims Dashboard Design', '{alice-id}');
 ```
 
 ---
 
-### 6. QUAD_resource_attributes
+### 15. QUAD_resource_attributes
 
 **Purpose:** Key-value attributes for resources (EAV pattern)
 
@@ -213,258 +454,86 @@ CREATE TABLE QUAD_resource_attributes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   resource_id UUID NOT NULL REFERENCES QUAD_domain_resources(id) ON DELETE CASCADE,
   attribute_name VARCHAR(50) NOT NULL,
-  -- Examples: 'project_type', 'frontend_framework', 'css_framework',
-  --           'blueprint_url', 'git_repo_url', 'backend_framework'
-
   attribute_value TEXT,
-  -- Stored as text, can be JSON for complex values
-
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
 
   UNIQUE(resource_id, attribute_name)
 );
-
-CREATE INDEX idx_attributes_resource ON QUAD_resource_attributes(resource_id);
-CREATE INDEX idx_attributes_name ON QUAD_resource_attributes(attribute_name);
-CREATE INDEX idx_attributes_resource_name ON QUAD_resource_attributes(resource_id, attribute_name);
-```
-
-**Example Data:**
-```sql
--- Web app project attributes
-INSERT INTO QUAD_resource_attributes (resource_id, attribute_name, attribute_value) VALUES
-  ('{claims-dashboard-id}', 'project_type', 'web_internal'),
-  ('{claims-dashboard-id}', 'frontend_framework', 'nextjs'),
-  ('{claims-dashboard-id}', 'css_framework', 'tailwind'),
-  ('{claims-dashboard-id}', 'blueprint_url', 'https://figma.com/file/abc123'),
-  ('{claims-dashboard-id}', 'blueprint_type', 'figma_url'),
-  ('{claims-dashboard-id}', 'blueprint_verified', 'true'),
-  ('{claims-dashboard-id}', 'git_repo_url', 'https://github.com/massmutual/claims-portal'),
-  ('{claims-dashboard-id}', 'git_repo_type', 'github'),
-  ('{claims-dashboard-id}', 'git_repo_private', 'false'),
-  ('{claims-dashboard-id}', 'git_repo_analyzed', 'true'),
-  ('{claims-dashboard-id}', 'git_repo_analysis_result', '{
-    "success": true,
-    "techStack": {
-      "frontend": {"framework": "nextjs", "cssFramework": "tailwind"},
-      "backend": {"framework": "java_spring_boot", "language": "java"}
-    },
-    "codePatterns": {...},
-    "fileStructure": {...}
-  }');
-```
-
----
-
-### 7. QUAD_resource_attribute_requirements
-
-**Purpose:** Define which attributes are required for which resource types
-
-```sql
-CREATE TABLE QUAD_resource_attribute_requirements (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  resource_type VARCHAR(50) NOT NULL,
-  -- 'web_app_project', 'mobile_app_project', 'api_project', etc.
-
-  attribute_name VARCHAR(50) NOT NULL,
-  -- 'project_type', 'frontend_framework', 'blueprint_url', etc.
-
-  is_required BOOLEAN DEFAULT false,
-  display_order INT,  -- Controls form field sequence (1, 2, 3...)
-  validation_rule VARCHAR(50),  -- 'url', 'enum', 'string', 'integer', 'boolean', 'json'
-  allowed_values TEXT[],  -- For enum validation: ARRAY['nextjs', 'react', 'vue']
-  help_text TEXT,
-
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
-
-  UNIQUE(resource_type, attribute_name)
-);
-
-CREATE INDEX idx_requirements_type ON QUAD_resource_attribute_requirements(resource_type);
-CREATE INDEX idx_requirements_name ON QUAD_resource_attribute_requirements(attribute_name);
-CREATE INDEX idx_requirements_type_name ON QUAD_resource_attribute_requirements(resource_type, attribute_name);
-CREATE INDEX idx_requirements_required ON QUAD_resource_attribute_requirements(is_required);
-```
-
-**Example Data:**
-```sql
--- Web app project requirements
-INSERT INTO QUAD_resource_attribute_requirements (
-  resource_type, attribute_name, is_required, display_order,
-  validation_rule, allowed_values, help_text
-) VALUES
-  -- Required attributes
-  ('web_app_project', 'project_type', true, 1, 'enum',
-   ARRAY['web_internal', 'web_external'],
-   'Is this an internal or external web application?'),
-
-  ('web_app_project', 'frontend_framework', true, 2, 'enum',
-   ARRAY['nextjs', 'react', 'vue', 'angular', 'svelte'],
-   'Select your frontend framework'),
-
-  ('web_app_project', 'css_framework', true, 3, 'enum',
-   ARRAY['tailwind', 'bootstrap', 'mui', 'chakra', 'ant-design'],
-   'Select your CSS framework'),
-
-  ('web_app_project', 'blueprint_url', true, 5, 'url',
-   NULL,
-   'Figma/Sketch URL, competitor website, or generated mockup URL'),
-
-  -- Optional attributes
-  ('web_app_project', 'git_repo_url', false, 13, 'url',
-   NULL,
-   'URL to existing codebase for style matching (optional)'),
-
-  ('web_app_project', 'backend_framework', false, 11, 'enum',
-   ARRAY['nodejs', 'java_spring_boot', 'python_fastapi', 'python_django', 'ruby_rails', 'none'],
-   'Select your backend framework (if full-stack)');
 ```
 
 ---
 
 ## Helper Functions
 
-### get_required_attributes()
-
-**Purpose:** Get all required attributes for a resource type, ordered by display_order
-
-```sql
-CREATE OR REPLACE FUNCTION get_required_attributes(p_resource_type VARCHAR)
-RETURNS TABLE (
-  attribute_name VARCHAR,
-  validation_rule VARCHAR,
-  allowed_values TEXT[],
-  help_text TEXT,
-  display_order INT
-) AS $$
-BEGIN
-  RETURN QUERY
-  SELECT
-    r.attribute_name,
-    r.validation_rule,
-    r.allowed_values,
-    r.help_text,
-    r.display_order
-  FROM QUAD_resource_attribute_requirements r
-  WHERE r.resource_type = p_resource_type
-    AND r.is_required = true
-  ORDER BY r.display_order;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-**Usage:**
-```sql
-SELECT * FROM get_required_attributes('web_app_project');
--- Returns: project_type, frontend_framework, css_framework, blueprint_url
-```
-
----
-
-### validate_resource_attributes()
-
-**Purpose:** Validate that a resource has all required attributes with valid values
-
-```sql
-CREATE OR REPLACE FUNCTION validate_resource_attributes(p_resource_id UUID)
-RETURNS TABLE (
-  is_valid BOOLEAN,
-  missing_attributes VARCHAR[],
-  invalid_attributes VARCHAR[]
-) AS $$
-DECLARE
-  v_resource_type VARCHAR;
-  v_missing VARCHAR[];
-  v_invalid VARCHAR[];
-BEGIN
-  -- Get resource type
-  SELECT resource_type INTO v_resource_type
-  FROM QUAD_domain_resources
-  WHERE id = p_resource_id;
-
-  -- Find missing required attributes
-  SELECT ARRAY_AGG(req.attribute_name)
-  INTO v_missing
-  FROM QUAD_resource_attribute_requirements req
-  LEFT JOIN QUAD_resource_attributes attr
-    ON attr.resource_id = p_resource_id
-    AND attr.attribute_name = req.attribute_name
-  WHERE req.resource_type = v_resource_type
-    AND req.is_required = true
-    AND attr.id IS NULL;
-
-  -- Find invalid enum values
-  SELECT ARRAY_AGG(attr.attribute_name)
-  INTO v_invalid
-  FROM QUAD_resource_attributes attr
-  JOIN QUAD_resource_attribute_requirements req
-    ON req.attribute_name = attr.attribute_name
-    AND req.resource_type = v_resource_type
-  WHERE attr.resource_id = p_resource_id
-    AND req.validation_rule = 'enum'
-    AND NOT (attr.attribute_value = ANY(req.allowed_values));
-
-  -- Return results
-  RETURN QUERY SELECT
-    (v_missing IS NULL AND v_invalid IS NULL) AS is_valid,
-    COALESCE(v_missing, ARRAY[]::VARCHAR[]) AS missing_attributes,
-    COALESCE(v_invalid, ARRAY[]::VARCHAR[]) AS invalid_attributes;
-END;
-$$ LANGUAGE plpgsql;
-```
-
-**Usage:**
-```sql
-SELECT * FROM validate_resource_attributes('{resource-id}');
--- Returns: {is_valid: false, missing_attributes: ['blueprint_url'], invalid_attributes: []}
-```
-
----
-
-## Triggers
-
-### update_updated_at_column()
+### QUAD_update_updated_at_column()
 
 **Purpose:** Automatically update `updated_at` timestamp on row updates
 
 ```sql
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+CREATE OR REPLACE FUNCTION QUAD_update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- Apply to all tables with updated_at
-CREATE TRIGGER trg_companies_updated_at
-  BEFORE UPDATE ON QUAD_companies
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER trg_users_updated_at
-  BEFORE UPDATE ON QUAD_users
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER trg_domains_updated_at
-  BEFORE UPDATE ON QUAD_domains
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER trg_resources_updated_at
-  BEFORE UPDATE ON QUAD_domain_resources
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER trg_attributes_updated_at
-  BEFORE UPDATE ON QUAD_resource_attributes
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 ```
+
+Applied to all tables with `updated_at` column via triggers.
+
+---
+
+## Auto-Init Triggers
+
+### QUAD_init_company_roles()
+
+**Purpose:** Auto-create 6 default roles when company is created
+
+```sql
+CREATE TRIGGER trg_companies_init_roles
+  AFTER INSERT ON QUAD_companies
+  FOR EACH ROW
+  EXECUTE FUNCTION QUAD_init_company_roles();
+```
+
+Creates: ADMIN, MANAGER, TECH_LEAD, DEVELOPER, QA, OBSERVER
+
+---
+
+### QUAD_init_user_adoption_matrix()
+
+**Purpose:** Auto-create adoption matrix entry when user is created
+
+```sql
+CREATE TRIGGER trg_QUAD_users_init_adoption_matrix
+  AFTER INSERT ON QUAD_users
+  FOR EACH ROW
+  EXECUTE FUNCTION QUAD_init_user_adoption_matrix();
+```
+
+Initializes user at position (1,1) = "AI Skeptic"
+
+---
+
+### QUAD_init_domain_circles()
+
+**Purpose:** Auto-create 4 circles when domain is created
+
+```sql
+CREATE TRIGGER trg_QUAD_domains_init_circles
+  AFTER INSERT ON QUAD_domains
+  FOR EACH ROW
+  EXECUTE FUNCTION QUAD_init_domain_circles();
+```
+
+Creates: Management, Development, QA, Infrastructure circles
 
 ---
 
 ## Example Queries
 
-### 1. Get All Domains for User
+### Get All Domains for User
 
 ```sql
 SELECT d.id, d.name, d.path, dm.role, dm.allocation_percentage
@@ -474,105 +543,93 @@ WHERE dm.user_id = '{user-id}'
 ORDER BY d.path;
 ```
 
-### 2. Get Resources for Domain (with Attributes)
+### Get User's Q-U-A-D Stage Participation
 
 ```sql
 SELECT
-  r.id,
-  r.resource_name,
-  r.resource_type,
-  r.resource_status,
-  jsonb_object_agg(
-    a.attribute_name,
-    a.attribute_value
-  ) AS attributes
-FROM QUAD_domain_resources r
-LEFT JOIN QUAD_resource_attributes a ON a.resource_id = r.id
-WHERE r.domain_id = '{domain-id}'
-GROUP BY r.id, r.resource_name, r.resource_type, r.resource_status;
+  u.full_name,
+  r.role_name,
+  r.q_participation,
+  r.u_participation,
+  r.a_participation,
+  r.d_participation
+FROM QUAD_users u
+JOIN QUAD_roles r ON u.role_id = r.id
+WHERE u.id = '{user-id}';
 ```
 
-**Result:**
-```json
-{
-  "id": "550e8400-...",
-  "resource_name": "Claims Dashboard",
-  "resource_type": "web_app_project",
-  "resource_status": "active",
-  "attributes": {
-    "project_type": "web_internal",
-    "frontend_framework": "nextjs",
-    "css_framework": "tailwind",
-    "blueprint_url": "https://figma.com/...",
-    "git_repo_url": "https://github.com/..."
-  }
-}
-```
-
-### 3. Get Domain Hierarchy (Recursive)
-
-```sql
-WITH RECURSIVE domain_tree AS (
-  -- Root domains
-  SELECT id, name, parent_domain_id, path, 1 AS level
-  FROM QUAD_domains
-  WHERE parent_domain_id IS NULL
-
-  UNION ALL
-
-  -- Child domains
-  SELECT d.id, d.name, d.parent_domain_id, d.path, dt.level + 1
-  FROM QUAD_domains d
-  JOIN domain_tree dt ON d.parent_domain_id = dt.id
-)
-SELECT * FROM domain_tree ORDER BY path;
-```
-
-### 4. Validate All Resources in Domain
+### Get Flows by Stage
 
 ```sql
 SELECT
-  r.id,
-  r.resource_name,
-  v.is_valid,
-  v.missing_attributes,
-  v.invalid_attributes
-FROM QUAD_domain_resources r
-CROSS JOIN LATERAL validate_resource_attributes(r.id) v
-WHERE r.domain_id = '{domain-id}';
+  f.title,
+  f.quad_stage,
+  f.stage_status,
+  u.full_name as assigned_to
+FROM QUAD_flows f
+LEFT JOIN QUAD_users u ON f.assigned_to = u.id
+WHERE f.domain_id = '{domain-id}'
+  AND f.quad_stage = 'D'
+ORDER BY f.priority DESC;
+```
+
+### Get User's Adoption Matrix Position
+
+```sql
+SELECT
+  u.full_name,
+  am.skill_level,
+  am.trust_level,
+  CASE
+    WHEN am.skill_level = 1 AND am.trust_level = 1 THEN 'AI Skeptic'
+    WHEN am.skill_level = 2 AND am.trust_level = 2 THEN 'AI Collaborator'
+    WHEN am.skill_level = 3 AND am.trust_level = 3 THEN 'AI Champion'
+    ELSE 'Transitioning'
+  END as adoption_label
+FROM QUAD_users u
+JOIN QUAD_adoption_matrix am ON am.user_id = u.id
+WHERE u.company_id = '{company-id}';
 ```
 
 ---
 
-## Migration Files
-
-**Location:** `quadframework/database/migrations/`
+## Schema File Organization
 
 ```
-001_create_resource_attribute_model.sql  ← Current (Dec 31, 2025)
-002_add_user_sessions.sql                ← Future
-003_add_integration_methods.sql          ← Future
+quadframework/database/sql/
+├── schema.sql                              ← Loader file (uses \i includes)
+├── functions/
+│   ├── QUAD_update_updated_at_column.fnc.sql
+│   ├── QUAD_init_company_roles.fnc.sql
+│   ├── QUAD_init_user_adoption_matrix.fnc.sql
+│   └── QUAD_init_domain_circles.fnc.sql
+└── tables/
+    ├── core/
+    │   ├── QUAD_companies.tbl.sql
+    │   ├── QUAD_roles.tbl.sql
+    │   ├── QUAD_users.tbl.sql
+    │   ├── QUAD_user_sessions.tbl.sql
+    │   ├── QUAD_domains.tbl.sql
+    │   ├── QUAD_domain_members.tbl.sql
+    │   ├── QUAD_domain_resources.tbl.sql
+    │   └── QUAD_resource_attributes.tbl.sql
+    └── features/
+        ├── QUAD_adoption_matrix.tbl.sql
+        ├── QUAD_workload_metrics.tbl.sql
+        ├── QUAD_flows.tbl.sql
+        ├── QUAD_flow_stage_history.tbl.sql
+        ├── QUAD_work_sessions.tbl.sql
+        ├── QUAD_circles.tbl.sql
+        └── QUAD_circle_members.tbl.sql
 ```
 
-**Run Migration:**
+**Run Schema:**
 ```bash
-psql -U quad_user -d quad_dev_db -f database/migrations/001_create_resource_attribute_model.sql
+cd quadframework/database/sql
+psql -U quad_user -d quad_dev_db -f schema.sql
 ```
 
 ---
 
-## Database Size Estimates
-
-| Table | Rows (Estimate) | Size per Row | Total Size |
-|-------|----------------|--------------|------------|
-| QUAD_companies | 100 | 1 KB | 100 KB |
-| QUAD_users | 10,000 | 1 KB | 10 MB |
-| QUAD_domains | 5,000 | 1 KB | 5 MB |
-| QUAD_domain_resources | 50,000 | 1 KB | 50 MB |
-| QUAD_resource_attributes | 500,000 | 512 bytes | 250 MB |
-
-**Total Database Size (1 year):** ~500 MB
-
----
-
-**Next:** See [API_OVERVIEW.md](API_OVERVIEW.md) for complete API documentation.
+**Last Updated:** January 1, 2026
+**Next:** See [API_REFERENCE.md](API_REFERENCE.md) for complete API documentation.

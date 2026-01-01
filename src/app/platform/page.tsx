@@ -6,6 +6,7 @@ import { useState } from "react";
 export default function QUADPlatform() {
   const sections = [
     { id: "overview", title: "Platform Overview" },
+    { id: "444-principle", title: "4-4-4 Principle" },
     { id: "deployment", title: "Deployment Options" },
     { id: "adoption", title: "Adoption Levels" },
     { id: "hierarchy", title: "Company Hierarchy" },
@@ -67,6 +68,87 @@ export default function QUADPlatform() {
                   <p className="text-xs text-slate-400">{feature.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 4-4-4 Principle */}
+        <section id="444-principle" className="mb-12 scroll-mt-32">
+          <h2 className="text-2xl font-bold mb-6 text-blue-300">The 4-4-4 Principle</h2>
+          <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl p-6 border border-emerald-500/20">
+            <div className="text-center mb-6">
+              <p className="text-lg text-slate-400 mb-4">QUAD transforms your work capacity through AI collaboration</p>
+              <div className="flex items-center justify-center gap-4 text-4xl font-bold">
+                <div className="flex items-center gap-2">
+                  <span className="text-emerald-400">4</span>
+                  <span className="text-slate-500 text-xl">hours/day</span>
+                </div>
+                <span className="text-slate-600">×</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-teal-400">4</span>
+                  <span className="text-slate-500 text-xl">days/week</span>
+                </div>
+                <span className="text-slate-600">=</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400">4X</span>
+                  <span className="text-slate-500 text-xl">output</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-4 mt-6">
+              <div className="bg-emerald-500/10 rounded-lg p-4 border border-emerald-500/20 text-center">
+                <div className="text-3xl font-bold text-emerald-400 mb-2">4 Hours</div>
+                <div className="text-sm text-slate-400">Focused Human Work</div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Deep work sessions while AI handles routine tasks in parallel
+                </p>
+              </div>
+              <div className="bg-teal-500/10 rounded-lg p-4 border border-teal-500/20 text-center">
+                <div className="text-3xl font-bold text-teal-400 mb-2">4 Days</div>
+                <div className="text-sm text-slate-400">Work Week</div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Sustainable pace with AI processing during off-days
+                </p>
+              </div>
+              <div className="bg-green-500/10 rounded-lg p-4 border border-green-500/20 text-center">
+                <div className="text-3xl font-bold text-green-400 mb-2">4X</div>
+                <div className="text-sm text-slate-400">Efficiency Gain</div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Deliver 4x more output with same effort level
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 bg-slate-800/50 rounded-lg p-4">
+              <h4 className="font-semibold text-white mb-3">How It Works in Practice</h4>
+              <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-slate-400">Human reviews AI-generated code during focused hours</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-slate-400">AI agents continue processing overnight and weekends</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-slate-400">Handoff queues ensure nothing is blocked</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-green-400">✓</span>
+                  <span className="text-slate-400">Adoption Matrix tracks individual readiness</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 text-center">
+              <a
+                href="/adoption-matrix"
+                className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 text-sm font-medium"
+              >
+                See the Adoption Matrix →
+              </a>
             </div>
           </div>
         </section>

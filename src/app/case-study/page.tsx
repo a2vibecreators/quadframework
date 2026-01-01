@@ -5,7 +5,8 @@ import PageNavigation from "@/components/PageNavigation";
 
 export default function QUADCaseStudy() {
   const sections = [
-    { id: "project", title: "The Project" },
+    { id: "domains", title: "5 Domains" },
+    { id: "project", title: "Calculator Example" },
     { id: "comparison", title: "Comparison" },
   ];
 
@@ -16,18 +17,151 @@ export default function QUADCaseStudy() {
       <section className="pt-8 pb-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-block px-4 py-1 bg-blue-500/20 rounded-full text-blue-300 text-sm font-medium mb-4">
-            Case Study
+            Case Studies
           </div>
           <h1 className="text-5xl font-bold mb-4">
-            Calculator Web App
+            QUAD in Action
           </h1>
           <p className="text-xl text-slate-400 mb-6">
-            Agile vs QUAD - A Side-by-Side Comparison
+            5 Domains • Real-World Examples • 4-4-4 Principle Applied
           </p>
           <p className="text-slate-300 max-w-2xl mx-auto">
-            See how a simple calculator project would be built using traditional Agile/Scrum
-            compared to QUAD methodology. Understand where human gates exist and where
-            AI agents can run autonomously.
+            See how QUAD methodology transforms development across different industries.
+            From e-commerce startups to hospital systems, education platforms to manufacturing.
+          </p>
+        </div>
+      </section>
+
+      {/* 5 Domain Case Studies */}
+      <section id="domains" className="py-12 px-6 bg-slate-800/30 scroll-mt-20">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl font-bold mb-8 text-center">5 Domain Case Studies</h2>
+          <p className="text-slate-400 text-center mb-10 max-w-2xl mx-auto">
+            Each case study demonstrates complete QUAD implementation with the 4-4-4 principle:
+            4 hours/day, 4 days/week, 4X efficiency.
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                domain: "E-commerce",
+                icon: "🛒",
+                title: "FreshMart Grocery",
+                timeline: "8 weeks MVP",
+                budget: "$0 Bootstrap",
+                highlights: ["1-person team", "Real-time inventory", "Subscription delivery"],
+                color: "green"
+              },
+              {
+                domain: "Healthcare",
+                icon: "🏥",
+                title: "CareFirst Clinic",
+                timeline: "12 weeks",
+                budget: "HIPAA Compliant",
+                highlights: ["Multi-location", "Patient portal", "Lab integration"],
+                color: "blue"
+              },
+              {
+                domain: "Education",
+                icon: "🎓",
+                title: "BrightPath Tutoring",
+                timeline: "10 weeks",
+                budget: "Non-profit",
+                highlights: ["Student matching", "Progress tracking", "Parent dashboard"],
+                color: "purple"
+              },
+              {
+                domain: "Manufacturing",
+                icon: "🏭",
+                title: "PrecisionParts MES",
+                timeline: "14 weeks",
+                budget: "OEE Tracking",
+                highlights: ["IoT integration", "Quality control", "Real-time monitoring"],
+                color: "amber"
+              },
+              {
+                domain: "Software/SaaS",
+                icon: "💻",
+                title: "TaskFlow Project Manager",
+                timeline: "Ongoing",
+                budget: "Full QUAD",
+                highlights: ["Workload tracking", "Root cause analysis", "Agent invocation"],
+                color: "cyan"
+              },
+            ].map((study) => (
+              <div
+                key={study.domain}
+                className={`bg-${study.color}-500/10 rounded-xl p-6 border border-${study.color}-500/20 hover:border-${study.color}-400/40 transition-colors`}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">{study.icon}</span>
+                  <div>
+                    <div className={`text-xs text-${study.color}-400 font-semibold`}>{study.domain}</div>
+                    <h3 className="text-lg font-bold text-white">{study.title}</h3>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mb-4">
+                  <span className="px-2 py-1 bg-slate-700/50 rounded text-xs text-slate-300">
+                    {study.timeline}
+                  </span>
+                  <span className="px-2 py-1 bg-slate-700/50 rounded text-xs text-slate-300">
+                    {study.budget}
+                  </span>
+                </div>
+
+                <ul className="space-y-1">
+                  {study.highlights.map((h) => (
+                    <li key={h} className="text-sm text-slate-400 flex items-center gap-2">
+                      <span className={`text-${study.color}-400`}>→</span> {h}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* 4-4-4 Principle Banner */}
+          <div className="mt-10 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl p-6 border border-emerald-500/20">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <h3 className="text-xl font-bold text-emerald-300 mb-2">The 4-4-4 Principle in All Case Studies</h3>
+                <p className="text-slate-400 text-sm">
+                  Each case study demonstrates how teams achieve 4X efficiency by working smarter, not longer.
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-center">
+                  <div className="text-3xl font-black text-emerald-400">4</div>
+                  <div className="text-xs text-slate-500">hrs/day</div>
+                </div>
+                <div className="text-xl text-slate-600">×</div>
+                <div className="text-center">
+                  <div className="text-3xl font-black text-emerald-400">4</div>
+                  <div className="text-xs text-slate-500">days/wk</div>
+                </div>
+                <div className="text-xl text-slate-600">=</div>
+                <div className="text-center">
+                  <div className="text-3xl font-black text-emerald-400">4X</div>
+                  <div className="text-xs text-slate-500">efficiency</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Calculator Example Header */}
+      <section className="py-8 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-block px-4 py-1 bg-blue-500/20 rounded-full text-blue-300 text-sm font-medium mb-4">
+            Detailed Example
+          </div>
+          <h2 className="text-3xl font-bold mb-4">
+            Calculator Web App: Agile vs QUAD
+          </h2>
+          <p className="text-slate-400">
+            A detailed comparison of traditional Agile vs QUAD methodology
           </p>
         </div>
       </section>

@@ -1,27 +1,22 @@
 /**
  * Authentication Utilities for QUAD Platform
+ * Uses Prisma ORM for database operations
  * Handles JWT tokens, password hashing, and session management
  */
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { query } from './db';
+import { prisma } from './db';
+import type { QUAD_users } from '@/generated/prisma';
 
-// JWT secret (MUST be changed in production!)
+// JWT configuration
 const JWT_SECRET = process.env.JWT_SECRET || 'quad-platform-secret-change-in-production';
-const JWT_EXPIRES_IN = '24h'; // Token expiration time
+const JWT_EXPIRES_IN = '24h';
 
 /**
- * User interface from database
+ * User type (from Prisma)
  */
-export interface QuadUser {
-  id: string;
-  company_id: string;
-  email: string;
-  role: 'QUAD_ADMIN' | 'PROJECT_MANAGER' | 'DEVELOPER' | 'QA' | 'INFRASTRUCTURE' | 'SOLUTION_ARCHITECT';
-  full_name: string | null;
-  is_active: boolean;
-}
+export type QuadUser = Pick<QUAD_users, 'id' | 'company_id' | 'email' | 'role' | 'full_name' | 'is_active'>;
 
 /**
  * JWT payload interface
@@ -33,10 +28,12 @@ export interface JWTPayload {
   role: string;
 }
 
+// =============================================================================
+// PASSWORD UTILITIES
+// =============================================================================
+
 /**
  * Hash a password using bcrypt
- * @param password Plain text password
- * @returns Hashed password
  */
 export async function hashPassword(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);
@@ -45,18 +42,17 @@ export async function hashPassword(password: string): Promise<string> {
 
 /**
  * Verify a password against a hash
- * @param password Plain text password
- * @param hash Hashed password from database
- * @returns True if password matches
  */
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return await bcrypt.compare(password, hash);
 }
 
+// =============================================================================
+// JWT UTILITIES
+// =============================================================================
+
 /**
  * Generate a JWT token for a user
- * @param user User object
- * @returns JWT token string
  */
 export function generateToken(user: QuadUser): string {
   const payload: JWTPayload = {
@@ -73,8 +69,6 @@ export function generateToken(user: QuadUser): string {
 
 /**
  * Verify and decode a JWT token
- * @param token JWT token string
- * @returns Decoded payload or null if invalid
  */
 export function verifyToken(token: string): JWTPayload | null {
   try {
@@ -85,12 +79,12 @@ export function verifyToken(token: string): JWTPayload | null {
   }
 }
 
+// =============================================================================
+// SESSION MANAGEMENT (using Prisma)
+// =============================================================================
+
 /**
  * Store session in database
- * @param userId User ID
- * @param token JWT token
- * @param ipAddress Client IP address
- * @param userAgent Client user agent
  */
 export async function createSession(
   userId: string,
@@ -98,75 +92,227 @@ export async function createSession(
   ipAddress: string | null,
   userAgent: string | null
 ): Promise<void> {
-  await query(
-    `INSERT INTO quad_sessions (user_id, token, expires_at, ip_address, user_agent)
-     VALUES ($1, $2, NOW() + INTERVAL '24 hours', $3, $4)`,
-    [userId, token, ipAddress, userAgent]
-  );
+  await prisma.QUAD_user_sessions.create({
+    data: {
+      user_id: userId,
+      session_token: token,
+      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+      ip_address: ipAddress,
+      user_agent: userAgent,
+    },
+  });
 }
 
 /**
  * Delete session from database (logout)
- * @param token JWT token
  */
 export async function deleteSession(token: string): Promise<void> {
-  await query('DELETE FROM quad_sessions WHERE token = $1', [token]);
+  await prisma.QUAD_user_sessions.deleteMany({
+    where: { session_token: token },
+  });
 }
 
 /**
  * Validate session exists and is not expired
- * @param token JWT token
- * @returns True if session is valid
  */
 export async function validateSession(token: string): Promise<boolean> {
-  const result = await query(
-    `SELECT id FROM quad_sessions
-     WHERE token = $1 AND expires_at > NOW()`,
-    [token]
-  );
+  const session = await prisma.QUAD_user_sessions.findFirst({
+    where: {
+      session_token: token,
+      expires_at: { gt: new Date() },
+    },
+  });
 
-  return result.rowCount ? result.rowCount > 0 : false;
+  return session !== null;
 }
 
 /**
- * Update session last activity timestamp
- * @param token JWT token
+ * Clean up expired sessions
  */
-export async function updateSessionActivity(token: string): Promise<void> {
-  await query(
-    'UPDATE quad_sessions SET last_activity_at = NOW() WHERE token = $1',
-    [token]
-  );
+export async function cleanupExpiredSessions(): Promise<number> {
+  const result = await prisma.QUAD_user_sessions.deleteMany({
+    where: {
+      expires_at: { lt: new Date() },
+    },
+  });
+
+  return result.count;
 }
 
+// =============================================================================
+// USER QUERIES (using Prisma)
+// =============================================================================
+
 /**
- * Get user from database by email
- * @param email User email
- * @returns User object or null
+ * Get user by email
  */
 export async function getUserByEmail(email: string): Promise<QuadUser | null> {
-  const result = await query(
-    `SELECT id, company_id, email, role, full_name, is_active
-     FROM quad_users
-     WHERE email = $1`,
-    [email]
-  );
+  const user = await prisma.QUAD_users.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      company_id: true,
+      email: true,
+      role: true,
+      full_name: true,
+      is_active: true,
+    },
+  });
 
-  return result.rows[0] || null;
+  return user;
 }
 
 /**
- * Get user from database by ID
- * @param userId User ID
- * @returns User object or null
+ * Get user by ID
  */
 export async function getUserById(userId: string): Promise<QuadUser | null> {
-  const result = await query(
-    `SELECT id, company_id, email, role, full_name, is_active
-     FROM quad_users
-     WHERE id = $1`,
-    [userId]
-  );
+  const user = await prisma.QUAD_users.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      company_id: true,
+      email: true,
+      role: true,
+      full_name: true,
+      is_active: true,
+    },
+  });
 
-  return result.rows[0] || null;
+  return user;
+}
+
+/**
+ * Get user with password hash for login verification
+ */
+export async function getUserWithPassword(email: string) {
+  return await prisma.QUAD_users.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      company_id: true,
+      email: true,
+      password_hash: true,
+      role: true,
+      full_name: true,
+      is_active: true,
+    },
+  });
+}
+
+/**
+ * Create a new user
+ */
+export async function createUser(data: {
+  companyId: string;
+  email: string;
+  password: string;
+  fullName?: string;
+  role?: string;
+}): Promise<QuadUser> {
+  const passwordHash = await hashPassword(data.password);
+
+  const user = await prisma.QUAD_users.create({
+    data: {
+      company_id: data.companyId,
+      email: data.email,
+      password_hash: passwordHash,
+      full_name: data.fullName,
+      role: data.role || 'DEVELOPER',
+    },
+    select: {
+      id: true,
+      company_id: true,
+      email: true,
+      role: true,
+      full_name: true,
+      is_active: true,
+    },
+  });
+
+  return user;
+}
+
+// =============================================================================
+// ADOPTION MATRIX (using Prisma)
+// =============================================================================
+
+/**
+ * Get user's adoption matrix position
+ */
+export async function getUserAdoptionMatrix(userId: string) {
+  return await prisma.QUAD_adoption_matrix.findUnique({
+    where: { user_id: userId },
+  });
+}
+
+/**
+ * Update user's adoption matrix position
+ */
+export async function updateUserAdoptionMatrix(
+  userId: string,
+  skillLevel: number,
+  trustLevel: number
+) {
+  const existing = await prisma.QUAD_adoption_matrix.findUnique({
+    where: { user_id: userId },
+  });
+
+  if (existing) {
+    return await prisma.QUAD_adoption_matrix.update({
+      where: { user_id: userId },
+      data: {
+        previous_skill_level: existing.skill_level,
+        previous_trust_level: existing.trust_level,
+        skill_level: skillLevel,
+        trust_level: trustLevel,
+        level_changed_at: new Date(),
+      },
+    });
+  } else {
+    return await prisma.QUAD_adoption_matrix.create({
+      data: {
+        user_id: userId,
+        skill_level: skillLevel,
+        trust_level: trustLevel,
+      },
+    });
+  }
+}
+
+/**
+ * Calculate safety buffer percentage based on matrix position
+ */
+export function calculateSafetyBuffer(skillLevel: number, trustLevel: number): number {
+  const bufferMatrix: { [key: string]: number } = {
+    '1-1': 80, // AI Skeptic
+    '1-2': 60, // Curious Novice
+    '1-3': 50, // Trusting Novice
+    '2-1': 60, // Skeptical User
+    '2-2': 40, // Growing User
+    '2-3': 30, // Eager Adopter
+    '3-1': 40, // Cautious Expert
+    '3-2': 20, // Balanced Expert
+    '3-3': 10, // AI Champion
+  };
+
+  return bufferMatrix[`${skillLevel}-${trustLevel}`] || 50;
+}
+
+/**
+ * Get zone name based on matrix position
+ */
+export function getZoneName(skillLevel: number, trustLevel: number): string {
+  const zoneNames: { [key: string]: string } = {
+    '1-1': 'AI Skeptic',
+    '1-2': 'Curious Novice',
+    '1-3': 'Trusting Novice',
+    '2-1': 'Skeptical User',
+    '2-2': 'Growing User',
+    '2-3': 'Eager Adopter',
+    '3-1': 'Cautious Expert',
+    '3-2': 'Balanced Expert',
+    '3-3': 'AI Champion',
+  };
+
+  return zoneNames[`${skillLevel}-${trustLevel}`] || 'Unknown';
 }

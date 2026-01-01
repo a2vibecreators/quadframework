@@ -180,10 +180,34 @@ export default function QUADPitch() {
               QUAD
             </span>
           </h1>
-          <p className="text-xl text-slate-400 max-w-3xl mx-auto">
-            See how companies achieve <span className="text-green-400 font-bold">80% cost reduction</span> by
+          <p className="text-xl text-slate-400 max-w-3xl mx-auto mb-6">
+            See how companies achieve <span className="text-green-400 font-bold">4X efficiency</span> by
             adopting the QUAD methodology with AI-powered agents.
           </p>
+
+          {/* 4-4-4 Principle Hero Banner */}
+          <div className="max-w-2xl mx-auto bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-xl p-6 border border-emerald-500/30">
+            <div className="text-lg font-semibold text-emerald-300 mb-3">The 4-4-4 Principle</div>
+            <div className="flex justify-center items-center gap-6 mb-3">
+              <div className="text-center">
+                <div className="text-4xl font-black text-emerald-400">4</div>
+                <div className="text-xs text-slate-400">hours/day</div>
+              </div>
+              <div className="text-2xl text-slate-600">×</div>
+              <div className="text-center">
+                <div className="text-4xl font-black text-emerald-400">4</div>
+                <div className="text-xs text-slate-400">days/week</div>
+              </div>
+              <div className="text-2xl text-slate-600">=</div>
+              <div className="text-center">
+                <div className="text-4xl font-black text-emerald-400">4X</div>
+                <div className="text-xs text-slate-400">efficiency</div>
+              </div>
+            </div>
+            <p className="text-sm text-slate-400">
+              Work smarter, not longer. 16 focused hours beat 40 distracted hours.
+            </p>
+          </div>
         </div>
 
         {/* Company Size Selector */}

@@ -5,8 +5,11 @@ import TermWithLens from "@/components/TermWithLens";
 
 export default function QUADConcept() {
   const sections = [
+    { id: "444-principle", title: "4-4-4 Principle" },
+    { id: "quad-steps", title: "Q-U-A-D Steps" },
     { id: "hierarchy", title: "1-2-3-4 Hierarchy" },
     { id: "what-is", title: "What is QUAD" },
+    { id: "adoption-matrix", title: "Adoption Matrix" },
     { id: "axioms", title: "3 Axioms" },
     { id: "circles", title: "4 Circles" },
     { id: "pipeline", title: "Agent Pipeline" },
@@ -25,9 +28,114 @@ export default function QUADConcept() {
             <h1 className="text-4xl font-bold">Main Concept</h1>
           </div>
           <p className="text-slate-400">
-            QUAD - Circle of Functions: The complete methodology
+            QUAD - Quick Unified Agentic Development: The complete methodology
           </p>
         </div>
+
+        {/* 4-4-4 Principle */}
+        <section id="444-principle" className="mb-12 scroll-mt-32">
+          <h2 className="text-2xl font-bold mb-6 text-emerald-300">The 4-4-4 Principle</h2>
+          <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 rounded-xl p-8 border border-emerald-500/20">
+            <div className="text-center mb-8">
+              <p className="text-lg text-slate-300 mb-4">Work smarter, not longer. Achieve more while living more.</p>
+              <div className="flex justify-center items-center gap-6">
+                <div className="text-center">
+                  <div className="text-5xl font-black text-emerald-400">4</div>
+                  <div className="text-sm text-slate-400">hours/day</div>
+                </div>
+                <div className="text-3xl text-slate-600">×</div>
+                <div className="text-center">
+                  <div className="text-5xl font-black text-emerald-400">4</div>
+                  <div className="text-sm text-slate-400">days/week</div>
+                </div>
+                <div className="text-3xl text-slate-600">=</div>
+                <div className="text-center">
+                  <div className="text-5xl font-black text-emerald-400">4X</div>
+                  <div className="text-sm text-slate-400">efficiency</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 mt-8">
+              <div className="bg-slate-800/50 rounded-xl p-5 border border-slate-700">
+                <h3 className="font-bold text-emerald-300 mb-2">16 Focused Hours</h3>
+                <p className="text-sm text-slate-400">
+                  16 deeply focused hours beat 40 distracted hours. Quality over quantity.
+                </p>
+              </div>
+              <div className="bg-slate-800/50 rounded-xl p-5 border border-slate-700">
+                <h3 className="font-bold text-emerald-300 mb-2">AI Amplification</h3>
+                <p className="text-sm text-slate-400">
+                  AI handles repetitive tasks. You handle creativity and decision-making.
+                </p>
+              </div>
+              <div className="bg-slate-800/50 rounded-xl p-5 border border-slate-700">
+                <h3 className="font-bold text-emerald-300 mb-2">Work-Life Balance</h3>
+                <p className="text-sm text-slate-400">
+                  Three-day weekends. Time for family, hobbies, and rest.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-8 p-4 bg-slate-800/30 rounded-lg border border-slate-700">
+              <p className="text-sm text-slate-400 text-center">
+                <span className="text-emerald-400 font-semibold">Traditional:</span> 8 hrs × 5 days = 40 hrs/week, lots of meetings, context switching
+                <br />
+                <span className="text-emerald-400 font-semibold">QUAD 4-4-4:</span> 4 hrs × 4 days = 16 hrs/week, deep work, AI-assisted, 4X output
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Q-U-A-D Steps */}
+        <section id="quad-steps" className="mb-12 scroll-mt-32">
+          <h2 className="text-2xl font-bold mb-6 text-blue-300">The Q-U-A-D Methodology Steps</h2>
+          <div className="grid md:grid-cols-4 gap-4">
+            {[
+              {
+                letter: "Q",
+                word: "Question",
+                color: "blue",
+                desc: "Capture requirements as questions. What problem are we solving? Who is the user? What are the success criteria?",
+                actions: ["Gather requirements", "Define user stories", "Identify constraints"]
+              },
+              {
+                letter: "U",
+                word: "Understand",
+                color: "green",
+                desc: "Analyze and break down. Research existing patterns, evaluate options, document the approach.",
+                actions: ["Technical analysis", "Risk assessment", "Architecture design"]
+              },
+              {
+                letter: "A",
+                word: "Allocate",
+                color: "amber",
+                desc: "Assign resources and plan. Who does what? What tools are needed? Set timelines with AI assistance.",
+                actions: ["Team assignment", "Tool selection", "Sprint planning"]
+              },
+              {
+                letter: "D",
+                word: "Deliver",
+                color: "purple",
+                desc: "Build, test, deploy. AI agents handle scaffolding, testing, and deployment automation.",
+                actions: ["Development", "Testing", "Deployment"]
+              },
+            ].map((step) => (
+              <div key={step.letter} className={`bg-${step.color}-500/10 rounded-xl p-6 border border-${step.color}-500/20`}>
+                <div className={`text-5xl font-black text-${step.color}-400 mb-2`}>{step.letter}</div>
+                <div className={`text-xl font-semibold text-${step.color}-300 mb-3`}>{step.word}</div>
+                <p className="text-sm text-slate-400 mb-4">{step.desc}</p>
+                <div className="space-y-1">
+                  {step.actions.map((action) => (
+                    <div key={action} className="text-xs text-slate-500 flex items-center gap-2">
+                      <span className={`text-${step.color}-400`}>→</span> {action}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* The 1-2-3-4 Hierarchy */}
         <section id="hierarchy" className="mb-12 scroll-mt-32">
@@ -75,6 +183,70 @@ export default function QUADConcept() {
                   <div className="text-xs text-slate-400 mt-1">{item.desc}</div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Adoption Matrix */}
+        <section id="adoption-matrix" className="mb-12 scroll-mt-32">
+          <h2 className="text-2xl font-bold mb-6 text-amber-300">QUAD Adoption Matrix</h2>
+          <p className="text-slate-400 mb-6">
+            Track your AI adoption journey. Position yourself on the matrix based on AI skill level and trust level.
+          </p>
+
+          {/* 3x3 Matrix */}
+          <div className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 mb-6">
+            <h3 className="font-bold text-white mb-4">3×3 Simplified Matrix</h3>
+            <div className="grid grid-cols-4 gap-2 text-center text-sm">
+              {/* Header row */}
+              <div className="p-2"></div>
+              <div className="p-2 font-semibold text-slate-400">Low Trust</div>
+              <div className="p-2 font-semibold text-slate-400">Medium Trust</div>
+              <div className="p-2 font-semibold text-slate-400">High Trust</div>
+
+              {/* Expert row */}
+              <div className="p-2 font-semibold text-slate-400">Expert</div>
+              <div className="p-2 bg-blue-500/20 rounded text-blue-300">Cautious Expert</div>
+              <div className="p-2 bg-purple-500/20 rounded text-purple-300">Balanced Expert</div>
+              <div className="p-2 bg-green-500/20 rounded text-green-300">AI Champion</div>
+
+              {/* Intermediate row */}
+              <div className="p-2 font-semibold text-slate-400">Intermediate</div>
+              <div className="p-2 bg-yellow-500/20 rounded text-yellow-300">Skeptical User</div>
+              <div className="p-2 bg-blue-500/20 rounded text-blue-300">Growing User</div>
+              <div className="p-2 bg-purple-500/20 rounded text-purple-300">Eager Adopter</div>
+
+              {/* Beginner row */}
+              <div className="p-2 font-semibold text-slate-400">Beginner</div>
+              <div className="p-2 bg-red-500/20 rounded text-red-300">AI Skeptic</div>
+              <div className="p-2 bg-yellow-500/20 rounded text-yellow-300">Curious Novice</div>
+              <div className="p-2 bg-blue-500/20 rounded text-blue-300">Trusting Novice</div>
+            </div>
+          </div>
+
+          {/* Safety Buffer */}
+          <div className="bg-amber-500/10 rounded-xl p-6 border border-amber-500/20">
+            <h3 className="font-bold text-amber-300 mb-4">Safety Buffer System</h3>
+            <p className="text-sm text-slate-400 mb-4">
+              AI-generated estimates include a safety buffer that decreases as trust increases.
+              This builds confidence gradually while protecting against over-reliance.
+            </p>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="bg-slate-800/50 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-red-400">80%</div>
+                <div className="text-xs text-slate-500">AI Skeptic Buffer</div>
+                <div className="text-xs text-slate-600">Maximum protection</div>
+              </div>
+              <div className="bg-slate-800/50 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-yellow-400">40%</div>
+                <div className="text-xs text-slate-500">Growing User Buffer</div>
+                <div className="text-xs text-slate-600">Balanced approach</div>
+              </div>
+              <div className="bg-slate-800/50 p-4 rounded-lg">
+                <div className="text-2xl font-bold text-green-400">10%</div>
+                <div className="text-xs text-slate-500">AI Champion Buffer</div>
+                <div className="text-xs text-slate-600">High trust, minimal buffer</div>
+              </div>
             </div>
           </div>
         </section>

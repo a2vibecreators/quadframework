@@ -12,6 +12,7 @@ export default function QUADDetails() {
     { id: "hierarchy", title: "Hierarchy Rules" },
     { id: "class-object", title: "Class-Object" },
     { id: "estimation", title: "Estimation" },
+    { id: "workload", title: "Workload Tracking" },
     { id: "flow-doc", title: "Flow Doc" },
     { id: "source-truth", title: "Source of Truth" },
   ];
@@ -586,6 +587,103 @@ export default function QUADDetails() {
             <p className="text-xs text-slate-500 mt-4 text-center">
               Override requires a reason (tracked for retrospectives). AI adjusts models based on who was more accurate.
             </p>
+          </div>
+        </section>
+
+        {/* Workload Tracking */}
+        <section id="workload" className="mb-12 scroll-mt-32">
+          <h2 className="text-2xl font-bold mb-6 text-amber-300">Workload Tracking</h2>
+          <p className="text-slate-400 mb-6">
+            QUAD tracks three key metrics to identify bottlenecks, skill gaps, and performance patterns.
+          </p>
+
+          {/* Three Metrics */}
+          <div className="grid md:grid-cols-3 gap-6 mb-6">
+            <div className="bg-blue-500/10 rounded-xl p-5 border border-blue-500/20">
+              <div className="text-3xl mb-2">📥</div>
+              <h3 className="font-bold text-blue-300 mb-2">Assignments</h3>
+              <p className="text-sm text-slate-400 mb-3">
+                Work assigned to a team member. Measures workload distribution.
+              </p>
+              <ul className="text-xs text-slate-500 space-y-1">
+                <li>• Story points assigned</li>
+                <li>• Tasks per cycle</li>
+                <li>• Queue depth</li>
+              </ul>
+            </div>
+
+            <div className="bg-green-500/10 rounded-xl p-5 border border-green-500/20">
+              <div className="text-3xl mb-2">✅</div>
+              <h3 className="font-bold text-green-300 mb-2">Completes</h3>
+              <p className="text-sm text-slate-400 mb-3">
+                Work finished by a team member. Measures throughput.
+              </p>
+              <ul className="text-xs text-slate-500 space-y-1">
+                <li>• Tasks completed</li>
+                <li>• On-time delivery rate</li>
+                <li>• Quality score (rework %)</li>
+              </ul>
+            </div>
+
+            <div className="bg-purple-500/10 rounded-xl p-5 border border-purple-500/20">
+              <div className="text-3xl mb-2">📊</div>
+              <h3 className="font-bold text-purple-300 mb-2">Output</h3>
+              <p className="text-sm text-slate-400 mb-3">
+                Value delivered. Measures effectiveness.
+              </p>
+              <ul className="text-xs text-slate-500 space-y-1">
+                <li>• Features shipped</li>
+                <li>• Customer impact</li>
+                <li>• Business value score</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Root Cause Analysis */}
+          <div className="bg-amber-500/10 rounded-xl p-6 border border-amber-500/20 mb-6">
+            <h3 className="font-bold text-amber-300 mb-4">Root Cause Analysis</h3>
+            <p className="text-sm text-slate-400 mb-4">
+              When gaps emerge between assignments and completes, QUAD identifies root causes:
+            </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              {[
+                { cause: "Skill Gap", symptom: "Low completion in specific areas", action: "Training or pair programming" },
+                { cause: "Overload", symptom: "High assignments, low completes", action: "Redistribute workload" },
+                { cause: "Blockers", symptom: "Tasks stuck in progress", action: "Identify and remove blockers" },
+                { cause: "Scope Creep", symptom: "Tasks taking longer than estimated", action: "Better requirements, smaller stories" },
+              ].map((item) => (
+                <div key={item.cause} className="bg-slate-800/50 rounded-lg p-3 border border-slate-700">
+                  <div className="font-semibold text-white text-sm mb-1">{item.cause}</div>
+                  <div className="text-xs text-slate-400 mb-1">Symptom: {item.symptom}</div>
+                  <div className="text-xs text-amber-300">Action: {item.action}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Fast Performer Identification */}
+          <div className="bg-green-500/10 rounded-xl p-6 border border-green-500/20">
+            <h3 className="font-bold text-green-300 mb-4">Fast Performer Identification</h3>
+            <p className="text-sm text-slate-400 mb-4">
+              QUAD identifies team members who consistently exceed expectations:
+            </p>
+            <div className="flex items-center gap-4 bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+              <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-xl">⭐</div>
+              <div className="flex-1">
+                <div className="font-semibold text-white">Fast Performer Criteria</div>
+                <ul className="text-xs text-slate-400 mt-1 space-y-1">
+                  <li>• Completes &gt; Assignments (ahead of schedule)</li>
+                  <li>• Low rework rate (&lt;5%)</li>
+                  <li>• High quality score (peer reviews)</li>
+                  <li>• Consistent across 3+ cycles</li>
+                </ul>
+              </div>
+              <div className="text-right">
+                <div className="text-xs text-slate-500">Benefits</div>
+                <div className="text-sm text-green-300">Higher complexity tasks</div>
+                <div className="text-sm text-green-300">Mentorship opportunities</div>
+              </div>
+            </div>
           </div>
         </section>
 

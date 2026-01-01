@@ -13,13 +13,36 @@ export default function Home() {
             <span className="gradient-text">QUAD</span>
             <span className="text-2xl align-super text-slate-500 ml-2">Framework</span>
           </h1>
-          <p className="text-2xl font-semibold text-blue-300 mb-4">
+          <p className="text-2xl font-semibold text-blue-300 mb-2">
             Quick Unified Agentic Development
           </p>
-          <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto">
-            A modern software development methodology for the AI era.
-            Replace Agile ceremonies with AI agents and documentation-first practices.
+          <p className="text-lg text-slate-500 mb-6">
+            <span className="text-blue-400">Q</span>uestion → <span className="text-green-400">U</span>nderstand → <span className="text-amber-400">A</span>llocate → <span className="text-purple-400">D</span>eliver
           </p>
+
+          {/* 4-4-4 Principle Banner */}
+          <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 rounded-2xl p-6 mb-8 max-w-2xl mx-auto">
+            <p className="text-lg font-semibold text-emerald-300 mb-2">The 4-4-4 Principle</p>
+            <div className="flex justify-center gap-4 mb-3">
+              <div className="text-center">
+                <div className="text-3xl font-black text-emerald-400">4</div>
+                <div className="text-xs text-slate-400">hours/day</div>
+              </div>
+              <div className="text-2xl text-slate-600">×</div>
+              <div className="text-center">
+                <div className="text-3xl font-black text-emerald-400">4</div>
+                <div className="text-xs text-slate-400">days/week</div>
+              </div>
+              <div className="text-2xl text-slate-600">=</div>
+              <div className="text-center">
+                <div className="text-3xl font-black text-emerald-400">4X</div>
+                <div className="text-xs text-slate-400">efficiency</div>
+              </div>
+            </div>
+            <p className="text-sm text-slate-400">
+              Work smarter, not longer. Achieve more while living more.
+            </p>
+          </div>
 
           {/* Circle of Functions - Super Blocks */}
           <div className="max-w-3xl mx-auto mb-12 px-4">
@@ -64,8 +87,8 @@ export default function Home() {
             </div>
             <p className="text-slate-400 max-w-2xl mx-auto text-center">
               QUAD combines four functional circles with AI agents at every step
-              and a documentation-first approach. The result: faster delivery,
-              consistent quality, and no knowledge silos.
+              and a documentation-first approach. Track workloads, identify skill gaps,
+              and use the Adoption Matrix to measure your AI journey.
             </p>
           </div>
 
@@ -362,12 +385,12 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-8 text-center">Why QUAD?</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { icon: "90%", title: "Less Meetings", desc: "AI Scheduling Agent replaces daily standups" },
-              { icon: "4x", title: "Faster Onboarding", desc: "New devs read flow docs instead of shadowing" },
-              { icon: "0", title: "Knowledge Silos", desc: "Everything documented, nothing in heads" },
-              { icon: "80%", title: "Less Test Writing", desc: "AI generates test cases from flow docs" },
-              { icon: "1", title: "Source of Truth", desc: "Git is the source, wikis sync from Git" },
-              { icon: "4wk", title: "Cycles Not Sprints", desc: "Monthly cycles with less context switching" },
+              { icon: "4×4×4", title: "Work-Life Balance", desc: "4 hrs/day × 4 days/week = 4X efficiency with AI" },
+              { icon: "16h", title: "Productive Hours", desc: "16 focused hours beat 40 distracted hours" },
+              { icon: "4x", title: "AI Amplification", desc: "AI handles repetitive tasks, you handle creativity" },
+              { icon: "📊", title: "Adoption Matrix", desc: "Track your AI journey from Skeptic to Expert" },
+              { icon: "🎯", title: "Workload Tracking", desc: "Assignments vs Completes vs Output metrics" },
+              { icon: "🔍", title: "Root Cause Analysis", desc: "Identify skill gaps, get personalized recommendations" },
             ].map((benefit) => (
               <div key={benefit.title} className="glass-card rounded-xl p-6 text-center">
                 <div className="text-3xl font-black text-blue-400 mb-3">{benefit.icon}</div>
@@ -423,10 +446,11 @@ export default function Home() {
                 icon: "📝",
               },
               {
-                title: "Case Study",
-                desc: "Calculator App: Agile vs QUAD - see the dramatic difference",
+                title: "Case Studies",
+                desc: "5 domains: E-commerce, Hospital, Education, Manufacturing, Software",
                 href: "/case-study",
-                icon: "🧮",
+                icon: "📊",
+                badge: "5 DOMAINS",
               },
               {
                 title: "Dashboard Demo",
@@ -453,6 +477,13 @@ export default function Home() {
                 href: "/platform",
                 icon: "🏢",
                 badge: "PRODUCT",
+              },
+              {
+                title: "Adoption Matrix",
+                desc: "Measure your AI journey - 3×3 or 5×5 positioning system with safety buffers",
+                href: "/adoption-matrix",
+                icon: "🎯",
+                badge: "NEW",
               },
               {
                 title: "Documentation",
@@ -595,9 +626,9 @@ export default function Home() {
       {/* CTA */}
       <section className="py-16 px-8 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Development?</h2>
+          <h2 className="text-3xl font-bold mb-4">Ready for the 4-4-4 Revolution?</h2>
           <p className="text-slate-400 mb-8">
-            Start with the Main Concept for a complete understanding, or explore the Case Study to see QUAD in action.
+            Work 4 hours/day, 4 days/week, achieve 4X efficiency. Start with Case Studies to see QUAD in action across 5 domains.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

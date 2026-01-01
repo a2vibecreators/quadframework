@@ -62,8 +62,14 @@ const PAGE_TITLES: Record<string, string> = {
 export default function Breadcrumb({ onFlowClick }: BreadcrumbProps) {
   const pathname = usePathname();
 
-  // Don't show breadcrumb on homepage
-  if (pathname === "/") {
+  // Don't show breadcrumb on homepage, dashboard, auth, or admin pages
+  if (
+    pathname === "/" ||
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/domain-config") ||
+    pathname.startsWith("/blueprint-agent")
+  ) {
     return null;
   }
 
@@ -76,14 +82,14 @@ export default function Breadcrumb({ onFlowClick }: BreadcrumbProps) {
   // If no flow found, just show Home > Page Title
   if (!flow) {
     return (
-      <div className="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700">
+      <div className="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700/30">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center gap-2 text-sm">
-            <Link href="/" className="text-slate-400 hover:text-white transition-colors">
+            <Link href="/" className="text-slate-400 hover:text-white transition-colors hover:underline">
               Home
             </Link>
-            <span className="text-slate-600">{">"}</span>
-            <span className="font-semibold text-white">{pageTitle || "Page"}</span>
+            <span className="text-slate-500 opacity-50">›</span>
+            <span className="font-semibold text-white truncate">{pageTitle || "Page"}</span>
           </div>
         </div>
       </div>
@@ -100,29 +106,57 @@ export default function Breadcrumb({ onFlowClick }: BreadcrumbProps) {
   const flowColorClass = colorClasses[flow.color as keyof typeof colorClasses] || "text-slate-400";
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700">
+    <div className="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700/30">
       <div className="max-w-7xl mx-auto px-4 py-3">
-        <div className="flex items-center gap-2 text-sm flex-wrap">
+        {/* Desktop: Full breadcrumb */}
+        <div className="hidden md:flex items-center gap-2 text-sm">
           {/* Home link */}
-          <Link href="/" className="text-slate-400 hover:text-white transition-colors">
+          <Link href="/" className="text-slate-400 hover:text-white transition-colors hover:underline">
             Home
           </Link>
 
-          <span className="text-slate-600">{">"}</span>
+          <span className="text-slate-500 opacity-50">›</span>
 
           {/* Flow name - clickable to open menu */}
           <button
             onClick={() => onFlowClick?.(flow.id)}
             className={`${flowColorClass} transition-colors hover:underline font-medium`}
             aria-label={`Open ${flow.name} menu`}
+            title={`Click to see all ${flow.name} pages`}
           >
             {flow.name}
           </button>
 
-          <span className="text-slate-600">{">"}</span>
+          <span className="text-slate-500 opacity-50">›</span>
 
           {/* Current page - not clickable */}
-          <span className="font-semibold text-white">
+          <span className="font-semibold text-white truncate">
+            {pageTitle}
+          </span>
+        </div>
+
+        {/* Mobile: Abbreviated breadcrumb */}
+        <div className="flex md:hidden items-center gap-2 text-sm">
+          {/* Home icon */}
+          <Link href="/" className="text-slate-400 hover:text-white transition-colors">
+            ◇
+          </Link>
+
+          <span className="text-slate-500 opacity-50">›</span>
+
+          {/* Flow name */}
+          <button
+            onClick={() => onFlowClick?.(flow.id)}
+            className={`${flowColorClass} transition-colors hover:underline font-medium`}
+            title={`Click to see all ${flow.name} pages`}
+          >
+            {flow.name}
+          </button>
+
+          <span className="text-slate-500 opacity-50">›</span>
+
+          {/* Current page - abbreviated */}
+          <span className="font-semibold text-white truncate">
             {pageTitle}
           </span>
         </div>
