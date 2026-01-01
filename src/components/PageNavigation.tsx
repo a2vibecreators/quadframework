@@ -29,6 +29,7 @@ const pages = [
   { href: "/sitemap", title: "Sitemap", icon: "🗺️", short: "Sitemap", section: "resources" },
   { href: "/support", title: "Support", icon: "💬", short: "Support", section: "resources" },
   { href: "/mm-pitch", title: "Enterprise Pitch", icon: "🏢", short: "MM Pitch", section: "resources" },
+  { href: "/book", title: "Free Book", icon: "📖", short: "Book", section: "resources" },
 ];
 
 // Group pages by section

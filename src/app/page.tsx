@@ -623,6 +623,64 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Free Book Section */}
+      <section className="py-16 px-8 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-y border-green-500/20">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center gap-8">
+            {/* Book Preview */}
+            <div className="shrink-0">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg transform rotate-3"></div>
+                <div className="relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg p-6 border border-slate-700 shadow-xl">
+                  <div className="w-40 h-52 flex flex-col justify-between">
+                    <div>
+                      <div className="text-xs text-blue-400 font-mono mb-1">A2VIBE</div>
+                      <div className="text-2xl font-black text-blue-400">Java</div>
+                      <div className="text-sm text-slate-300">for the</div>
+                      <div className="text-xl font-black text-green-400">AI Era</div>
+                    </div>
+                    <div className="flex items-center gap-2 text-2xl">
+                      <span>☕</span>
+                      <span className="text-sm">+</span>
+                      <span>🤖</span>
+                    </div>
+                    <div className="text-xs text-slate-400">12 Chapters + QUAD</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Book Info */}
+            <div className="flex-1 text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm font-medium mb-4">
+                <span>📖</span>
+                <span>FREE for registered users</span>
+              </div>
+              <h2 className="text-3xl font-bold mb-4">
+                Get the Complete Book
+              </h2>
+              <p className="text-slate-300 mb-6">
+                <strong>Java for the AI Era</strong> teaches Java concepts that AI can't replace,
+                effective prompting techniques, and includes two chapters on the QUAD Framework.
+              </p>
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start mb-6">
+                <span className="px-3 py-1 bg-slate-700 text-slate-300 rounded-full text-sm">12 Chapters</span>
+                <span className="px-3 py-1 bg-slate-700 text-slate-300 rounded-full text-sm">4+ Hours</span>
+                <span className="px-3 py-1 bg-slate-700 text-slate-300 rounded-full text-sm">QUAD Included</span>
+              </div>
+              <Link
+                href="/book"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg font-semibold transition-all hover:scale-105"
+              >
+                <span>📥</span>
+                <span>Download Free Book</span>
+                <span>→</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-16 px-8 bg-gradient-to-r from-blue-500/10 to-purple-500/10">
         <div className="max-w-2xl mx-auto text-center">
