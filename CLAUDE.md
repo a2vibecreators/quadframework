@@ -542,6 +542,19 @@ npx prisma studio
 
 ---
 
+## Phase 2 Features (Planned)
+
+Features documented for future implementation:
+
+| Feature | Description | Priority |
+|---------|-------------|----------|
+| **Discovery Results Persistence** | Save discovery wizard responses to database for logged-in users. Currently client-side only (React useState) - data lost on refresh. Would require: `QUAD_discovery_results` table, API endpoint, frontend integration. | Low |
+| **File Upload for Blueprints** | Phase 1 uses URLs only. Phase 2 adds actual file upload to cloud storage. | Medium |
+| **Slack/Email Agents** | Auto-implement features from Slack messages or emails. | High |
+| **Multi-version Documentation** | Serve archived versions at `/1.0/`, `/2.0/` etc. | Low |
+
+---
+
 ## Related Projects
 
 | Project | Path | Description |
