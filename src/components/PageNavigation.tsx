@@ -7,12 +7,13 @@ import { useSession, signOut } from "next-auth/react";
 import Breadcrumb from "./Breadcrumb";
 
 // Define all pages in order for prev/next navigation
+// EXPLORE order: Concept first (learn what QUAD is), then Discovery (is it right for me?)
 const pages = [
   { href: "/", title: "QUAD Home", icon: "◇", short: "QUAD", section: "brand" },
+  { href: "/concept", title: "Main Concept", icon: "💡", short: "Concept", section: "explore" },
   { href: "/discovery", title: "Discovery Assessment", icon: "🔍", short: "Discovery", section: "explore" },
   { href: "/pitch", title: "Value Proposition", icon: "💰", short: "Pitch", section: "explore" },
   { href: "/flow", title: "Source of Truth Flow", icon: "🔄", short: "Flow", section: "explore" },
-  { href: "/concept", title: "Main Concept", icon: "💡", short: "Concept", section: "explore" },
   { href: "/architecture", title: "Agent Architecture", icon: "🏗️", short: "Arch", section: "explore" },
   { href: "/details", title: "Technical Details", icon: "📋", short: "Details", section: "explore" },
   { href: "/jargons", title: "Terminology", icon: "📖", short: "Terms", section: "explore" },
