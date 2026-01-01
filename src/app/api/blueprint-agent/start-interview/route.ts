@@ -79,14 +79,14 @@ export async function POST(request: NextRequest) {
       projectDescription,
       conversation: [
         {
-          role: 'user',
+          role: 'user' as const,
           content: projectDescription,
           timestamp: new Date().toISOString(),
         },
       ],
       currentQuestionIndex: 0,
-      questionsAsked: [],
-      answersGiven: [],
+      questionsAsked: [] as string[],
+      answersGiven: [] as string[],
     };
 
     // Store interview session
