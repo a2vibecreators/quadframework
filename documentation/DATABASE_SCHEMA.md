@@ -595,39 +595,40 @@ WHERE u.company_id = '{company-id}';
 
 ## Schema File Organization
 
+**QUAD uses Prisma ORM for schema management:**
+
 ```
-quadframework/database/sql/
-├── schema.sql                              ← Loader file (uses \i includes)
-├── functions/
-│   ├── QUAD_update_updated_at_column.fnc.sql
-│   ├── QUAD_init_company_roles.fnc.sql
-│   ├── QUAD_init_user_adoption_matrix.fnc.sql
-│   └── QUAD_init_domain_circles.fnc.sql
-└── tables/
-    ├── core/
-    │   ├── QUAD_companies.tbl.sql
-    │   ├── QUAD_roles.tbl.sql
-    │   ├── QUAD_users.tbl.sql
-    │   ├── QUAD_user_sessions.tbl.sql
-    │   ├── QUAD_domains.tbl.sql
-    │   ├── QUAD_domain_members.tbl.sql
-    │   ├── QUAD_domain_resources.tbl.sql
-    │   └── QUAD_resource_attributes.tbl.sql
-    └── features/
-        ├── QUAD_adoption_matrix.tbl.sql
-        ├── QUAD_workload_metrics.tbl.sql
-        ├── QUAD_flows.tbl.sql
-        ├── QUAD_flow_stage_history.tbl.sql
-        ├── QUAD_work_sessions.tbl.sql
-        ├── QUAD_circles.tbl.sql
-        └── QUAD_circle_members.tbl.sql
+quadframework/
+├── prisma/
+│   ├── schema.prisma                       ← Prisma schema definition
+│   └── seeds/
+│       └── journey1_healthtrack.sql        ← Test data for Journey 1
+├── src/generated/prisma/                   ← Auto-generated Prisma client
+└── .env                                    ← DATABASE_URL for quad_dev_db
 ```
 
-**Run Schema:**
+**Database Setup:**
 ```bash
-cd quadframework/database/sql
-psql -U quad_user -d quad_dev_db -f schema.sql
+# Generate Prisma client
+npx prisma generate
+
+# Push schema to database (creates/updates tables)
+npx prisma db push
+
+# View database in browser
+npx prisma studio
+
+# Run seed data
+docker cp prisma/seeds/journey1_healthtrack.sql postgres-dev:/tmp/
+docker exec postgres-dev psql -U nutrinine_user -d quad_dev_db -f /tmp/journey1_healthtrack.sql
 ```
+
+**Database Connection:**
+```env
+DATABASE_URL="postgresql://nutrinine_user:nutrinine_dev_pass@localhost:16201/quad_dev_db?schema=public"
+```
+
+**Note:** QUAD uses a **separate database** (`quad_dev_db`) from NutriNine (`nutrinine_dev_db`), both hosted in the same postgres-dev container.
 
 ---
 

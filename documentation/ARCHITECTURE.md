@@ -1,7 +1,7 @@
 # QUAD Platform - Architecture Documentation
 
-**Date:** December 31, 2025
-**Version:** 1.0
+**Date:** January 1, 2026
+**Version:** 1.1
 
 ---
 
@@ -93,11 +93,12 @@ Response to Frontend (success + metadata)
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Next.js** | 14.x | React framework with SSR |
-| **React** | 18.x | UI library |
+| **Next.js** | 15.5.x | React framework with SSR |
+| **React** | 19.x | UI library |
 | **TypeScript** | 5.x | Type safety |
-| **Tailwind CSS** | 3.x | Utility-first CSS |
+| **Tailwind CSS** | 4.x | Utility-first CSS |
 | **shadcn/ui** | Latest | Component library |
+| **NextAuth.js** | 4.x | Authentication |
 
 **Why Next.js?**
 - ✅ File-based routing (automatic route generation)
@@ -110,14 +111,20 @@ Response to Frontend (success + metadata)
 
 | Technology | Version | Purpose |
 |------------|---------|---------|
-| **Next.js API Routes** | 14.x | RESTful API endpoints |
+| **Next.js API Routes** | 15.5.x | RESTful API endpoints |
 | **Node.js** | 20.x | Runtime environment |
 | **TypeScript** | 5.x | Type safety |
-| **pg (node-postgres)** | 8.x | PostgreSQL client |
+| **Prisma ORM** | 6.x | Database ORM with type safety |
 | **Puppeteer** | 21.x | Screenshot capture |
 
+**Why Prisma ORM?**
+- Type-safe database queries
+- Auto-generated TypeScript types from schema
+- Easy migrations and schema management
+- Works seamlessly with Next.js
+
 **Why NOT Spring Boot?**
-- QUAD has ~10-15 tables (simple schema)
+- QUAD has ~15 tables (simple schema)
 - Next.js API routes are sufficient
 - Reduces deployment complexity
 - TypeScript across full stack
@@ -299,39 +306,34 @@ export async function GET(
 
 ### Database Connection
 
-**Singleton Pattern:**
+**IMPORTANT:** QUAD uses a **separate database** (`quad_dev_db`) from NutriNine (`nutrinine_dev_db`).
+
+**Prisma Client:**
 ```typescript
 // src/lib/db.ts
-import { Pool } from 'pg';
+import { PrismaClient } from '@/generated/prisma';
 
-let pool: Pool | null = null;
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
-export function getPool(): Pool {
-  if (!pool) {
-    pool = new Pool({
-      connectionString: process.env.DATABASE_URL ||
-        'postgresql://nutrinine_user:nutrinine_dev_pass@localhost:16201/nutrinine_dev_db',
-      max: 20,
-      idleTimeoutMillis: 30000,
-    });
-  }
-  return pool;
-}
+export const prisma = globalForPrisma.prisma || new PrismaClient();
 
-export async function query(text: string, params?: any[]) {
-  const pool = getPool();
-  return await pool.query(text, params);
-}
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+```
+
+**Environment Configuration (.env):**
+```env
+DATABASE_URL="postgresql://nutrinine_user:nutrinine_dev_pass@localhost:16201/quad_dev_db?schema=public"
 ```
 
 **Usage:**
 ```typescript
-import { query } from '@/lib/db';
+import { prisma } from '@/lib/db';
 
-const result = await query(
-  'SELECT * FROM QUAD_domain_resources WHERE id = $1',
-  [resourceId]
-);
+// Type-safe queries
+const resources = await prisma.qUAD_domain_resources.findMany({
+  where: { domain_id: domainId },
+  include: { attributes: true }
+});
 ```
 
 ---
@@ -527,17 +529,19 @@ GIT_ACCESS_TOKEN=ghp_...  # Fallback if Vaultwarden not configured
 ```
 Mac Studio M4 Max (macOS Sequoia 15.6)
 ├── Docker Containers
-│   ├── nutrinine-web-dev (port 16001) → dev.quadframe.work
-│   ├── nutrinine-web-qa (port 17001) → qa.quadframe.work
+│   ├── quadframework-dev (port 18001) → dev.quadframe.work
+│   ├── quadframework-qa (port 18101) → qa.quadframe.work
 │   └── postgres-dev (port 16201)
+│       ├── quad_dev_db (QUAD Framework)
+│       └── nutrinine_dev_db (NutriNine - separate)
 │
 ├── Caddy Reverse Proxy
-│   ├── dev.quadframe.work → nutrinine-web-dev:80
-│   └── qa.quadframe.work → nutrinine-web-qa:80
+│   ├── dev.quadframe.work → quadframework-dev:3000
+│   └── qa.quadframe.work → quadframework-qa:3000
 │
 └── Cloudflare DNS
-    ├── dev → 96.240.97.243 (Proxied)
-    └── qa → 96.240.97.243 (Proxied)
+    ├── dev.quadframe.work → 96.240.97.243 (Proxied)
+    └── qa.quadframe.work → 96.240.97.243 (Proxied)
 ```
 
 ### Production (GCP Cloud Run - Future)

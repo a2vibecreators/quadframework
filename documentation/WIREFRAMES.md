@@ -430,6 +430,19 @@ Status Badges:
 │ pending   │  │in_progress│  │ completed │
 │  (gray)   │  │  (blue)   │  │  (green)  │
 └───────────┘  └───────────┘  └───────────┘
+
+4 Circles Allocation Badges (RESPONSIVE):
+┌────────────────────────────────────────────────────────────────────────┐
+│ Desktop (lg+):    DEDICATED | MOSTLY DEDICATED | MOSTLY SHARED | SHARED│
+│ Mobile (<lg):     DED       | MOSTLY DED       | MOSTLY SHR    | SHR   │
+└────────────────────────────────────────────────────────────────────────┘
+
+Circle Allocation (color-coded):
+┌───────────┐  ┌───────────────┐  ┌──────────────┐  ┌────────┐
+│ DEDICATED │  │ MOSTLY DED    │  │ MOSTLY SHR   │  │ SHARED │
+│  (blue)   │  │ (light blue)  │  │ (yellow)     │  │ (gray) │
+│   100%    │  │   51-99%      │  │   26-50%     │  │ 1-25%  │
+└───────────┘  └───────────────┘  └──────────────┘  └────────┘
 ```
 
 ### Navigation Components

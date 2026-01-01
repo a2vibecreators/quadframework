@@ -7,10 +7,16 @@ This file provides guidance to Claude Code when working with the QUAD Framework 
 **QUAD Framework** (quadframe.work) is the official documentation and learning site for the QUAD methodology - Quick Unified Agentic Development.
 
 **Tech Stack:**
-- Next.js 14 (App Router)
+- Next.js 15.5 (App Router)
 - TypeScript
 - Tailwind CSS
-- Deployed on Vercel
+- Prisma ORM with PostgreSQL
+- NextAuth.js for authentication
+- Deployed on Mac Studio (Docker) + GCP Cloud Run
+
+**Live URLs:**
+- DEV: https://dev.quadframe.work (port 18001)
+- QA: https://qa.quadframe.work (port 18101)
 
 ## QUAD Development Model - Revolutionary Paradigm Shift
 
@@ -345,6 +351,156 @@ quadframework/
 
 ---
 
+## Database Setup
+
+**QUAD uses a separate database from NutriNine:**
+
+| Database | Purpose | Port | Host |
+|----------|---------|------|------|
+| `quad_dev_db` | QUAD Framework development | 16201 | postgres-dev container |
+| `quad_qa_db` | QUAD Framework QA (future) | 17201 | postgres-qa container |
+| `nutrinine_dev_db` | NutriNine app (separate) | 16201 | postgres-dev container |
+
+**Connection String (.env):**
+```
+DATABASE_URL="postgresql://nutrinine_user:nutrinine_dev_pass@localhost:16201/quad_dev_db?schema=public"
+```
+
+**Prisma Commands:**
+```bash
+# Generate Prisma client
+npx prisma generate
+
+# Push schema to database (creates tables)
+npx prisma db push
+
+# View database in browser
+npx prisma studio
+```
+
+**Schema Tables (15 tables with QUAD_ prefix):**
+- `QUAD_companies` - Company/organization accounts
+- `QUAD_roles` - Role definitions with QUAD participation levels
+- `QUAD_users` - User accounts with role assignments
+- `QUAD_adoption_matrix` - Skill/Trust levels per user
+- `QUAD_domains` - Product/project domains
+- `QUAD_domain_members` - User assignments to domains
+- `QUAD_circles` - 4 Circles within each domain
+- `QUAD_circle_members` - User assignments to circles
+- `QUAD_flows` - Work items progressing through Q-U-A-D stages
+- `QUAD_flow_stage_history` - Stage transition audit trail
+- `QUAD_domain_resources` - Git repos, databases, cloud projects
+- `QUAD_resource_attributes` - Key-value attributes for resources
+- `QUAD_work_sessions` - Time tracking sessions
+- `QUAD_domain_blueprints` - UI blueprints for projects
+- `QUAD_blueprint_agent_sessions` - AI interview sessions
+
+---
+
+## Test Data (Seed Files)
+
+**Journey 1: HealthTrack Startup** (`prisma/seeds/journey1_healthtrack.sql`)
+
+A complete test scenario for a 4-person startup building a mobile health app.
+
+| Entity | Count | Description |
+|--------|-------|-------------|
+| Company | 1 | HealthTrack Startup |
+| Roles | 7 | 6 default + 1 custom (MOBILE_LEAD) |
+| Users | 4 | Founder, iOS dev, Android dev, Full-stack |
+| Circles | 4 | Management, Development, QA, Infrastructure |
+| Resources | 5 | 3 git repos, 1 database, 1 cloud project |
+| Flows | 5 | At different Q-U-A-D stages |
+
+**Test Credentials:**
+```
+founder@healthtrack.io / Test123!@#  (ADMIN)
+ios@healthtrack.io / Test123!@#      (DEVELOPER)
+android@healthtrack.io / Test123!@#  (DEVELOPER)
+fullstack@healthtrack.io / Test123!@# (SENIOR_DEVELOPER)
+```
+
+**Run Seed:**
+```bash
+docker cp prisma/seeds/journey1_healthtrack.sql postgres-dev:/tmp/
+docker exec postgres-dev psql -U nutrinine_user -d quad_dev_db -f /tmp/journey1_healthtrack.sql
+```
+
+**More test journeys:** See `documentation/TEST_JOURNEYS.md` for 6 complete scenarios (Startup, Small Business, Enterprise).
+
+---
+
+## Authentication (NextAuth)
+
+**Provider:** Credentials (email/password with bcrypt)
+
+**Session Strategy:** JWT tokens stored in cookies
+
+**Key Files:**
+- `src/lib/authOptions.ts` - NextAuth configuration
+- `src/app/api/auth/[...nextauth]/route.ts` - Auth endpoints
+- `src/types/next-auth.d.ts` - TypeScript session extensions
+
+**Session includes:**
+- `user.id` - User UUID
+- `user.email` - User email
+- `user.role` - Role code (ADMIN, DEVELOPER, etc.)
+- `user.companyId` - Company UUID
+- `user.domainId` - Current domain UUID (if selected)
+- `accessToken` - JWT for API calls
+
+**Protected API Routes:**
+```typescript
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
+
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  // ... use session.user.companyId, etc.
+}
+```
+
+---
+
+## Deployment
+
+**Deploy Script:** `./deploy-studio.sh`
+
+```bash
+# Deploy to DEV
+./deploy-studio.sh dev
+
+# Deploy to QA
+./deploy-studio.sh qa
+
+# Deploy to both
+./deploy-studio.sh all
+```
+
+**Container Details:**
+| Environment | Container | Port | URL |
+|-------------|-----------|------|-----|
+| DEV | quadframework-dev | 18001 | https://dev.quadframe.work |
+| QA | quadframework-qa | 18101 | https://qa.quadframe.work |
+
+**Docker Network:** `nutrinine-network` (shared with Caddy reverse proxy)
+
+**Caddy Configuration:** `/Users/semostudio/docker/caddy/Caddyfile`
+```
+dev.quadframe.work {
+    reverse_proxy quadframework-dev:3000
+}
+
+qa.quadframe.work {
+    reverse_proxy quadframework-qa:3000
+}
+```
+
+---
+
 ## Development Commands
 
 ```bash
@@ -359,6 +515,15 @@ npm run build
 
 # Start production server
 npm start
+
+# Generate Prisma client
+npx prisma generate
+
+# Push schema changes
+npx prisma db push
+
+# View database
+npx prisma studio
 ```
 
 ---
@@ -377,12 +542,22 @@ npm start
 
 ---
 
+## Related Projects
+
+| Project | Path | Description |
+|---------|------|-------------|
+| **NutriNine** | `/Users/semostudio/git/a2vibecreators/nutrinine` | Family health app (uses same postgres-dev) |
+| **A2Vibe Creators** | `/Users/semostudio/git/a2vibecreators/a2vibecreators-web` | Company website |
+| **Nanna** | `/Users/semostudio/git/sumanaddanki/nanna` | AI teaching agent (Telugu) |
+
 ## Related Documentation
 
 - QUAD Methodology docs: `/nutrinine-docs/documentation/methodology/QUAD.md`
 - A2Vibe Creators website: `/a2vibecreators-web/`
+- Test Journeys: `documentation/TEST_JOURNEYS.md`
+- Blueprint Agent Implementation: `documentation/BLUEPRINT_AGENT_IMPLEMENTATION_PLAN.md`
 
 ---
 
 **Author:** Suman Addanki
-**Last Updated:** December 31, 2025
+**Last Updated:** January 1, 2026
