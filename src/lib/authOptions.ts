@@ -81,78 +81,73 @@ export const authOptions: NextAuthOptions = {
       }
 
       try {
-        // Check if user exists by email
+        // Check if user exists by email (using correct QUAD_ table name with quotes)
         const existingUser = await query(
-          'SELECT id, company_id, role FROM quad_users WHERE email = $1',
+          'SELECT id, company_id, role FROM "QUAD_users" WHERE email = $1',
           [user.email]
         );
 
         if (existingUser.rows.length > 0) {
-          // User exists - update OAuth info
+          // User exists - update last activity time
           await query(
-            `UPDATE quad_users
-             SET oauth_provider = $1, oauth_id = $2, avatar_url = $3, last_login_at = NOW()
-             WHERE email = $4`,
-            [account.provider, account.providerAccountId, user.image, user.email]
+            `UPDATE "QUAD_users" SET updated_at = NOW() WHERE email = $1`,
+            [user.email]
           );
           return true;
         }
 
-        // New user - check if they belong to existing company by email domain
+        // New user - check if they belong to existing organization by email domain
         const emailDomain = user.email.split('@')[1];
 
-        // Look for company with matching admin email domain
-        const companyResult = await query(
-          `SELECT id FROM quad_companies
-           WHERE admin_email LIKE $1`,
+        // Look for organization with matching admin email domain
+        const orgResult = await query(
+          `SELECT id FROM "QUAD_organizations"
+           WHERE admin_email LIKE $1 AND is_active = true`,
           [`%@${emailDomain}`]
         );
 
-        if (companyResult.rows.length > 0) {
-          // Company exists - add user as team member
-          const company = companyResult.rows[0] as { id: string };
+        if (orgResult.rows.length > 0) {
+          // Organization exists - add user as team member
+          const org = orgResult.rows[0] as { id: string };
 
           // Check user count for free tier limit (5 users)
           const userCountResult = await query<{ count: string }>(
-            'SELECT COUNT(*) as count FROM quad_users WHERE company_id = $1',
-            [company.id]
+            'SELECT COUNT(*) as count FROM "QUAD_users" WHERE company_id = $1',
+            [org.id]
           );
 
           const userCount = parseInt(userCountResult.rows[0].count);
 
           if (userCount >= 5) {
-            // Check if company has paid plan
-            const companyPlanResult = await query<{ size: string }>(
-              'SELECT size FROM quad_companies WHERE id = $1',
-              [company.id]
+            // Check if org has paid plan
+            const orgPlanResult = await query<{ size: string }>(
+              'SELECT size FROM "QUAD_organizations" WHERE id = $1',
+              [org.id]
             );
 
             // For now, allow if size is not 'startup' (pro/enterprise plans)
-            if (companyPlanResult.rows[0].size === 'startup') {
+            if (orgPlanResult.rows[0]?.size === 'startup') {
               console.log(`Sign-in rejected: Free tier limit (5 users) reached for ${user.email}`);
               return '/upgrade?reason=user-limit'; // Redirect to upgrade page
             }
           }
 
-          // Add user
+          // Add user with minimal required fields (no oauth columns in schema)
           await query(
-            `INSERT INTO quad_users (
-              company_id, email, oauth_provider, oauth_id,
-              full_name, avatar_url, role, is_active, email_verified
-            ) VALUES ($1, $2, $3, $4, $5, $6, 'DEVELOPER', true, true)`,
+            `INSERT INTO "QUAD_users" (
+              company_id, email, password_hash, full_name, role, is_active, email_verified
+            ) VALUES ($1, $2, $3, $4, 'DEVELOPER', true, true)`,
             [
-              company.id,
+              org.id,
               user.email,
-              account.provider,
-              account.providerAccountId,
+              'oauth-' + account.provider, // Placeholder hash for OAuth users
               user.name,
-              user.image,
             ]
           );
           return true;
         } else {
-          // No company found - user must be invited first
-          console.log(`Sign-in rejected: No company found for ${user.email}`);
+          // No organization found - redirect to signup
+          console.log(`Sign-in rejected: No organization found for ${user.email}`);
           return '/signup?reason=no-company&email=' + encodeURIComponent(user.email);
         }
 
@@ -167,9 +162,9 @@ export const authOptions: NextAuthOptions = {
      */
     async jwt({ token, user, account }) {
       if (account && user) {
-        // Fetch user data from database
+        // Fetch user data from database (using correct QUAD_ table names)
         const userResult = await query(
-          `SELECT id, company_id, role, full_name FROM quad_users WHERE email = $1`,
+          `SELECT id, company_id, role, full_name FROM "QUAD_users" WHERE email = $1`,
           [user.email]
         );
 
@@ -180,13 +175,13 @@ export const authOptions: NextAuthOptions = {
           token.role = dbUser.role;
           token.fullName = dbUser.full_name;
 
-          // NEW: Fetch domain membership (if exists)
+          // Fetch domain membership (if exists)
           const domainResult = await query(
             `SELECT
               dm.domain_id,
               dm.role as domain_role,
               dm.allocation_percentage
-            FROM quad_domain_members dm
+            FROM "QUAD_domain_members" dm
             WHERE dm.user_id = $1
             ORDER BY dm.created_at ASC
             LIMIT 1`,

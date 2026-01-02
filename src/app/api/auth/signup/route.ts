@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
     // Check if email already exists
     const existingUser = await query(
-      'SELECT id FROM quad_users WHERE email = $1',
+      'SELECT id FROM "QUAD_users" WHERE email = $1',
       [adminEmail]
     );
 
@@ -36,20 +36,20 @@ export async function POST(request: NextRequest) {
     // Hash password
     const passwordHash = await hashPassword(password);
 
-    // Create company
-    const companyResult = await query(
-      `INSERT INTO quad_companies (name, admin_email, size)
+    // Create organization
+    const orgResult = await query(
+      `INSERT INTO "QUAD_organizations" (name, admin_email, size)
        VALUES ($1, $2, $3)
        RETURNING id, name, admin_email, size`,
       [companyName, adminEmail, size || 'medium']
     );
 
     interface CompanyRow { id: string; name: string; admin_email: string; size: string; }
-    const company = companyResult.rows[0] as CompanyRow;
+    const company = orgResult.rows[0] as CompanyRow;
 
     // Create QUAD_ADMIN user
     const userResult = await query(
-      `INSERT INTO quad_users (company_id, email, password_hash, role, full_name, is_active, email_verified)
+      `INSERT INTO "QUAD_users" (company_id, email, password_hash, role, full_name, is_active, email_verified)
        VALUES ($1, $2, $3, 'QUAD_ADMIN', $4, true, true)
        RETURNING id, company_id, email, role, full_name, is_active`,
       [company.id, adminEmail, passwordHash, fullName || 'Admin']

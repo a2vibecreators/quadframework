@@ -39,9 +39,9 @@ export async function GET(request: Request) {
         d.domain_type,
         d.depth,
         c.name as company_name
-      FROM QUAD_domain_members dm
-      JOIN QUAD_domains d ON dm.domain_id = d.id
-      LEFT JOIN QUAD_companies c ON d.company_id = c.id
+      FROM "QUAD_domain_members" dm
+      JOIN "QUAD_domains" d ON dm.domain_id = d.id
+      LEFT JOIN "QUAD_organizations" c ON d.company_id = c.id
       WHERE dm.email = $1
         AND dm.status = 'active'
       ORDER BY

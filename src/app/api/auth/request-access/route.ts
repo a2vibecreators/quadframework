@@ -23,62 +23,45 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if company/email already exists
-    const existingCompany = await query(
-      'SELECT id FROM QUAD_companies WHERE admin_email = $1',
+    // Check if organization/email already exists
+    const existingOrg = await query(
+      'SELECT id FROM "QUAD_organizations" WHERE admin_email = $1',
       [adminEmail]
     );
 
-    if (existingCompany.rows.length > 0) {
+    if (existingOrg.rows.length > 0) {
       return NextResponse.json(
         { error: 'An account with this email already exists' },
         { status: 409 }
       );
     }
 
-    // Create pending company (admin must approve via email)
+    // Create pending organization (admin must approve via email)
     const result = await query(
-      `INSERT INTO QUAD_companies (
+      `INSERT INTO "QUAD_organizations" (
         name,
         admin_email,
-        size,
-        adoption_level,
-        estimation_preset,
-        refresh_interval
-      ) VALUES ($1, $2, $3, $4, $5, $6)
+        size
+      ) VALUES ($1, $2, $3)
       RETURNING id`,
       [
         companyName,
         adminEmail,
         companySize,
-        'hyperspace', // Default adoption level
-        'platonic', // Default estimation preset
-        30, // Default 30s refresh
       ]
     );
 
     const companyId = (result.rows[0] as { id: string }).id;
 
-    // Store access request metadata (for admin review)
-    await query(
-      `INSERT INTO QUAD_company_integrations (
-        company_id,
-        integration_id,
-        enabled,
-        config
-      ) VALUES ($1, $2, $3, $4)`,
-      [
-        companyId,
-        'access_request',
-        false, // Not enabled until admin approves
-        JSON.stringify({
-          ssoProvider,
-          message,
-          requestedAt: new Date().toISOString(),
-          status: 'pending',
-        }),
-      ]
-    );
+    // TODO: Store access request metadata when QUAD_access_requests table is added
+    // For now, log the request details
+    console.log('Access request metadata:', {
+      companyId,
+      ssoProvider,
+      message,
+      requestedAt: new Date().toISOString(),
+      status: 'pending',
+    });
 
     // TODO: Send email notification to QUAD support team
     // TODO: Send confirmation email to user

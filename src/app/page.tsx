@@ -489,6 +489,7 @@ export default function Home() {
                   <th className="text-center py-3 px-2 text-slate-400 font-medium">Linear</th>
                   <th className="text-center py-3 px-2 text-slate-400 font-medium">Cursor</th>
                   <th className="text-center py-3 px-2 text-slate-400 font-medium">Devin</th>
+                  <th className="text-center py-3 px-2 text-slate-400 font-medium">Emergent</th>
                   <th className="text-center py-3 px-2 text-slate-400 font-medium">Bolt</th>
                   <th className="text-center py-3 px-2 text-green-400 font-bold">QUAD</th>
                 </tr>
@@ -500,11 +501,13 @@ export default function Home() {
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
+                  <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-green-400 font-bold">✓</td>
                 </tr>
                 <tr className="border-b border-slate-800">
                   <td className="py-3 px-4">AI Code Generation</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
+                  <td className="text-center py-3 px-2 text-green-400">✓</td>
                   <td className="text-center py-3 px-2 text-green-400">✓</td>
                   <td className="text-center py-3 px-2 text-green-400">✓</td>
                   <td className="text-center py-3 px-2 text-green-400">✓</td>
@@ -516,10 +519,12 @@ export default function Home() {
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
+                  <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-green-400 font-bold">✓</td>
                 </tr>
                 <tr className="border-b border-slate-800">
                   <td className="py-3 px-4">Deployment Recipes</td>
+                  <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
@@ -532,6 +537,7 @@ export default function Home() {
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-red-400">✗</td>
+                  <td className="text-center py-3 px-2 text-red-400">✗</td>
                   <td className="text-center py-3 px-2 text-green-400 font-bold">✓</td>
                 </tr>
                 <tr className="border-b border-slate-800">
@@ -539,6 +545,7 @@ export default function Home() {
                   <td className="text-center py-3 px-2 text-slate-500">N/A</td>
                   <td className="text-center py-3 px-2 text-green-400">✓</td>
                   <td className="text-center py-3 px-2 text-yellow-400">~</td>
+                  <td className="text-center py-3 px-2 text-green-400">✓</td>
                   <td className="text-center py-3 px-2 text-yellow-400">~</td>
                   <td className="text-center py-3 px-2 text-green-400 font-bold">✓</td>
                 </tr>
@@ -547,6 +554,7 @@ export default function Home() {
                   <td className="text-center py-3 px-2 text-slate-400">$12/user</td>
                   <td className="text-center py-3 px-2 text-slate-400">$40/user</td>
                   <td className="text-center py-3 px-2 text-slate-400">$500/mo</td>
+                  <td className="text-center py-3 px-2 text-slate-400">$20/mo</td>
                   <td className="text-center py-3 px-2 text-slate-400">$20-200</td>
                   <td className="text-center py-3 px-2 text-green-400 font-bold">$399/mo</td>
                 </tr>

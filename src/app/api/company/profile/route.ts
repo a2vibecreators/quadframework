@@ -24,7 +24,7 @@ export async function GET(request: Request) {
       );
     }
 
-    // Fetch user and company data
+    // Fetch user and organization data
     const result = await query(
       `SELECT
         u.id as user_id,
@@ -35,13 +35,10 @@ export async function GET(request: Request) {
         c.name as company_name,
         c.admin_email,
         c.size as company_size,
-        c.adoption_level,
-        c.estimation_preset,
-        c.refresh_interval,
         c.created_at as company_created_at,
-        (SELECT COUNT(*) FROM QUAD_users WHERE company_id = c.id AND is_active = true) as active_users
-      FROM QUAD_users u
-      JOIN QUAD_companies c ON u.company_id = c.id
+        (SELECT COUNT(*) FROM "QUAD_users" WHERE company_id = c.id AND is_active = true) as active_users
+      FROM "QUAD_users" u
+      JOIN "QUAD_organizations" c ON u.company_id = c.id
       WHERE u.email = $1 AND u.is_active = true`,
       [email]
     );
@@ -62,21 +59,10 @@ export async function GET(request: Request) {
       company_name: string;
       admin_email: string;
       company_size: string;
-      adoption_level: string;
-      estimation_preset: string;
-      refresh_interval: number;
       company_created_at: string;
       active_users: string;
     }
     const userData = result.rows[0] as UserDataRow;
-
-    // Fetch enabled integrations
-    const integrationsResult = await query(
-      `SELECT integration_id, enabled, config
-       FROM QUAD_company_integrations
-       WHERE company_id = $1 AND enabled = true`,
-      [userData.company_id]
-    );
 
     const profile = {
       user: {
@@ -90,20 +76,10 @@ export async function GET(request: Request) {
         name: userData.company_name,
         adminEmail: userData.admin_email,
         size: userData.company_size,
-        adoptionLevel: userData.adoption_level,
-        estimationPreset: userData.estimation_preset,
-        refreshInterval: userData.refresh_interval,
         createdAt: userData.company_created_at,
         activeUsers: parseInt(userData.active_users),
       },
-      integrations: integrationsResult.rows.map((r) => {
-        const row = r as { integration_id: string; enabled: boolean; config: string };
-        return {
-          id: row.integration_id,
-          enabled: row.enabled,
-          config: row.config,
-        };
-      }),
+      integrations: [], // TODO: Add when QUAD_org_integrations table is implemented
     };
 
     // Format for dashboard component (flatten for easier access)
@@ -115,8 +91,6 @@ export async function GET(request: Request) {
       company_name: profile.company.name,
       company_size: profile.company.size,
       active_users: profile.company.activeUsers,
-      adoption_level: profile.company.adoptionLevel,
-      refresh_interval: profile.company.refreshInterval,
       integrations: profile.integrations,
     });
   } catch (error: any) {
