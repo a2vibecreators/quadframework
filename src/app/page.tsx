@@ -533,14 +533,14 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-green-300">TRY</h3>
-                  <p className="text-xs text-slate-500">5 pages</p>
+                  <p className="text-xs text-slate-500">6 pages</p>
                 </div>
               </div>
               <p className="text-sm text-slate-400 mb-4">
                 See QUAD in action - case study, demo, configuration wizard, quiz, and platform.
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {["Case Study", "Demo", "Configure", "Platform", "Quiz"].map((p) => (
+                {["Case Study", "Demo", "Configure", "Matrix", "Platform", "Quiz"].map((p) => (
                   <span key={p} className="px-2 py-0.5 bg-green-500/10 text-green-300 rounded text-xs">
                     {p}
                   </span>
@@ -562,14 +562,14 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-purple-300">RESOURCES</h3>
-                  <p className="text-xs text-slate-500">4 pages</p>
+                  <p className="text-xs text-slate-500">7 pages</p>
                 </div>
               </div>
               <p className="text-sm text-slate-400 mb-4">
                 Quick reference - cheat sheet, onboarding checklist, documentation, and enterprise materials.
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {["Cheat Sheet", "Onboarding", "Docs", "Enterprise Pitch"].map((p) => (
+                {["Cheat Sheet", "Onboarding", "Docs", "Sitemap", "Support", "Pitch", "Book"].map((p) => (
                   <span key={p} className="px-2 py-0.5 bg-purple-500/10 text-purple-300 rounded text-xs">
                     {p}
                   </span>
