@@ -57,7 +57,7 @@ Google Antigravity is Google's new **agentic IDE** launched November 2025 alongs
 |---------------------|-------------|-------------|
 | **Manager View** | Control center for orchestrating multiple agents in parallel | 🔜 Phase 3 |
 | **Artifacts System** | Verifiable deliverables (screenshots, recordings, task lists) | 🔜 Phase 3 |
-| **Gemini 3 Deep Think** | Extended reasoning for complex problems | ❌ Not planned (use Claude Opus) |
+| **Gemini 3 Deep Think** | Extended reasoning for complex problems | ✅ Supported (+ Claude Opus fallback) |
 | **Native IDE** | Full VS Code fork with integrated AI | Partial (Plugin only) |
 | **Workspace Isolation** | Agents work in isolated workspaces | ✅ Sandbox system |
 | **Browser Recording** | Agents can record browser actions as proof | 🔜 Phase 3 |
