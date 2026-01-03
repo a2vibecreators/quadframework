@@ -877,6 +877,12 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
+              href="/auth/signup"
+              className="px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg font-bold text-lg transition-all hover:scale-105 shadow-lg"
+            >
+              Get Started Free →
+            </Link>
+            <Link
               href="/concept"
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
             >
@@ -888,12 +894,6 @@ export default function Home() {
             >
               View Case Study
             </Link>
-            <a
-              href="mailto:suman.addanki@gmail.com?subject=QUAD%20Framework%20Inquiry"
-              className="px-6 py-3 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors border border-white/20"
-            >
-              ✉️ Contact: suman.addanki@gmail.com
-            </a>
           </div>
         </div>
       </section>

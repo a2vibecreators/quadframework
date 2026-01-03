@@ -107,9 +107,13 @@ model QUAD_organizations {
   org_members        QUAD_org_members[]       // All members including cross-org
   domains            QUAD_domains[]           // Projects under this org/sub-org
   roles              QUAD_roles[]
-  ai_provider_config QUAD_ai_provider_config?
-  invitations        QUAD_org_invitations[]
-  settings           QUAD_org_settings?       // Org-level settings
+  ai_provider_config   QUAD_ai_provider_config?
+  invitations          QUAD_org_invitations[]
+  settings             QUAD_org_settings?       // Org-level settings
+  meeting_integrations QUAD_meeting_integrations[] // Calendar/meeting providers
+  setup_status         QUAD_org_setup_status?     // Onboarding completion tracking
+  git_integrations     QUAD_git_integrations[]    // Git providers (GitHub, GitLab, etc.)
+  git_repositories     QUAD_git_repositories[]    // Connected repositories
 
   @@index([tier_id])
   @@index([slug])
@@ -141,6 +145,13 @@ model QUAD_org_settings {
   ai_features_enabled    Boolean  @default(true)
   gamification_enabled   Boolean  @default(true)
 
+  // BYOK Settings - Bring Your Own Key (Custom Credentials)
+  // Org can choose to use their own OAuth Apps/API keys for integrations
+  byok_git_enabled       Boolean  @default(false) // Use custom Git OAuth App
+  byok_calendar_enabled  Boolean  @default(false) // Use custom Calendar OAuth App
+  byok_ai_enabled        Boolean  @default(false) // Use custom AI API keys
+  byok_communication_enabled Boolean @default(false) // Use custom SMS/Email API keys
+
   created_at             DateTime @default(now())
   updated_at             DateTime @updatedAt
 
@@ -148,6 +159,123 @@ model QUAD_org_settings {
   organization QUAD_organizations @relation(fields: [org_id], references: [id], onDelete: Cascade)
 
   @@map("QUAD_org_settings")
+}
+
+// Meeting Provider Integrations - OAuth credentials per organization
+model QUAD_meeting_integrations {
+  id            String   @id @default(uuid()) @db.Uuid
+  org_id        String   @db.Uuid
+  provider      String   @db.VarChar(50) // google_calendar, cal_com, outlook, zoom
+  provider_name String   @db.VarChar(100) // Display name
+  is_enabled    Boolean  @default(false)
+  is_configured Boolean  @default(false)
+
+  // OAuth tokens (encrypted in production)
+  access_token     String?
+  refresh_token    String?
+  token_expires_at DateTime?
+
+  // Provider-specific config
+  calendar_id   String? @db.VarChar(255) // For Google Calendar
+  webhook_url   String? // For Cal.com webhooks
+  api_key       String? // For Cal.com API key
+  account_email String? @db.VarChar(255) // Connected account email
+
+  // BYOK - Bring Your Own Key (Custom OAuth App)
+  use_byok          Boolean @default(false) // Use org's own OAuth App instead of QUAD's
+  byok_client_id    String? @db.VarChar(255) // Custom OAuth App Client ID
+  byok_client_secret String? // Custom OAuth App Client Secret (encrypted)
+  byok_redirect_uri String? // Custom callback URL (if different from default)
+
+  // Setup status
+  setup_completed_at DateTime?
+  setup_completed_by String?  @db.Uuid
+  last_sync_at       DateTime?
+  sync_status        String?  @db.VarChar(50) // success, failed, pending, never
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  organization QUAD_organizations @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  completed_by QUAD_users?        @relation(fields: [setup_completed_by], references: [id], onDelete: SetNull)
+
+  @@unique([org_id, provider])
+  @@index([org_id])
+  @@index([provider])
+  @@map("QUAD_meeting_integrations")
+}
+
+// Organization Setup Status - tracks onboarding completion
+model QUAD_org_setup_status {
+  id     String @id @default(uuid()) @db.Uuid
+  org_id String @unique @db.Uuid
+
+  // Required setup steps
+  meeting_provider_configured Boolean @default(false)
+  calendar_connected          Boolean @default(false)
+  ai_tier_selected            Boolean @default(false)
+  first_domain_created        Boolean @default(false)
+  first_circle_created        Boolean @default(false)
+
+  // Optional setup steps
+  git_provider_connected Boolean @default(false)
+  slack_connected        Boolean @default(false)
+
+  // Timestamps
+  setup_started_at   DateTime  @default(now())
+  setup_completed_at DateTime?
+
+  // Relations
+  organization QUAD_organizations @relation(fields: [org_id], references: [id], onDelete: Cascade)
+
+  @@map("QUAD_org_setup_status")
+}
+
+// Git Provider Integrations - OAuth credentials per organization
+model QUAD_git_integrations {
+  id            String   @id @default(uuid()) @db.Uuid
+  org_id        String   @db.Uuid
+  provider      String   @db.VarChar(50) // github, gitlab, bitbucket, azure_devops
+  provider_name String   @db.VarChar(100) // Display name
+  is_enabled    Boolean  @default(false)
+  is_configured Boolean  @default(false)
+
+  // OAuth tokens
+  access_token     String?
+  refresh_token    String?
+  token_expires_at DateTime?
+
+  // Provider-specific config
+  account_login    String? @db.VarChar(255) // GitHub username or org
+  account_id       String? @db.VarChar(100) // Provider's user ID
+  account_type     String? @db.VarChar(50) // User or Organization
+  installation_id  String? @db.VarChar(100) // GitHub App installation ID (if using App)
+  scope            String? // OAuth scopes granted
+
+  // BYOK - Bring Your Own Key (Custom OAuth App)
+  use_byok          Boolean @default(false) // Use org's own OAuth App instead of QUAD's
+  byok_client_id    String? @db.VarChar(255) // Custom OAuth App Client ID
+  byok_client_secret String? // Custom OAuth App Client Secret (encrypted)
+  byok_redirect_uri String? // Custom callback URL (if different from default)
+
+  // Setup status
+  setup_completed_at DateTime?
+  setup_completed_by String?  @db.Uuid
+  last_sync_at       DateTime?
+  sync_status        String?  @db.VarChar(50) // success, failed, pending, never
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  organization QUAD_organizations @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  completed_by QUAD_users?        @relation("GitIntegrationSetup", fields: [setup_completed_by], references: [id], onDelete: SetNull)
+
+  @@unique([org_id, provider])
+  @@index([org_id])
+  @@index([provider])
+  @@map("QUAD_git_integrations")
 }
 
 // Organization Membership - allows users to belong to multiple orgs
@@ -337,6 +465,20 @@ model QUAD_users {
   domains_created  QUAD_domains[]          @relation("DomainCreator")
   domains_deleted  QUAD_domains[]          @relation("DomainDeleter")
 
+  // Relations - Meeting integrations
+  meeting_integrations_setup QUAD_meeting_integrations[] // Integrations this user set up
+
+  // Relations - Git integrations
+  git_integrations_setup QUAD_git_integrations[] @relation("GitIntegrationSetup")
+
+  // Relations - PR Reviews (normalized)
+  pr_reviews_assigned    QUAD_pr_reviewers[] @relation("PRReviewer")
+  pr_reviews_assigned_by QUAD_pr_reviewers[] @relation("PRReviewerAssigner")
+  pr_approvals_given     QUAD_pr_approvals[] @relation("PRApprover")
+
+  // Relations - Release notes
+  release_contributions  QUAD_release_contributors[] @relation("ReleaseContributor")
+
   @@index([org_id])
   @@index([email])
   @@index([role_id])
@@ -361,6 +503,22 @@ model QUAD_user_sessions {
   @@index([session_token])
   @@index([expires_at])
   @@map("QUAD_user_sessions")
+}
+
+// Email verification codes for passwordless login
+model QUAD_email_verification_codes {
+  id         String   @id @default(uuid()) @db.Uuid
+  email      String   @db.VarChar(255)
+  code       String   @db.VarChar(6)
+  expires_at DateTime
+  attempts   Int      @default(0) // Track failed verification attempts
+  used       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  @@index([email])
+  @@index([code])
+  @@index([expires_at])
+  @@map("QUAD_email_verification_codes")
 }
 
 model QUAD_domains {
@@ -563,15 +721,28 @@ model QUAD_flows {
   actual_hours            Decimal?  @db.Decimal(5, 2)
   external_id             String?   @db.VarChar(100)
   external_url            String?
+  acceptance_criteria     String?
   created_by              String?   @db.Uuid
   created_at              DateTime  @default(now())
   updated_at              DateTime  @updatedAt
+
+  // Git Integration
+  git_branch              String?   @db.VarChar(255)
+  git_repository_id       String?   @db.Uuid
+  git_pull_request_id     String?   @db.Uuid
+  git_pull_request_url    String?
+
+  // Cycle relation (optional)
+  cycle_id                String?   @db.Uuid
 
   // Relations
   domain        QUAD_domains              @relation(fields: [domain_id], references: [id], onDelete: Cascade)
   assignee      QUAD_users?               @relation("FlowAssignedTo", fields: [assigned_to], references: [id])
   creator       QUAD_users?               @relation("FlowCreatedBy", fields: [created_by], references: [id])
   stage_history QUAD_flow_stage_history[]
+  cycle         QUAD_cycles?              @relation(fields: [cycle_id], references: [id], onDelete: SetNull)
+  branches      QUAD_flow_branches[]
+  pull_requests QUAD_pull_requests[]
 
   @@index([domain_id])
   @@index([quad_stage])
@@ -580,6 +751,8 @@ model QUAD_flows {
   @@index([circle_number])
   @@index([priority])
   @@index([external_id])
+  @@index([cycle_id])
+  @@index([git_repository_id])
   @@map("QUAD_flows")
 }
 
@@ -600,6 +773,33 @@ model QUAD_flow_stage_history {
   @@index([flow_id])
   @@index([to_stage])
   @@map("QUAD_flow_stage_history")
+}
+
+// Git branches created for Flows
+model QUAD_flow_branches {
+  id            String    @id @default(uuid()) @db.Uuid
+  flow_id       String    @db.Uuid
+  repository_id String    @db.Uuid
+  branch_name   String    @db.VarChar(255)
+  branch_type   String    @default("feature") @db.VarChar(50) // feature, bugfix, hotfix
+  branch_url    String?
+  source_branch String    @db.VarChar(255)
+  commit_sha    String?   @db.VarChar(50)
+  is_active     Boolean   @default(true)
+  created_by    String    @db.Uuid
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  // Relations
+  flow         QUAD_flows            @relation(fields: [flow_id], references: [id], onDelete: Cascade)
+  repository   QUAD_git_repositories @relation(fields: [repository_id], references: [id], onDelete: Cascade)
+  pull_requests QUAD_pull_requests[]
+
+  @@unique([flow_id, repository_id, branch_name])
+  @@index([flow_id])
+  @@index([repository_id])
+  @@index([is_active])
+  @@map("QUAD_flow_branches")
 }
 
 model QUAD_work_sessions {
@@ -750,6 +950,7 @@ model QUAD_cycles {
   domain    QUAD_domains     @relation(fields: [domain_id], references: [id], onDelete: Cascade)
   milestone QUAD_milestones? @relation(fields: [milestone_id], references: [id], onDelete: SetNull)
   tickets   QUAD_tickets[]
+  flows     QUAD_flows[]
 
   @@unique([domain_id, cycle_number])
   @@index([domain_id])
@@ -872,15 +1073,18 @@ model QUAD_ticket_time_logs {
 
 model QUAD_git_repositories {
   id             String  @id @default(uuid()) @db.Uuid
-  domain_id      String  @db.Uuid
+  org_id         String  @db.Uuid
+  domain_id      String? @db.Uuid
   provider       String  @db.VarChar(50) // github, gitlab, bitbucket, azure_devops
+  external_id    String  @db.VarChar(100) // GitHub repo ID
   owner          String  @db.VarChar(255) // GitHub org or user
   repo_name      String  @db.VarChar(255)
-  full_name      String  @db.VarChar(500) // owner/repo
+  repo_full_name String  @db.VarChar(500) // owner/repo (aliased from full_name)
+  repo_url       String? // Web URL (aliased from web_url)
   default_branch String  @default("main") @db.VarChar(100)
   clone_url      String?
-  web_url        String?
   is_private     Boolean @default(true)
+  is_primary     Boolean @default(false) // Primary repo for domain
 
   // Branch naming convention
   feature_prefix String @default("feature/") @db.VarChar(50)
@@ -888,6 +1092,7 @@ model QUAD_git_repositories {
   hotfix_prefix  String @default("hotfix/") @db.VarChar(50)
 
   // Connection
+  connected_by    String?   @db.Uuid
   access_token_id String?   @db.Uuid // Reference to secret vault
   last_synced_at  DateTime?
   sync_status     String    @default("pending") @db.VarChar(50)
@@ -896,25 +1101,34 @@ model QUAD_git_repositories {
   updated_at DateTime @updatedAt
 
   // Relations
-  domain         QUAD_domains          @relation(fields: [domain_id], references: [id], onDelete: Cascade)
+  organization   QUAD_organizations    @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  domain         QUAD_domains?         @relation(fields: [domain_id], references: [id], onDelete: SetNull)
   pull_requests  QUAD_pull_requests[]
   git_operations QUAD_git_operations[]
+  branches       QUAD_flow_branches[]
 
-  @@unique([domain_id, provider, full_name])
+  @@unique([org_id, external_id])
+  @@index([org_id])
   @@index([domain_id])
   @@index([provider])
+  @@index([is_primary])
   @@map("QUAD_git_repositories")
 }
 
 model QUAD_pull_requests {
   id            String  @id @default(uuid()) @db.Uuid
   repository_id String  @db.Uuid
+  flow_id       String? @db.Uuid
+  branch_id     String? @db.Uuid
   pr_number     Int
   title         String  @db.VarChar(500)
   description   String?
-  source_branch String  @db.VarChar(255)
-  target_branch String  @db.VarChar(255)
-  status        String  @default("open") @db.VarChar(50) // open, closed, merged
+  head_branch   String  @db.VarChar(255) // Source branch (aliased from source_branch)
+  base_branch   String  @db.VarChar(255) // Target branch (aliased from target_branch)
+  head_sha      String? @db.VarChar(50)
+  state         String  @default("open") @db.VarChar(50) // open, closed (aliased from status)
+  is_draft      Boolean @default(false)
+  is_merged     Boolean @default(false)
 
   // Review
   review_status String?  @db.VarChar(50) // pending, approved, changes_requested, rejected
@@ -926,8 +1140,8 @@ model QUAD_pull_requests {
   ai_review_notes String?
 
   // External
-  external_url String?
-  external_id  String? @db.VarChar(100)
+  pr_url      String? // PR web URL (aliased from external_url)
+  external_id String? @db.VarChar(100)
 
   // Timestamps
   created_by String    @db.Uuid
@@ -938,13 +1152,67 @@ model QUAD_pull_requests {
 
   // Relations
   repository QUAD_git_repositories @relation(fields: [repository_id], references: [id], onDelete: Cascade)
+  flow       QUAD_flows?           @relation(fields: [flow_id], references: [id], onDelete: SetNull)
+  branch     QUAD_flow_branches?   @relation(fields: [branch_id], references: [id], onDelete: SetNull)
   tickets    QUAD_tickets[]
+
+  // Normalized relations (replaces reviewers[] and approved_by[] arrays)
+  pr_reviewers QUAD_pr_reviewers[]
+  pr_approvals QUAD_pr_approvals[]
 
   @@unique([repository_id, pr_number])
   @@index([repository_id])
-  @@index([status])
+  @@index([flow_id])
+  @@index([branch_id])
+  @@index([state])
   @@index([created_by])
   @@map("QUAD_pull_requests")
+}
+
+// PR Reviewers - normalized from QUAD_pull_requests.reviewers[]
+model QUAD_pr_reviewers {
+  id         String   @id @default(uuid()) @db.Uuid
+  pr_id      String   @db.Uuid
+  user_id    String   @db.Uuid
+  assigned_at DateTime @default(now())
+  assigned_by String?  @db.Uuid
+
+  // Review status for this reviewer
+  status     String   @default("pending") @db.VarChar(50) // pending, approved, changes_requested, commented
+  reviewed_at DateTime?
+
+  // Relations
+  pull_request QUAD_pull_requests @relation(fields: [pr_id], references: [id], onDelete: Cascade)
+  user         QUAD_users         @relation("PRReviewer", fields: [user_id], references: [id], onDelete: Cascade)
+  assigner     QUAD_users?        @relation("PRReviewerAssigner", fields: [assigned_by], references: [id], onDelete: SetNull)
+
+  @@unique([pr_id, user_id])
+  @@index([pr_id])
+  @@index([user_id])
+  @@index([status])
+  @@map("QUAD_pr_reviewers")
+}
+
+// PR Approvals - normalized from QUAD_pull_requests.approved_by[]
+model QUAD_pr_approvals {
+  id          String   @id @default(uuid()) @db.Uuid
+  pr_id       String   @db.Uuid
+  user_id     String   @db.Uuid
+  approved_at DateTime @default(now())
+
+  // Approval details
+  comment     String?  // Optional approval comment
+  commit_sha  String?  @db.VarChar(50) // SHA at time of approval
+
+  // Relations
+  pull_request QUAD_pull_requests @relation(fields: [pr_id], references: [id], onDelete: Cascade)
+  user         QUAD_users         @relation("PRApprover", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([pr_id, user_id]) // One approval per user per PR
+  @@index([pr_id])
+  @@index([user_id])
+  @@index([approved_at])
+  @@map("QUAD_pr_approvals")
 }
 
 model QUAD_git_operations {
@@ -2460,6 +2728,9 @@ model QUAD_release_notes {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
+  // Normalized relation (replaces contributors[] array)
+  release_contributors QUAD_release_contributors[]
+
   @@unique([domain_id, release_version])
   @@index([org_id])
   @@index([domain_id])
@@ -2467,6 +2738,36 @@ model QUAD_release_notes {
   @@index([status])
   @@index([release_date])
   @@map("QUAD_release_notes")
+}
+
+// Release Contributors - normalized from QUAD_release_notes.contributors[]
+model QUAD_release_contributors {
+  id               String   @id @default(uuid()) @db.Uuid
+  release_notes_id String   @db.Uuid
+  user_id          String?  @db.Uuid // Null if external contributor (not in system)
+  contributor_name String   @db.VarChar(255) // Name (from git or user profile)
+  contributor_email String? @db.VarChar(255) // Email from git commits
+
+  // Contribution stats
+  commits_count    Int      @default(0)
+  additions        Int      @default(0)
+  deletions        Int      @default(0)
+  files_changed    Int      @default(0)
+
+  // Contribution type
+  contribution_type String  @default("code") @db.VarChar(50) // code, review, documentation, testing
+
+  created_at DateTime @default(now())
+
+  // Relations
+  release_notes QUAD_release_notes @relation(fields: [release_notes_id], references: [id], onDelete: Cascade)
+  user          QUAD_users?        @relation("ReleaseContributor", fields: [user_id], references: [id], onDelete: SetNull)
+
+  @@unique([release_notes_id, user_id])
+  @@index([release_notes_id])
+  @@index([user_id])
+  @@index([contributor_name])
+  @@map("QUAD_release_contributors")
 }
 
 // -----------------------------------------------------------------------------

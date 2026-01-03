@@ -542,6 +542,126 @@ npx prisma studio
 
 ---
 
+## Claude AI Integration (Anthropic API)
+
+**Status:** API key configured, client library implemented.
+
+**API Key Location:**
+- `.env` → `ANTHROPIC_API_KEY`
+- `.env.deploy` → `ANTHROPIC_API_KEY` (shared across DEV/QA/PROD)
+
+**Console:** https://console.anthropic.com/settings/usage (madhuri.recherla@gmail.com account)
+
+### Token Optimization Strategy
+
+QUAD uses 4 optimization strategies to minimize Claude API costs:
+
+| Strategy | Savings | Implementation |
+|----------|---------|----------------|
+| **Prompt Caching** | 90% on input | Cache system prompts, org context, codebase summaries |
+| **Model Routing** | 30-50% | Haiku for simple, Sonnet for coding, Opus for complex |
+| **Batch API** | 50% | "Come Back in 5 Minutes" async processing |
+| **Context Compression** | 20-40% | Summarize conversations, compress code context |
+
+**BYOK (Bring Your Own Key) Modes:**
+- **Conservative** - Max optimization, ~$15/mo per dev
+- **Flexible** - Full power, ~$45/mo per dev
+
+### Client Library Files
+
+| File | Purpose |
+|------|---------|
+| `src/lib/claude/client.ts` | Main Claude client with caching |
+| `src/lib/claude/types.ts` | TypeScript types and interfaces |
+| `src/lib/claude/cache.ts` | Cache management utilities |
+| `src/lib/claude/router.ts` | Task → Model routing logic |
+| `src/lib/claude/usage.ts` | Token usage tracking |
+| `src/lib/claude/batch.ts` | Batch API processor ("Come Back in 5 Minutes") |
+| `src/lib/claude/index.ts` | Exports all modules |
+
+**Usage Example:**
+```typescript
+import { getClaudeClient, createBYOKClient } from '@/lib/claude';
+
+// Using QUAD's API key
+const client = getClaudeClient();
+const response = await client.chat('Hello!');
+
+// Code review (batch-eligible)
+const review = await client.codeReview(code, 'Check for security issues');
+
+// Using user's own API key (BYOK)
+const byokClient = createBYOKClient({
+  apiKey: 'user-api-key',
+  mode: 'conservative',
+  userId: 'user-123',
+  organizationId: 'org-456',
+});
+```
+
+### AI Documentation (Complete)
+
+| Document | Purpose |
+|----------|---------|
+| `documentation/TOKEN_OPTIMIZATION_STRATEGY.md` | Core optimization strategies |
+| `documentation/MULTI_PROVIDER_AI_STRATEGY.md` | Multi-provider cost comparison |
+| `documentation/AI_PRICING_TIERS.md` | User-facing tier options |
+| `documentation/AI_PIPELINE_TIERS.md` | NutriNine-style pipeline approach |
+| `documentation/QUAD_AI_ACTIVITIES.md` | Complete list of 62 AI activities |
+
+### User AI Tiers
+
+| Tier | Cost/Dev/Mo | Description |
+|------|-------------|-------------|
+| 🚀 **Turbo** | ~$5 | Cheapest - Groq FREE + DeepSeek |
+| ⚡ **Balanced** | ~$15 | Best value - Smart mix of providers |
+| 💎 **Quality** | ~$35 | Best results - Claude-first |
+| 🔑 **BYOK** | Direct | Bring Your Own Key |
+
+---
+
+## Testing Protocol (IMPORTANT)
+
+**When testing each page, Claude must explain the complete flow step by step:**
+
+1. **Before Testing:**
+   - Explain what the page/feature does
+   - List all components involved
+   - Describe the data flow (frontend → API → database)
+
+2. **During Testing:**
+   - Walk through each user interaction
+   - Explain what happens at each step
+   - Show expected API calls and responses
+
+3. **After Testing:**
+   - Summarize what worked/didn't work
+   - Document any issues found
+   - Suggest improvements if any
+
+**Example Flow Documentation:**
+```
+Page: /domains (Domain Management)
+
+1. User loads page
+   → GET /api/domains (fetch user's domains)
+   → Response: [{ id, name, description, ...}]
+
+2. User clicks "Create Domain"
+   → Modal opens
+   → Form validation client-side
+
+3. User submits form
+   → POST /api/domains { name, description, project_type }
+   → Server validates, creates in QUAD_domains table
+   → Response: { id, name, ... }
+   → UI updates list, shows success toast
+```
+
+This protocol ensures thorough understanding of each feature before and after testing.
+
+---
+
 ## Phase 2 Features (Planned)
 
 Features documented for future implementation:
@@ -573,4 +693,4 @@ Features documented for future implementation:
 ---
 
 **Author:** Suman Addanki
-**Last Updated:** January 1, 2026
+**Last Updated:** January 2, 2026

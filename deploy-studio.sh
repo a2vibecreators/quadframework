@@ -8,6 +8,11 @@
 #   ./deploy-studio.sh qa    - Deploy to QA (qa.quadframe.work)
 #   ./deploy-studio.sh all   - Deploy to both DEV and QA
 #
+# Secrets:
+#   Pulls secrets from Vaultwarden using ~/scripts/vault-secrets.sh
+#   Make sure vault is unlocked: bw unlock --raw > ~/.bw-session
+#   Falls back to .env.deploy if vault not available
+#
 # Note: PROD (quadframe.work) is deployed to GCP Cloud Run, not Mac Studio
 
 set -e
@@ -16,15 +21,34 @@ set -e
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
 PROJECT_NAME="quadframework"
 NETWORK_NAME="caddy-network"
 
-# Port assignments (similar to a2vibecreators-web pattern)
+# Port assignments
 DEV_PORT=18001
 QA_PORT=18501
+
+# Load secrets from Vaultwarden if available
+load_vault_secrets() {
+    local env=$1
+    if [ -f ~/.bw-session ]; then
+        export BW_SESSION=$(cat ~/.bw-session)
+        if [ -f ~/scripts/vault-secrets.sh ]; then
+            echo -e "${BLUE}🔐 Loading secrets from Vaultwarden ($env)...${NC}"
+            source ~/scripts/vault-secrets.sh "$env" 2>/dev/null && return 0 || {
+                echo -e "${YELLOW}⚠️  Could not load secrets from vault. Using .env.deploy fallback.${NC}"
+                return 1
+            }
+        fi
+    else
+        echo -e "${YELLOW}⚠️  No vault session. Run: bw unlock --raw > ~/.bw-session${NC}"
+        return 1
+    fi
+}
 
 print_status() {
     echo -e "${GREEN}[INFO]${NC} $1"
@@ -57,31 +81,44 @@ deploy_env() {
         docker rm ${CONTAINER_NAME} 2>/dev/null || true
     fi
 
-    # Set environment-specific credentials
-    # Source from .env.deploy file (gitignored) or environment variables
-    # Create .env.deploy from .env.deploy.example and fill in real values
+    # Try to load secrets from Vaultwarden first
+    load_vault_secrets "${ENV}" || true
+
+    # Source fallback .env.deploy file
     if [ -f ".env.deploy" ]; then
         source .env.deploy
     fi
 
+    # Set environment-specific credentials
+    # Priority: Vault > .env.deploy > defaults
     if [ "${ENV}" = "dev" ]; then
-        DB_HOST="${DEV_DB_HOST:-postgres-dev}"
-        DB_NAME="${DEV_DB_NAME:-quad_dev_db}"
-        DB_PASS="${DEV_DB_PASS:-quad_dev_pass}"
-        GOOGLE_CLIENT_ID="${DEV_GOOGLE_CLIENT_ID:?ERROR: DEV_GOOGLE_CLIENT_ID not set. Create .env.deploy from .env.deploy.example}"
-        GOOGLE_CLIENT_SECRET="${DEV_GOOGLE_CLIENT_SECRET:?ERROR: DEV_GOOGLE_CLIENT_SECRET not set. Create .env.deploy from .env.deploy.example}"
-        NEXTAUTH_SECRET="${DEV_NEXTAUTH_SECRET:?ERROR: DEV_NEXTAUTH_SECRET not set. Create .env.deploy from .env.deploy.example}"
+        DB_HOST="${QUAD_DB_HOST:-${DEV_DB_HOST:-postgres-dev}}"
+        DB_NAME="${QUAD_DB_NAME:-${DEV_DB_NAME:-quad_dev_db}}"
+        DB_PASS="${QUAD_DB_PASSWORD:-${DEV_DB_PASS:-quad_dev_pass}}"
+        GOOGLE_CLIENT_ID="${QUAD_GOOGLE_CLIENT_ID:-${DEV_GOOGLE_CLIENT_ID:?ERROR: Google OAuth credentials required}}"
+        GOOGLE_CLIENT_SECRET="${QUAD_GOOGLE_CLIENT_SECRET:-${DEV_GOOGLE_CLIENT_SECRET:?ERROR: Google OAuth credentials required}}"
+        NEXTAUTH_SECRET="${QUAD_NEXTAUTH_SECRET:-${DEV_NEXTAUTH_SECRET:?ERROR: NextAuth secret required}}"
+        NETWORK_NAME="docker_dev-network"
     else
-        DB_HOST="${QA_DB_HOST:-postgres-qa}"
-        DB_NAME="${QA_DB_NAME:-quad_qa_db}"
-        DB_PASS="${QA_DB_PASS:-quad_qa_pass}"
-        GOOGLE_CLIENT_ID="${QA_GOOGLE_CLIENT_ID:?ERROR: QA_GOOGLE_CLIENT_ID not set. Create .env.deploy from .env.deploy.example}"
-        GOOGLE_CLIENT_SECRET="${QA_GOOGLE_CLIENT_SECRET:?ERROR: QA_GOOGLE_CLIENT_SECRET not set. Create .env.deploy from .env.deploy.example}"
-        NEXTAUTH_SECRET="${QA_NEXTAUTH_SECRET:?ERROR: QA_NEXTAUTH_SECRET not set. Create .env.deploy from .env.deploy.example}"
+        DB_HOST="${QUAD_DB_HOST:-${QA_DB_HOST:-postgres-qa}}"
+        DB_NAME="${QUAD_DB_NAME:-${QA_DB_NAME:-quad_qa_db}}"
+        DB_PASS="${QUAD_DB_PASSWORD:-${QA_DB_PASS:-quad_qa_pass}}"
+        GOOGLE_CLIENT_ID="${QUAD_GOOGLE_CLIENT_ID:-${QA_GOOGLE_CLIENT_ID:?ERROR: Google OAuth credentials required}}"
+        GOOGLE_CLIENT_SECRET="${QUAD_GOOGLE_CLIENT_SECRET:-${QA_GOOGLE_CLIENT_SECRET:?ERROR: Google OAuth credentials required}}"
+        NEXTAUTH_SECRET="${QUAD_NEXTAUTH_SECRET:-${QA_NEXTAUTH_SECRET:?ERROR: NextAuth secret required}}"
+        NETWORK_NAME="docker_qa-network"
     fi
+
+    # Email configuration (from vault or .env.deploy)
+    RESEND_KEY="${QUAD_RESEND_API_KEY:-${RESEND_API_KEY:-}}"
+    EMAIL_FROM_ADDR="${QUAD_EMAIL_FROM:-${EMAIL_FROM:-QUAD Platform <quadframework@quadframe.work>}}"
+
+    # Construct DATABASE_URL for Prisma
+    DATABASE_URL="postgresql://quad_user:${DB_PASS}@${DB_HOST}:5432/${DB_NAME}?schema=public"
 
     # Run the new container
     print_status "Starting container: ${CONTAINER_NAME} on port ${PORT}"
+    print_status "Network: ${NETWORK_NAME}"
     docker run -d \
         --name ${CONTAINER_NAME} \
         --network ${NETWORK_NAME} \
@@ -91,11 +128,15 @@ deploy_env() {
         -e NEXTAUTH_SECRET=${NEXTAUTH_SECRET} \
         -e GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
         -e GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
+        -e DATABASE_URL="${DATABASE_URL}" \
         -e DB_HOST=${DB_HOST} \
         -e DB_PORT=5432 \
         -e DB_NAME=${DB_NAME} \
         -e DB_USER=quad_user \
         -e DB_PASSWORD=${DB_PASS} \
+        -e EMAIL_PROVIDER=resend \
+        -e RESEND_API_KEY="${RESEND_KEY}" \
+        -e EMAIL_FROM="${EMAIL_FROM_ADDR}" \
         ${IMAGE_NAME}
 
     # Verify the container is running

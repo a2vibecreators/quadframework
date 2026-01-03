@@ -69,8 +69,8 @@ export async function GET(
             id: true,
             pr_number: true,
             title: true,
-            status: true,
-            external_url: true
+            state: true,
+            pr_url: true
           }
         }
       }

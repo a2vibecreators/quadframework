@@ -77,18 +77,26 @@ export const authOptions: NextAuthOptions = {
      */
     async signIn({ user, account }) {
       if (!account || !user.email) {
+        console.log('Sign-in rejected: Missing account or email');
         return false;
       }
 
       try {
-        // Check if user exists by email (using correct QUAD_ table name with quotes)
+        // Check if user exists by email - this enables account linking
+        // If user signed up with email/password and later uses OAuth with same email,
+        // they will be linked by email and allowed to sign in
         const existingUser = await query(
-          'SELECT id, company_id, role FROM "QUAD_users" WHERE email = $1',
+          'SELECT id, company_id, role, password_hash FROM "QUAD_users" WHERE email = $1',
           [user.email]
         );
 
         if (existingUser.rows.length > 0) {
-          // User exists - update last activity time
+          const dbUser = existingUser.rows[0] as { id: string; password_hash: string };
+
+          // Account linking: User exists, allow OAuth sign-in regardless of original auth method
+          // This links OAuth provider to existing account
+          console.log(`Account linking: ${user.email} signed in via ${account.provider} (existing user)`);
+
           await query(
             `UPDATE "QUAD_users" SET updated_at = NOW() WHERE email = $1`,
             [user.email]
@@ -148,7 +156,7 @@ export const authOptions: NextAuthOptions = {
         } else {
           // No organization found - redirect to signup
           console.log(`Sign-in rejected: No organization found for ${user.email}`);
-          return '/signup?reason=no-company&email=' + encodeURIComponent(user.email);
+          return '/auth/signup?reason=no-company&email=' + encodeURIComponent(user.email);
         }
 
       } catch (error) {
