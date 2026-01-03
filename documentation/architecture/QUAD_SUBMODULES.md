@@ -58,21 +58,23 @@ a2vibecreators/                   # GitHub Organization
 │
 ├── quadframework/                # Parent repo (orchestrator)
 │   ├── .gitmodules               # Submodule definitions
-│   ├── quadframework-database/   # ← Submodule
-│   ├── quadframework-services/   # ← Submodule (NEW)
-│   ├── quadframework-web/        # ← Submodule
-│   ├── quadframework-vscode/     # ← Submodule
-│   ├── documentation/            # Keep in parent (shared)
+│   ├── quad-database/            # ← Submodule (Prisma schema)
+│   ├── quad-services/            # ← Submodule (Core business logic)
+│   ├── quad-ui/                  # ← Submodule (Next.js web app)
+│   ├── quad-ios/                 # ← Submodule (iOS native app)
+│   ├── quad-android/             # ← Submodule (Android native app)
+│   ├── quad-vscode/              # ← Submodule (VS Code extension)
+│   ├── documentation/            # Keep in parent (shared docs)
 │   └── scripts/                  # Deploy scripts
 │
-├── quadframework-database/       # Standalone repo
+├── quad-database/                # Standalone repo
 │   ├── prisma/
 │   │   ├── schema.prisma
 │   │   ├── migrations/
 │   │   └── sql/
 │   └── package.json
 │
-├── quadframework-services/       # Standalone repo (NEW)
+├── quad-services/                # Standalone repo
 │   ├── src/
 │   │   ├── services/             # Core business logic
 │   │   ├── ai/                   # AI routing, providers
@@ -80,13 +82,26 @@ a2vibecreators/                   # GitHub Organization
 │   │   └── index.ts              # Exports
 │   └── package.json
 │
-├── quadframework-web/            # Standalone repo
+├── quad-ui/                      # Standalone repo (Web App)
 │   ├── src/
 │   │   ├── app/                  # Next.js pages + API
 │   │   └── components/
 │   └── package.json              # Depends on services
 │
-└── quadframework-vscode/         # Standalone repo
+├── quad-ios/                     # Standalone repo (iOS App)
+│   ├── QUAD/
+│   │   ├── Views/                # SwiftUI views
+│   │   ├── ViewModels/           # MVVM ViewModels
+│   │   └── Services/             # API client
+│   └── QUAD.xcodeproj
+│
+├── quad-android/                 # Standalone repo (Android App)
+│   ├── app/
+│   │   ├── src/main/java/        # Kotlin source
+│   │   └── src/main/res/         # Resources
+│   └── build.gradle.kts
+│
+└── quad-vscode/                  # Standalone repo (VS Code Extension)
     ├── src/
     │   └── extension.ts
     └── package.json              # Depends on services
@@ -307,6 +322,179 @@ export class QuadClient {
 
 ---
 
+### quad-ios
+
+**Purpose:** Native iOS app for QUAD platform access on iPhone/iPad
+
+```
+quad-ios/
+├── QUAD/
+│   ├── App/
+│   │   ├── QUADApp.swift           # App entry point
+│   │   └── ContentView.swift       # Main container
+│   │
+│   ├── Views/                      # SwiftUI Views
+│   │   ├── Dashboard/
+│   │   │   ├── DashboardView.swift
+│   │   │   └── WidgetViews/
+│   │   ├── IDE/
+│   │   │   ├── IDETabView.swift    # IDE experience
+│   │   │   └── CodeEditorView.swift
+│   │   ├── Tickets/
+│   │   │   ├── TicketListView.swift
+│   │   │   └── TicketDetailView.swift
+│   │   └── Chat/
+│   │       └── AIChatView.swift
+│   │
+│   ├── ViewModels/                 # MVVM ViewModels
+│   │   ├── DashboardViewModel.swift
+│   │   ├── TicketViewModel.swift
+│   │   └── ChatViewModel.swift
+│   │
+│   ├── Services/                   # API & Services
+│   │   ├── APIClient.swift         # REST API calls
+│   │   ├── AuthService.swift       # Authentication
+│   │   └── WebSocketService.swift  # Real-time updates
+│   │
+│   ├── Models/                     # Data Models
+│   │   ├── Ticket.swift
+│   │   ├── Project.swift
+│   │   └── User.swift
+│   │
+│   └── Resources/
+│       └── Assets.xcassets
+│
+├── QUAD.xcodeproj
+├── QUADTests/
+└── README.md
+```
+
+**Tech Stack:**
+- SwiftUI (iOS 16+)
+- Combine for reactive programming
+- URLSession for networking
+- Keychain for secure storage
+
+**Key Features:**
+- Role-based dashboard (same as web)
+- Ticket management on the go
+- AI chat for quick queries
+- Push notifications for agent updates
+- Offline support for viewing tickets
+
+---
+
+### quad-android
+
+**Purpose:** Native Android app for QUAD platform access
+
+```
+quad-android/
+├── app/
+│   ├── src/main/
+│   │   ├── java/com/quad/
+│   │   │   ├── QUADApplication.kt
+│   │   │   │
+│   │   │   ├── ui/                 # Jetpack Compose UI
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   ├── DashboardScreen.kt
+│   │   │   │   │   └── WidgetComponents.kt
+│   │   │   │   ├── ide/
+│   │   │   │   │   ├── IDEScreen.kt
+│   │   │   │   │   └── CodeEditorView.kt
+│   │   │   │   ├── tickets/
+│   │   │   │   │   ├── TicketListScreen.kt
+│   │   │   │   │   └── TicketDetailScreen.kt
+│   │   │   │   └── chat/
+│   │   │   │       └── AIChatScreen.kt
+│   │   │   │
+│   │   │   ├── viewmodel/          # MVVM ViewModels
+│   │   │   │   ├── DashboardViewModel.kt
+│   │   │   │   ├── TicketViewModel.kt
+│   │   │   │   └── ChatViewModel.kt
+│   │   │   │
+│   │   │   ├── data/               # Data Layer
+│   │   │   │   ├── api/
+│   │   │   │   │   ├── QUADApiService.kt  # Retrofit
+│   │   │   │   │   └── AuthInterceptor.kt
+│   │   │   │   ├── repository/
+│   │   │   │   └── model/
+│   │   │   │
+│   │   │   └── di/                 # Hilt DI
+│   │   │       └── AppModule.kt
+│   │   │
+│   │   └── res/
+│   │       ├── values/
+│   │       └── drawable/
+│   │
+│   └── build.gradle.kts
+│
+├── build.gradle.kts
+├── settings.gradle.kts
+└── README.md
+```
+
+**Tech Stack:**
+- Jetpack Compose (Material 3)
+- Kotlin Coroutines + Flow
+- Retrofit + OkHttp
+- Hilt for DI
+- DataStore for preferences
+
+**Key Features:**
+- Same role-based dashboard as iOS/Web
+- Ticket management
+- AI chat interface
+- FCM push notifications
+- Offline-first with Room database
+
+---
+
+## Prisma Concern: Mobile Apps Don't Use Prisma
+
+> **Important:** Mobile apps (iOS/Android) do NOT include Prisma. They consume the REST API exposed by `quad-ui` (Next.js).
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        QUAD Architecture                                │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌──────────────┐    ┌──────────────┐    ┌──────────────┐             │
+│   │   quad-ios   │    │quad-android  │    │  quad-vscode │             │
+│   │   (Swift)    │    │  (Kotlin)    │    │     (TS)     │             │
+│   └──────┬───────┘    └──────┬───────┘    └──────┬───────┘             │
+│          │                   │                   │                      │
+│          │ REST API          │ REST API          │ REST API            │
+│          │                   │                   │                      │
+│          └───────────────────┼───────────────────┘                      │
+│                              │                                          │
+│                    ┌─────────▼─────────┐                                │
+│                    │     quad-ui       │                                │
+│                    │   (Next.js API)   │ ← API Routes                   │
+│                    └─────────┬─────────┘                                │
+│                              │                                          │
+│                    ┌─────────▼─────────┐                                │
+│                    │   quad-services   │                                │
+│                    │ (Business Logic)  │ ← Uses Prisma Client           │
+│                    └─────────┬─────────┘                                │
+│                              │                                          │
+│                    ┌─────────▼─────────┐                                │
+│                    │   quad-database   │                                │
+│                    │     (Prisma)      │ ← Schema & Migrations          │
+│                    └───────────────────┘                                │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Why this works:**
+- Mobile apps are **thin clients** - just UI
+- Business logic stays in `quad-services`
+- Prisma only runs server-side in `quad-ui` and `quad-services`
+- Mobile apps call REST APIs, not database directly
+- This is the same pattern as NutriNine (Java API + iOS/Android clients)
+
+---
+
 ## 4. Migration Plan
 
 ### Phase 1: Extract Database (1 day)
@@ -349,12 +537,49 @@ gh repo create a2vibecreators/quadframework-web --public
 
 ```bash
 # 1. Create new repo
-gh repo create a2vibecreators/quadframework-vscode --public
+gh repo create a2vibecreators/quad-vscode --public
 
 # 2. Move quad-vscode-plugin contents
 # 3. Update to use services package
 # 4. Add as submodule
 ```
+
+### Phase 5: Create iOS App (Phase 2 - 2-3 weeks)
+
+```bash
+# 1. Create new repo
+gh repo create a2vibecreators/quad-ios --private
+
+# 2. Initialize Xcode project with SwiftUI
+# 3. Set up API client to call quad-ui endpoints
+# 4. Implement role-based dashboard
+# 5. Add as submodule
+```
+
+### Phase 6: Create Android App (Phase 2 - 2-3 weeks)
+
+```bash
+# 1. Create new repo
+gh repo create a2vibecreators/quad-android --private
+
+# 2. Initialize Android project with Compose
+# 3. Set up Retrofit to call quad-ui endpoints
+# 4. Implement role-based dashboard
+# 5. Add as submodule
+```
+
+### Migration Timeline
+
+| Phase | Component | Effort | Priority |
+|-------|-----------|--------|----------|
+| 1 | quad-database | 1 day | P0 (Now) |
+| 2 | quad-services | 2 days | P0 (Now) |
+| 3 | quad-ui (web) | 1 day | P0 (Now) |
+| 4 | quad-vscode | 1 day | P1 (Next) |
+| 5 | quad-ios | 2-3 weeks | P2 (Later) |
+| 6 | quad-android | 2-3 weeks | P2 (Later) |
+
+**Note:** iOS and Android are Phase 2 priorities. Focus on web platform first.
 
 ---
 

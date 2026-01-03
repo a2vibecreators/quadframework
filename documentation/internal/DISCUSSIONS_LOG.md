@@ -21,7 +21,9 @@
 10. [Multilingual Coding Experience](#10-multilingual-coding-experience)
 11. [Agent Behavior Rules](#11-agent-behavior-rules)
 12. [Chat Message Queue Management](#12-chat-message-queue-management)
-13. [Future Ideas Backlog](#13-future-ideas-backlog)
+13. [Role-Based IDE Dashboards](#13-role-based-ide-dashboards)
+14. [Multi-Platform Expansion Concerns](#14-multi-platform-expansion-concerns)
+15. [Future Ideas Backlog](#15-future-ideas-backlog)
 
 ---
 
@@ -811,7 +813,189 @@ ALTER TABLE QUAD_chat_messages ADD COLUMN
 
 ---
 
-## 13. Future Ideas Backlog
+## 13. Role-Based IDE Dashboards
+
+**Date Discussed:** January 3, 2026
+**Status:** Planning
+
+### Core Concept
+
+Design role-based dashboards that feel like an IDE experience, not just a web dashboard. Each role sees what's relevant to them with restricted access to prevent micromanagement.
+
+### Role-Based Views
+
+| Role | Dashboard Focus | Can Drill Down To | Restricted From |
+|------|----------------|-------------------|-----------------|
+| **Senior Director** | Portfolio overview | Director dashboards | Individual tickets |
+| **Director** | All projects in their domain | Project details, team leads | Individual developer work |
+| **Team Lead** | Their circle/team | Member work, tickets | Other circles |
+| **Operator** | Their assignments | Own work details | Other members' work |
+
+### Dashboard Tabs/Components
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  QUAD Dashboard (Role-Specific)                              [User ▼]  │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  [IDE] [Projects] [Tickets] [Reports] [Settings]           ← Tab Bar   │
+│                                                                         │
+│  ┌────────────────────────────────────────────────────────────────────┐ │
+│  │                         MAIN CONTENT AREA                          │ │
+│  │                                                                    │ │
+│  │   Based on selected tab and user role                              │ │
+│  │                                                                    │ │
+│  └────────────────────────────────────────────────────────────────────┘ │
+│                                                                         │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
+│  │   Widget 1   │  │   Widget 2   │  │   Widget 3   │   ← Customizable │
+│  │ My Tickets   │  │ Project      │  │ Team Health  │                  │
+│  │              │  │ Status       │  │              │                  │
+│  └──────────────┘  └──────────────┘  └──────────────┘                  │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Tabs
+
+| Tab | Purpose | Who Uses |
+|-----|---------|----------|
+| **IDE** | Full QUAD IDE experience (like SUCCESS_STORY.md vision) | Developers, Team Leads |
+| **Projects** | Project status overview, drill down | Directors, Team Leads |
+| **Tickets** | Tickets assigned by project | All roles (filtered by access) |
+| **Reports** | Analytics, metrics, trends | Directors, Admins |
+| **Settings** | Personal preferences, widgets | All |
+
+### Customizable Widgets
+
+Users can add widgets to their home screen:
+
+| Widget | Shows | Useful For |
+|--------|-------|------------|
+| **My Tickets** | Assigned tickets by status | Developers |
+| **All Projects Status** | Overview of all accessible projects | Directors |
+| **Team Velocity** | Sprint burndown, points completed | Team Leads |
+| **AI Agent Status** | Running agents, queue status | All |
+| **Recent Activity** | Latest updates in their scope | All |
+| **Meeting Action Items** | Pending items from meetings | Management |
+
+### Phase 1 vs Phase 2
+
+**Phase 1 (Now):**
+- Fixed tab structure
+- Role-based access control
+- Basic dashboard layout
+- 2-3 default widgets
+
+**Phase 2 (Future):**
+- Drag-and-drop widget customization
+- Save dashboard layouts
+- Share layouts with team
+- Custom widgets via plugin API
+
+### Design Decisions
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| IDE-like feel | Tabbed interface with panels | Familiar to developers |
+| Restriction model | Restrict drilling, not viewing | Prevent micromanagement |
+| Widgets | Pre-built, selectable | Fast Phase 1, extensible later |
+| Home screen | Customizable per user | Different roles want different views |
+
+### Key Insights from Discussion
+
+1. **End user UI should feel like an IDE** - not just another web dashboard
+2. **Role restriction is about depth, not visibility** - Directors can see projects but shouldn't dig into individual ticket details
+3. **Customizable widgets for login screen** - Some users want "all projects status" on login, others want "my tickets"
+4. **Phase 2 will add more customization** - Start simple, add flexibility later
+
+---
+
+## 14. Multi-Platform Expansion Concerns
+
+**Date Discussed:** January 3, 2026
+**Status:** Planning
+
+### User Concern
+
+> "I am worried about Prisma now... we started small but this is bigger than I thought"
+
+The project has grown from a simple web platform to a full multi-platform ecosystem:
+- **Started with:** Web app (Next.js + Prisma)
+- **Now includes:** iOS, Android, VS Code extension, and a services layer
+
+### The Prisma Question
+
+**Will mobile apps need Prisma?**
+
+**Answer: NO.** Mobile apps are thin REST clients. They call the API, not the database.
+
+```
+Mobile Apps (iOS/Android)
+         │
+         │ REST API calls
+         ▼
+    quad-ui (Next.js)
+         │
+         │ Uses Prisma Client
+         ▼
+    quad-services (Business Logic)
+         │
+         │ Uses Prisma Client
+         ▼
+    quad-database (Prisma Schema)
+```
+
+**Key points:**
+1. **Prisma stays server-side** - Only `quad-ui` and `quad-services` use Prisma
+2. **Mobile = REST clients** - Just like NutriNine's iOS/Android apps call the Java API
+3. **VS Code = REST client** - Also calls the API, doesn't use Prisma directly
+4. **One source of truth** - All platforms use the same API endpoints
+
+### Renamed Submodules (Shorter Names)
+
+| Old Name | New Name | Reason |
+|----------|----------|--------|
+| quadframework-database | quad-database | Shorter, cleaner |
+| quadframework-services | quad-services | Consistent |
+| quadframework-web | quad-ui | "UI" is more accurate |
+| quadframework-vscode | quad-vscode | Consistent |
+| (new) | quad-ios | iOS native app |
+| (new) | quad-android | Android native app |
+
+### Phased Approach
+
+| Phase | Components | Focus |
+|-------|------------|-------|
+| **Phase 1 (Now)** | quad-database, quad-services, quad-ui, quad-vscode | Web platform + VS Code |
+| **Phase 2 (Later)** | quad-ios, quad-android | Mobile apps |
+
+### Why This Works
+
+1. **Same pattern as NutriNine:**
+   - NutriNine has Java API + iOS + Android
+   - Mobile apps don't include database logic
+   - All business logic is server-side
+
+2. **Prisma is contained:**
+   - Schema in `quad-database`
+   - Client used in `quad-services`
+   - Exposed via API in `quad-ui`
+   - Mobile/VS Code never touch Prisma
+
+3. **Scalable architecture:**
+   - Add more platforms later (tablet, desktop, watch)
+   - All consume the same API
+   - Business logic centralized
+
+### Decision
+
+**Focus on Phase 1 first.** Mobile apps are Phase 2 priority.
+
+See: [QUAD_SUBMODULES.md](../architecture/QUAD_SUBMODULES.md)
+
+---
+
+## 15. Future Ideas Backlog
 
 ### Confirmed for Future Phases
 
