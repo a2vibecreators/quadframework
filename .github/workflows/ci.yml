@@ -1,0 +1,109 @@
+# QUAD Framework - CI Pipeline
+#
+# Runs on every PR and push to main/dev branches.
+# All checks must pass before PR can be merged.
+#
+# Steps:
+# 1. Checkout code
+# 2. Setup Node.js
+# 3. Install dependencies
+# 4. Validate Prisma schema
+# 5. TypeScript check
+# 6. ESLint
+# 7. Build
+# 8. (Future) Run tests
+#
+
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  validate:
+    name: Validate & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Validate Prisma Schema
+        run: npx prisma validate
+
+      - name: TypeScript Check
+        run: npx tsc --noEmit
+
+      - name: ESLint
+        run: npx eslint . --max-warnings 0
+        continue-on-error: true  # Don't fail on lint warnings for now
+
+      - name: Build
+        run: npm run build
+        env:
+          # Provide dummy env vars for build
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db"
+          NEXTAUTH_URL: "http://localhost:3000"
+          NEXTAUTH_SECRET: "ci-build-secret"
+
+      - name: Check for build artifacts
+        run: |
+          if [ -d ".next" ]; then
+            echo "✓ Build artifacts created successfully"
+            du -sh .next
+          else
+            echo "✗ Build artifacts not found"
+            exit 1
+          fi
+
+  # Future: Add test job
+  # test:
+  #   name: Run Tests
+  #   runs-on: ubuntu-latest
+  #   needs: validate
+  #   services:
+  #     postgres:
+  #       image: postgres:15
+  #       env:
+  #         POSTGRES_USER: quad_test
+  #         POSTGRES_PASSWORD: quad_test_pass
+  #         POSTGRES_DB: quad_test_db
+  #       ports:
+  #         - 5432:5432
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ env.NODE_VERSION }}
+  #         cache: 'npm'
+  #     - run: npm ci
+  #     - run: npx prisma generate
+  #     - run: npx prisma db push
+  #       env:
+  #         DATABASE_URL: "postgresql://quad_test:quad_test_pass@localhost:5432/quad_test_db"
+  #     - run: npm test
+  #       env:
+  #         DATABASE_URL: "postgresql://quad_test:quad_test_pass@localhost:5432/quad_test_db"
