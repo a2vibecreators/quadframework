@@ -15,8 +15,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { routeToContext, compactConversation, Message, ContextCategory } from '@/lib/ai/context-categories';
 import { getCodebaseIndex, formatIndexForAI } from '@/lib/ai/codebase-indexer';
+import { callAI, AIMessage } from '@/lib/ai/providers';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
+
+// Environment check for AI providers
+const USE_REAL_AI = process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY;
 
 // Schema definitions for context injection
 const SCHEMA_DEFINITIONS: Record<string, string> = {
@@ -264,19 +268,59 @@ ${compacted.summary ? `## Previous Conversation Summary:\n${compacted.summary}\n
     // Keys are stored as vault references: openai_key_ref, anthropic_key_ref, etc.
     const hasCustomKeys = !!(aiConfig?.anthropic_key_ref || aiConfig?.openai_key_ref);
 
-    // Step 7: Build messages array for AI (Step 6 was AI config)
-    const aiMessages = [
+    // Step 7: Build messages array for AI
+    const aiMessages: AIMessage[] = [
       { role: 'system', content: systemPrompt },
-      ...compacted.recentMessages.map(m => ({ role: m.role, content: m.content })),
+      ...compacted.recentMessages.map(m => ({
+        role: m.role as 'user' | 'assistant' | 'system',
+        content: m.content
+      })),
       { role: 'user', content: message },
     ];
 
-    // Step 8: Call AI provider
-    // For now, return a structured response (actual AI call would go here)
+    // Step 8: Call AI provider (real or mock)
+    let responseMessage: string;
+    let usage = {
+      promptTokens: Math.ceil(systemPrompt.length / 4),
+      completionTokens: 100,
+      totalTokens: Math.ceil(systemPrompt.length / 4) + 100,
+    };
+    let provider = 'mock';
+    let model = 'mock';
+    let latencyMs = 0;
+
+    if (USE_REAL_AI) {
+      try {
+        // Use real AI provider
+        const aiResponse = await callAI(user.companyId, aiMessages, {
+          activityType: 'general_chat',
+        });
+
+        responseMessage = aiResponse.content;
+        usage = {
+          promptTokens: aiResponse.usage.inputTokens,
+          completionTokens: aiResponse.usage.outputTokens,
+          totalTokens: aiResponse.usage.totalTokens,
+        };
+        provider = 'claude'; // or detect from response
+        model = aiResponse.model;
+        latencyMs = aiResponse.latencyMs;
+
+        console.log(`[AI Chat] Real AI response in ${latencyMs}ms, tokens: ${usage.totalTokens}`);
+      } catch (aiError) {
+        console.error('[AI Chat] AI provider error, falling back to mock:', aiError);
+        responseMessage = generateMockResponse(message, context.categories);
+      }
+    } else {
+      // Use mock response (no API keys configured)
+      console.log('[AI Chat] No API keys configured, using mock response');
+      responseMessage = generateMockResponse(message, context.categories);
+    }
+
     const response = {
       success: true,
       data: {
-        message: generateMockResponse(message, context.categories),
+        message: responseMessage,
         context: {
           categories: context.categories,
           tables: context.tables,
@@ -285,11 +329,10 @@ ${compacted.summary ? `## Previous Conversation Summary:\n${compacted.summary}\n
           usedCodebaseIndex: !!codebaseContext,
           codebaseIndexTokens: indexTokens,
         },
-        usage: {
-          promptTokens: Math.ceil(systemPrompt.length / 4),
-          completionTokens: 100,
-          totalTokens: Math.ceil(systemPrompt.length / 4) + 100,
-        },
+        usage,
+        provider,
+        model,
+        latencyMs,
       },
     };
 

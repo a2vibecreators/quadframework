@@ -14,6 +14,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { prisma } from '@/lib/prisma';
+import { callAI, AIMessage } from '@/lib/ai/providers';
+
+// Environment check for AI providers
+const USE_REAL_AI = process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY;
 
 /**
  * GET - Retrieve conversation history for a ticket
@@ -154,8 +158,9 @@ export async function POST(request: NextRequest) {
     // 4. Build ticket-scoped context (LIMITED to this ticket)
     const ticketPrompt = buildTicketContext(ticketContext);
 
-    // 5. Generate AI response (mock for now - replace with actual AI call)
+    // 5. Generate AI response (real AI with mock fallback)
     const aiResponse = await generateTicketResponse(
+      orgId,
       message,
       ticketContext,
       conversationHistory,
@@ -170,8 +175,8 @@ export async function POST(request: NextRequest) {
         content: aiResponse.content,
         content_type: aiResponse.hasCode ? 'code' : 'text',
         tokens_used: aiResponse.tokensUsed,
-        provider: routing?.provider || 'mock',
-        model_id: routing?.model_id || 'mock-model',
+        provider: aiResponse.provider,
+        model_id: aiResponse.model,
         latency_ms: aiResponse.latencyMs,
         suggestion_type: aiResponse.suggestion?.type,
         suggestion_data: aiResponse.suggestion?.data as object | undefined,
@@ -198,7 +203,9 @@ export async function POST(request: NextRequest) {
         message: aiResponse.content,
         suggestion: aiResponse.suggestion,
         tokensUsed: aiResponse.tokensUsed,
-        provider: routing?.provider || 'mock',
+        provider: aiResponse.provider,
+        model: aiResponse.model,
+        latencyMs: aiResponse.latencyMs,
       },
     });
   } catch (error) {
@@ -239,8 +246,9 @@ You are helping with THIS SPECIFIC TICKET only. Do not discuss other tickets unl
 `;
 }
 
-// Generate response for ticket questions (mock - replace with actual AI)
+// Generate response for ticket questions
 async function generateTicketResponse(
+  orgId: string,
   message: string,
   ticketContext: Record<string, string> | undefined,
   history: { role: string; content: string }[],
@@ -250,12 +258,125 @@ async function generateTicketResponse(
   tokensUsed: number;
   latencyMs: number;
   hasCode: boolean;
+  provider: string;
+  model: string;
   suggestion?: { type: string; data: Record<string, unknown> };
 }> {
   const startTime = Date.now();
-  const q = message.toLowerCase();
 
-  // Mock responses based on question type
+  // Build system prompt with ticket context
+  const ticketPromptContext = buildTicketContext(ticketContext || {});
+  const systemPrompt = `You are QUAD AI, helping with a specific ticket in a project management system.
+
+${ticketPromptContext}
+
+## Your Capabilities:
+- Answer questions about THIS ticket only
+- Suggest next steps, identify blockers, estimate effort
+- Provide implementation hints based on the ticket description
+- Suggest ticket actions (status changes, comments, assignments)
+
+## Response Format:
+- Be concise and actionable
+- Use markdown for formatting
+- If suggesting an action, format it clearly
+
+## Important:
+- Stay focused on THIS ticket
+- If asked about other tickets, politely redirect to use the general search`;
+
+  // Check if we should use real AI
+  if (USE_REAL_AI) {
+    try {
+      // Build messages for AI
+      const aiMessages: AIMessage[] = [
+        { role: 'system', content: systemPrompt },
+        ...history.slice(-10).map(m => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        })),
+        { role: 'user', content: message },
+      ];
+
+      // Call real AI
+      const aiResponse = await callAI(orgId, aiMessages, {
+        activityType: 'ticket_question',
+        provider: routing?.provider,
+        model: routing?.model_id,
+      });
+
+      const latencyMs = Date.now() - startTime;
+      console.log(`[ticket-chat] Real AI response in ${latencyMs}ms`);
+
+      // Check for suggested actions in the response
+      const suggestion = extractSuggestion(aiResponse.content);
+
+      return {
+        content: aiResponse.content,
+        tokensUsed: aiResponse.usage.totalTokens,
+        latencyMs,
+        hasCode: aiResponse.content.includes('```'),
+        provider: routing?.provider || 'claude',
+        model: aiResponse.model,
+        suggestion,
+      };
+    } catch (error) {
+      console.error('[ticket-chat] AI error, using mock:', error);
+      // Fall through to mock response
+    }
+  }
+
+  // Mock response fallback
+  console.log('[ticket-chat] Using mock response');
+  const mockResponse = generateMockTicketResponse(message, ticketContext);
+
+  return {
+    content: mockResponse.content,
+    tokensUsed: Math.ceil(mockResponse.content.length / 4),
+    latencyMs: Date.now() - startTime,
+    hasCode: mockResponse.content.includes('```'),
+    provider: 'mock',
+    model: 'mock',
+    suggestion: mockResponse.suggestion,
+  };
+}
+
+// Extract action suggestions from AI response
+function extractSuggestion(
+  content: string
+): { type: string; data: Record<string, unknown> } | undefined {
+  // Look for suggestion patterns in the response
+  const lowerContent = content.toLowerCase();
+
+  if (lowerContent.includes('suggest moving') || lowerContent.includes('change status')) {
+    const statusMatch = content.match(/status.*?["'](\w+)["']/i);
+    if (statusMatch) {
+      return {
+        type: 'update_status',
+        data: { newStatus: statusMatch[1] },
+      };
+    }
+  }
+
+  if (lowerContent.includes('add a comment') || lowerContent.includes('leave a note')) {
+    return {
+      type: 'add_comment',
+      data: { content: 'AI suggested adding a comment' },
+    };
+  }
+
+  return undefined;
+}
+
+// Mock response generator for when no API keys are configured
+function generateMockTicketResponse(
+  message: string,
+  ticketContext: Record<string, string> | undefined
+): {
+  content: string;
+  suggestion?: { type: string; data: Record<string, unknown> };
+} {
+  const q = message.toLowerCase();
   let content: string;
   let suggestion: { type: string; data: Record<string, unknown> } | undefined;
 
@@ -306,11 +427,5 @@ I can help you with:
 What would you like to know about this ticket?`;
   }
 
-  return {
-    content,
-    tokensUsed: Math.ceil(content.length / 4),
-    latencyMs: Date.now() - startTime,
-    hasCode: content.includes('```'),
-    suggestion,
-  };
+  return { content, suggestion };
 }
