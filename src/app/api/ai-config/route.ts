@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
         primary_provider: 'gemini',
         fallback_provider: null,
         ai_usage_mode: 'conservative',
+        classification_mode: 'hybrid',  // accuracy, cost, or hybrid
         enable_code_generation: true,
         enable_code_review: true,
         enable_estimation: true,

@@ -434,22 +434,27 @@ export async function buildOrgCodebaseIndex(orgId: string): Promise<void> {
   };
 
   await prisma.qUAD_codebase_indexes.upsert({
-    where: { org_id: orgId },
+    where: {
+      org_id_repo_name_branch: {
+        org_id: orgId,
+        repo_name: 'quadframework',
+        branch: 'main'
+      }
+    },
     create: {
       org_id: orgId,
-      index_type: 'schema',
-      summary: `QUAD Schema: ${indexData.tables} tables across ${indexData.categories.length} categories`,
-      key_entities: indexData.categories,
-      last_indexed_at: new Date(),
-      token_count: indexData.totalTokens,
-      index_data: QUAD_TABLE_INDEX as unknown as Record<string, unknown>[],
+      repo_name: 'quadframework',
+      branch: 'main',
+      tables_summary: JSON.parse(JSON.stringify(indexData)),
+      total_tokens: indexData.totalTokens,
+      last_synced_at: new Date(),
+      sync_status: 'synced',
     },
     update: {
-      summary: `QUAD Schema: ${indexData.tables} tables across ${indexData.categories.length} categories`,
-      key_entities: indexData.categories,
-      last_indexed_at: new Date(),
-      token_count: indexData.totalTokens,
-      index_data: QUAD_TABLE_INDEX as unknown as Record<string, unknown>[],
+      tables_summary: JSON.parse(JSON.stringify(indexData)),
+      total_tokens: indexData.totalTokens,
+      last_synced_at: new Date(),
+      sync_status: 'synced',
     },
   });
 }

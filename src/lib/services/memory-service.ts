@@ -276,18 +276,20 @@ export async function upsertMemoryDocument(
   // Parse sections from markdown
   const sections = parseSectionsFromMarkdown(content);
 
+  const entityId = levelEntityId || '_global_'; // Use placeholder for null entity IDs
+
   const doc = await prisma.qUAD_memory_documents.upsert({
     where: {
       org_id_memory_level_level_entity_id: {
         org_id: orgId,
         memory_level: level,
-        level_entity_id: levelEntityId,
+        level_entity_id: entityId,
       },
     },
     create: {
       org_id: orgId,
       memory_level: level,
-      level_entity_id: levelEntityId,
+      level_entity_id: entityId,
       document_key: documentKey,
       title,
       content,
