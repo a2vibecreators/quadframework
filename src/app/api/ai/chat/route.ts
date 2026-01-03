@@ -6,6 +6,7 @@
  *
  * Features:
  * - Keyword-based context routing (Phase 1)
+ * - Codebase index for token optimization (500 tokens vs 50K+)
  * - Conversation compaction for long chats
  * - BYOK support (user's own API keys)
  * - Falls back to embeddings if no keyword match (Phase 2 - TODO)
@@ -13,6 +14,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { routeToContext, compactConversation, Message, ContextCategory } from '@/lib/ai/context-categories';
+import { getCodebaseIndex, formatIndexForAI } from '@/lib/ai/codebase-indexer';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/auth';
 
@@ -134,11 +136,20 @@ CREATE TABLE "QUAD_byok_keys" (
 };
 
 // Build context string from matched categories
-function buildContextString(tables: string[], categories: ContextCategory[]): string {
+function buildContextString(
+  tables: string[],
+  categories: ContextCategory[],
+  codebaseContext?: string
+): string {
   const schemaContext = tables
     .filter(t => SCHEMA_DEFINITIONS[t])
     .map(t => `-- ${t}\n${SCHEMA_DEFINITIONS[t]}`)
     .join('\n\n');
+
+  // If we have a codebase index, use that for broader context
+  const codebaseSection = codebaseContext
+    ? `\n### Codebase Overview (from index):\n${codebaseContext}\n`
+    : '';
 
   return `
 ## QUAD Framework Context
@@ -148,7 +159,7 @@ Matched categories: ${categories.join(', ')}
 
 ### Relevant Database Schema:
 ${schemaContext || 'No specific schema context needed.'}
-
+${codebaseSection}
 ### Key Concepts:
 - **Domains**: Top-level organizational units (products, projects)
 - **Flows**: Work processes within domains (feature dev, bug fix, etc.)
@@ -214,8 +225,22 @@ export async function POST(request: NextRequest) {
       console.log(`[AI Chat] Compacted ${compacted.messagesSummarized} messages, saved ~${compacted.estimatedTokensSaved} tokens`);
     }
 
-    // Step 4: Build system prompt with only relevant context
-    const contextString = buildContextString(context.tables, context.categories);
+    // Step 4: Fetch codebase index for broader context (token-optimized)
+    let codebaseContext: string | undefined;
+    let indexTokens = 0;
+    try {
+      const codebaseIndex = await getCodebaseIndex(user.companyId, 'quadframework');
+      if (codebaseIndex) {
+        codebaseContext = formatIndexForAI(codebaseIndex);
+        indexTokens = Math.ceil(codebaseContext.length / 4);
+        console.log(`[AI Chat] Using codebase index (~${indexTokens} tokens)`);
+      }
+    } catch {
+      console.log('[AI Chat] No codebase index available');
+    }
+
+    // Step 5: Build system prompt with only relevant context
+    const contextString = buildContextString(context.tables, context.categories, codebaseContext);
 
     const systemPrompt = `You are QUAD AI, an intelligent assistant for the QUAD project management framework.
 
@@ -230,7 +255,7 @@ ${compacted.summary ? `## Previous Conversation Summary:\n${compacted.summary}\n
 - If the question is outside QUAD scope, politely redirect to QUAD-related help
 `;
 
-    // Step 5: Get AI configuration for this org
+    // Step 6: Get AI configuration for this org
     const aiConfig = await prisma.qUAD_ai_configs.findUnique({
       where: { org_id: user.companyId },
     });
@@ -239,7 +264,7 @@ ${compacted.summary ? `## Previous Conversation Summary:\n${compacted.summary}\n
     // Keys are stored as vault references: openai_key_ref, anthropic_key_ref, etc.
     const hasCustomKeys = !!(aiConfig?.anthropic_key_ref || aiConfig?.openai_key_ref);
 
-    // Step 7: Build messages array for AI
+    // Step 7: Build messages array for AI (Step 6 was AI config)
     const aiMessages = [
       { role: 'system', content: systemPrompt },
       ...compacted.recentMessages.map(m => ({ role: m.role, content: m.content })),
@@ -257,6 +282,8 @@ ${compacted.summary ? `## Previous Conversation Summary:\n${compacted.summary}\n
           tables: context.tables,
           tokensSaved: compacted.estimatedTokensSaved,
           usedFallback: context.shouldUseFallback,
+          usedCodebaseIndex: !!codebaseContext,
+          codebaseIndexTokens: indexTokens,
         },
         usage: {
           promptTokens: Math.ceil(systemPrompt.length / 4),

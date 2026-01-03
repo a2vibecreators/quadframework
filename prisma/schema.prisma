@@ -114,6 +114,7 @@ model QUAD_organizations {
   setup_status         QUAD_org_setup_status?     // Onboarding completion tracking
   git_integrations     QUAD_git_integrations[]    // Git providers (GitHub, GitLab, etc.)
   git_repositories     QUAD_git_repositories[]    // Connected repositories
+  codebase_indexes     QUAD_codebase_indexes[]    // AI token-optimized codebase summaries
 
   @@index([tier_id])
   @@index([slug])
@@ -3690,4 +3691,59 @@ model QUAD_training_completions {
   @@index([content_id])
   @@index([status])
   @@map("QUAD_training_completions")
+}
+
+// ============================================================================
+// AI CODEBASE INDEXING - Token Optimization
+// ============================================================================
+
+// Stores summarized codebase index for AI context optimization
+// Instead of sending full code (50K+ tokens), we send this summary (~500 tokens)
+model QUAD_codebase_indexes {
+  id     String @id @default(uuid()) @db.Uuid
+  org_id String @map("company_id") @db.Uuid
+
+  // Repository identification
+  repo_name    String  @db.VarChar(255) // e.g., "quadframework", "nutrinine"
+  repo_url     String? @db.VarChar(500) // GitHub/GitLab URL
+  branch       String  @default("main") @db.VarChar(100)
+  commit_hash  String? @db.VarChar(40) // Last indexed commit
+
+  // Summarized content (JSONB for flexible structure)
+  // Each contains { "item_name": "brief_description" }
+  tables_summary     Json? // {"QUAD_tickets": "Work items with status, priority", ...}
+  apis_summary       Json? // {"POST /api/tickets": "Create new ticket", ...}
+  files_summary      Json? // {"src/lib/auth.ts": "JWT authentication utilities", ...}
+  components_summary Json? // {"TicketCard.tsx": "Displays ticket in kanban view", ...}
+  patterns_summary   Json? // {"auth": "NextAuth with email/OAuth", "db": "Prisma ORM", ...}
+
+  // Architecture overview (longer text)
+  architecture_summary String? // High-level description of the system
+
+  // Token tracking
+  total_tokens Int @default(0) // Estimated tokens when this index is used
+  token_savings_percent Int @default(0) // Compared to full code read
+
+  // Sync status
+  last_synced_at DateTime?
+  sync_status    String   @default("pending") @db.VarChar(50) // pending, syncing, synced, failed
+  sync_error     String?
+
+  // Metadata
+  file_count   Int @default(0)
+  table_count  Int @default(0)
+  api_count    Int @default(0)
+  loc_count    Int @default(0) // Lines of code
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  organization QUAD_organizations @relation(fields: [org_id], references: [id], onDelete: Cascade)
+
+  @@unique([org_id, repo_name, branch])
+  @@index([org_id])
+  @@index([repo_name])
+  @@index([sync_status])
+  @@map("QUAD_codebase_indexes")
 }
