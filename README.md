@@ -31,18 +31,18 @@ a2vibecreators/                       # GitHub Organization
 │
 ├── quadframework/                    # Parent repo (THIS REPO)
 │   ├── .gitmodules                   # Submodule definitions
-│   ├── quadframework-database/       # ← Git Submodule (Prisma schema)
-│   ├── quadframework-services/       # ← Git Submodule (Core business logic)
-│   ├── quadframework-web/            # ← Git Submodule (Next.js web app)
+│   ├── quad-database/                # ← Git Submodule (Prisma schema)
+│   ├── quad-services/                # ← Git Submodule (Core business logic)
+│   ├── quad-web/                     # ← Git Submodule (Next.js web app)
 │   ├── quad-ios/                     # ← Git Submodule (iOS native app)
 │   ├── quad-android/                 # ← Git Submodule (Android native app)
-│   ├── quad-vscode-plugin/           # ← Git Submodule (VS Code extension)
+│   ├── quad-vscode/                  # ← Git Submodule (VS Code extension)
 │   ├── documentation/                # Keep in parent (shared docs)
 │   └── scripts/                      # Deploy scripts
 │
-├── quadframework-database/           # Standalone repo
-├── quadframework-services/           # Standalone repo
-├── quadframework-web/                # Standalone repo
+├── quad-database/                    # Standalone repo
+├── quad-services/                    # Standalone repo
+├── quad-web/                         # Standalone repo
 ├── quad-ios/                         # Standalone repo
 ├── quad-android/                     # Standalone repo
 └── quad-vscode/                      # Standalone repo
@@ -53,9 +53,9 @@ a2vibecreators/                       # GitHub Organization
 | Repository | Type | Description |
 |------------|------|-------------|
 | [a2vibecreators/quadframework](https://github.com/a2vibecreators/quadframework) | Parent | Parent repo with submodules |
-| [a2vibecreators/quadframework-database](https://github.com/a2vibecreators/quadframework-database) | Submodule | Prisma schema & migrations |
-| [a2vibecreators/quadframework-services](https://github.com/a2vibecreators/quadframework-services) | Submodule | Core business logic |
-| [a2vibecreators/quadframework-web](https://github.com/a2vibecreators/quadframework-web) | Submodule | Next.js web application |
+| [a2vibecreators/quad-database](https://github.com/a2vibecreators/quad-database) | Submodule | Prisma schema & migrations |
+| [a2vibecreators/quad-services](https://github.com/a2vibecreators/quad-services) | Submodule | Core business logic |
+| [a2vibecreators/quad-web](https://github.com/a2vibecreators/quad-web) | Submodule | Next.js web application |
 | [a2vibecreators/quad-ios](https://github.com/a2vibecreators/quad-ios) | Submodule | iOS native app (SwiftUI) |
 | [a2vibecreators/quad-android](https://github.com/a2vibecreators/quad-android) | Submodule | Android native app (Kotlin) |
 | [a2vibecreators/quad-vscode](https://github.com/a2vibecreators/quad-vscode) | Submodule | VS Code extension |
