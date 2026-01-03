@@ -17,6 +17,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { prisma } from '@/lib/prisma';
 import { TOKEN_PRICING } from '@/lib/ai/providers';
+import { getOrCreateBalance } from '@/lib/ai/credit-service';
 
 // Haiku pricing (current default)
 const HAIKU_PRICING = TOKEN_PRICING['claude-3-5-haiku-20241022'];
@@ -176,6 +177,13 @@ export async function GET(request: NextRequest) {
     // Sort by story points
     complexityAnalysis.sort((a, b) => (a.storyPoints || 0) - (b.storyPoints || 0));
 
+    // Get credit balance for the org
+    const creditBalance = await getOrCreateBalance(orgId);
+    const daysRemaining = Math.max(
+      0,
+      Math.ceil((creditBalance.billing_period_end.getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
+    );
+
     return NextResponse.json({
       success: true,
       data: {
@@ -183,6 +191,22 @@ export async function GET(request: NextRequest) {
         dateRange: {
           start: startDate.toISOString(),
           end: now.toISOString(),
+        },
+        // Credit balance (org-wide, shared by all users)
+        credits: {
+          remainingCents: creditBalance.credits_remaining_cents,
+          remainingUsd: (creditBalance.credits_remaining_cents / 100).toFixed(2),
+          usedCents: creditBalance.credits_used_cents,
+          usedUsd: (creditBalance.credits_used_cents / 100).toFixed(2),
+          periodUsedCents: creditBalance.period_credits_used,
+          periodLimitCents: creditBalance.period_credits_limit,
+          periodUsedPercent: creditBalance.period_credits_limit > 0
+            ? Math.round((creditBalance.period_credits_used / creditBalance.period_credits_limit) * 100)
+            : 0,
+          billingPeriodEnd: creditBalance.billing_period_end.toISOString(),
+          daysRemaining,
+          tier: creditBalance.tier_name,
+          isByok: creditBalance.is_byok,
         },
         summary: {
           totalConversations,

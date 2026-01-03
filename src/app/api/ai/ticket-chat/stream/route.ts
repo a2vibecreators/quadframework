@@ -19,6 +19,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { prisma } from '@/lib/prisma';
 import { streamAI, AIMessage } from '@/lib/ai/providers';
+import { hasCredits, deductCredits } from '@/lib/ai/credit-service';
 
 // Build context string for ticket-scoped questions
 function buildTicketContext(ticket: {
@@ -71,6 +72,19 @@ export async function POST(request: NextRequest) {
 
     const orgId = session.user.companyId;
     const userId = session.user.id;
+
+    // Check if org has credits (shared pool across all users)
+    const creditCheck = await hasCredits(orgId);
+    if (!creditCheck.hasCredits && !creditCheck.isByok) {
+      return new Response(
+        JSON.stringify({
+          error: 'Insufficient credits',
+          remainingCents: creditCheck.remainingCents,
+          message: 'Your organization has run out of AI credits. Please purchase more or enable BYOK.',
+        }),
+        { status: 402, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Find or create conversation for this ticket
     let conversation = await prisma.qUAD_ai_conversations.findFirst({
@@ -189,15 +203,18 @@ ${ticketPromptContext}
 
               // Save assistant message to database
               if (accumulatedContent) {
-                await prisma.qUAD_ai_messages.create({
+                const modelUsed = routing?.model_id || 'claude-3-5-haiku-20241022';
+                const providerUsed = routing?.provider || 'claude';
+
+                const assistantMessage = await prisma.qUAD_ai_messages.create({
                   data: {
                     conversation_id: conversationId,
                     role: 'assistant',
                     content: accumulatedContent,
                     content_type: accumulatedContent.includes('```') ? 'code' : 'text',
                     tokens_used: totalOutputTokens || Math.ceil(accumulatedContent.length / 4),
-                    provider: routing?.provider || 'claude',
-                    model_id: routing?.model_id || 'claude-3-5-sonnet-20241022',
+                    provider: providerUsed,
+                    model_id: modelUsed,
                     latency_ms: latencyMs,
                   },
                 });
@@ -212,6 +229,30 @@ ${ticketPromptContext}
                     },
                   },
                 });
+
+                // Deduct credits from org pool (shared by all users)
+                // This tracks per-ticket cost for transparency
+                const ticketInfo = await prisma.qUAD_tickets.findUnique({
+                  where: { id: ticketId },
+                  select: { ticket_number: true },
+                });
+
+                await deductCredits(
+                  orgId,
+                  userId,
+                  {
+                    inputTokens: totalInputTokens || userMessage.tokens_used,
+                    outputTokens: totalOutputTokens || Math.ceil(accumulatedContent.length / 4),
+                    modelId: modelUsed,
+                    provider: providerUsed,
+                  },
+                  {
+                    conversationId: conversationId,
+                    messageId: assistantMessage.id,
+                    ticketId: ticketId,
+                    ticketNumber: ticketInfo?.ticket_number || undefined,
+                  }
+                );
               }
 
               break;

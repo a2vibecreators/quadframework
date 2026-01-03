@@ -3911,3 +3911,106 @@ model QUAD_ai_activity_routing {
   @@index([is_active])
   @@map("QUAD_ai_activity_routing")
 }
+
+// ============================================================================
+// AI CREDIT SYSTEM - Per-org credit tracking and billing
+// ============================================================================
+
+// Per-organization credit balance (pooled across all users in the org)
+model QUAD_ai_credit_balances {
+  id     String @id @default(uuid()) @db.Uuid
+  org_id String @unique @map("company_id") @db.Uuid
+
+  // Credit pool (in cents to avoid floating point issues)
+  credits_purchased_cents  Int @default(0)  // Total credits ever purchased
+  credits_used_cents       Int @default(0)  // Total credits consumed
+  credits_expired_cents    Int @default(0)  // Credits that expired unused
+  credits_refunded_cents   Int @default(0)  // Credits refunded to user
+
+  // Calculated: credits_purchased - credits_used - credits_expired + credits_refunded
+  credits_remaining_cents  Int @default(0)
+
+  // Billing period tracking
+  billing_period_start    DateTime  // Start of current billing period
+  billing_period_end      DateTime  // End of current billing period (expiry date)
+  period_credits_limit    Int @default(0) // Monthly credit limit (0 = unlimited BYOK)
+  period_credits_used     Int @default(0) // Credits used THIS period
+
+  // BYOK (Bring Your Own Key) status
+  is_byok          Boolean @default(false) // User uses their own API key
+  byok_provider    String? @db.VarChar(50) // claude, openai if BYOK
+
+  // Alert thresholds (percentage of credits_remaining)
+  alert_threshold_50   Boolean @default(false) // Alert sent at 50%?
+  alert_threshold_80   Boolean @default(false) // Alert sent at 80%?
+  alert_threshold_95   Boolean @default(false) // Alert sent at 95%?
+
+  // Tier info
+  tier_name        String @default("free") @db.VarChar(50) // free, starter, pro, enterprise
+  tier_monthly_usd Decimal? @db.Decimal(10, 2) // $0, $10, $25, $50
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  // Relations
+  transactions QUAD_ai_credit_transactions[]
+
+  @@index([org_id])
+  @@index([billing_period_end])
+  @@index([tier_name])
+  @@map("QUAD_ai_credit_balances")
+}
+
+// Every credit transaction (usage, purchase, refund, expiry, bonus)
+model QUAD_ai_credit_transactions {
+  id         String @id @default(uuid()) @db.Uuid
+  balance_id String @db.Uuid
+  org_id     String @map("company_id") @db.Uuid
+
+  // Transaction details
+  transaction_type String @db.VarChar(50) // usage, purchase, refund, expiry, bonus, adjustment
+  amount_cents     Int    // Positive for credits added, negative for credits used
+
+  // Running balance (after this transaction)
+  balance_after_cents Int
+
+  // For usage transactions: link to the AI call
+  conversation_id String? @db.Uuid
+  message_id      String? @db.Uuid
+  ticket_id       String? @db.Uuid  // Direct link for per-ticket cost tracking
+  ticket_number   String? @db.VarChar(50) // e.g., "QUAD-123" for display
+
+  // Token breakdown (for usage transactions)
+  input_tokens    Int?
+  output_tokens   Int?
+  total_tokens    Int?
+
+  // Provider/model used
+  provider        String? @db.VarChar(50)
+  model_id        String? @db.VarChar(100)
+
+  // Description for display
+  description     String? @db.VarChar(500) // "Ticket QUAD-123: 1,234 tokens"
+
+  // For purchases: payment reference
+  payment_id      String? @db.VarChar(255) // Stripe/Razorpay payment ID
+  payment_method  String? @db.VarChar(50)  // card, upi, bank_transfer
+
+  // For expiry: when did these credits expire
+  expired_from_period DateTime?
+
+  // Who triggered this transaction
+  user_id         String? @db.Uuid // null for system actions (expiry, bonus)
+
+  created_at      DateTime @default(now())
+
+  // Relations
+  balance QUAD_ai_credit_balances @relation(fields: [balance_id], references: [id], onDelete: Cascade)
+
+  @@index([balance_id])
+  @@index([org_id])
+  @@index([transaction_type])
+  @@index([ticket_id])
+  @@index([created_at])
+  @@map("QUAD_ai_credit_transactions")
+}

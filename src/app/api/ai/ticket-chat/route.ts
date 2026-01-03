@@ -15,6 +15,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 import { prisma } from '@/lib/prisma';
 import { callAI, AIMessage } from '@/lib/ai/providers';
+import { hasCredits, deductCredits } from '@/lib/ai/credit-service';
 
 // Environment check for AI providers
 const USE_REAL_AI = process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY;
@@ -108,6 +109,19 @@ export async function POST(request: NextRequest) {
     const orgId = session.user.companyId;
     const userId = session.user.id;
 
+    // Check if org has credits (shared pool across all users)
+    const creditCheck = await hasCredits(orgId);
+    if (!creditCheck.hasCredits && !creditCheck.isByok) {
+      return NextResponse.json(
+        {
+          error: 'Insufficient credits',
+          remainingCents: creditCheck.remainingCents,
+          message: 'Your organization has run out of AI credits. Please purchase more or enable BYOK.',
+        },
+        { status: 402 }
+      );
+    }
+
     // 1. Find or create conversation for this ticket
     let conversation = await prisma.qUAD_ai_conversations.findFirst({
       where: {
@@ -194,6 +208,32 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // 8. Deduct credits from org pool (shared by all users)
+    // Skip for mock provider (no real cost)
+    if (aiResponse.provider !== 'mock') {
+      const ticketInfo = await prisma.qUAD_tickets.findUnique({
+        where: { id: ticketId },
+        select: { ticket_number: true },
+      });
+
+      await deductCredits(
+        orgId,
+        userId,
+        {
+          inputTokens: userMessage.tokens_used,
+          outputTokens: aiResponse.tokensUsed,
+          modelId: aiResponse.model,
+          provider: aiResponse.provider,
+        },
+        {
+          conversationId: conversation.id,
+          messageId: assistantMessage.id,
+          ticketId: ticketId,
+          ticketNumber: ticketInfo?.ticket_number || undefined,
+        }
+      );
+    }
 
     return NextResponse.json({
       success: true,
