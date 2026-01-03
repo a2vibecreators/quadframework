@@ -1,0 +1,18 @@
+[submodule "quadframework-database"]
+	path = quadframework-database
+	url = git@github.com:a2vibecreators/quadframework-database.git
+[submodule "quadframework-services"]
+	path = quadframework-services
+	url = git@github.com:a2vibecreators/quadframework-services.git
+[submodule "quadframework-web"]
+	path = quadframework-web
+	url = git@github.com:a2vibecreators/quadframework-web.git
+[submodule "quad-ios"]
+	path = quad-ios
+	url = git@github.com:a2vibecreators/quad-ios.git
+[submodule "quad-android"]
+	path = quad-android
+	url = git@github.com:a2vibecreators/quad-android.git
+[submodule "quad-vscode"]
+	path = quad-vscode
+	url = git@github.com:a2vibecreators/quad-vscode.git
