@@ -1,0 +1,23 @@
+name: Daily Backup Sync
+
+on:
+  schedule:
+    # Runs daily at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  sync-to-backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to a2vibecreators backup branch
+        run: |
+          git remote add backup https://${{ secrets.BACKUP_PAT }}@github.com/a2vibecreators/QUAD.git
+          git push backup main:backup --force
+        env:
+          BACKUP_PAT: ${{ secrets.BACKUP_PAT }}
