@@ -22,6 +22,39 @@ This file provides guidance to Claude Code when working with the QUAD Framework 
 - DEV Database: localhost:14201 (quad_dev_db)
 - QA Database: localhost:15201 (quad_qa_db)
 
+---
+
+## Cloudflare DNS Configuration
+
+**Mac Studio IP:** 96.240.97.243
+
+**DNS Architecture:**
+```
+User → Cloudflare DNS → Mac Studio (96.240.97.243) → Caddy (SSL) → Docker Container
+```
+
+**QUAD Framework DNS Records:**
+
+| Subdomain | IP Address | Proxy | Port (via Caddy) | Container |
+|-----------|------------|-------|------------------|-----------|
+| dev.quadframe.work | 96.240.97.243 | ❌ Off | 14001 | quad-web-dev |
+| qa.quadframe.work | 96.240.97.243 | ❌ Off | 15001 | quad-web-qa |
+| dev-api.quadframe.work | 96.240.97.243 | ❌ Off | 14101 | quad-services-dev |
+| qa-api.quadframe.work | 96.240.97.243 | ❌ Off | 15101 | quad-services-qa |
+
+**Key Points:**
+- Cloudflare proxy is **OFF** (DNS only)
+- Caddy handles SSL/HTTPS termination automatically
+- All HTTPS traffic goes through Caddy on ports 80/443
+- Caddy routes to containers based on subdomain
+
+**DNS Management:**
+- Automated script: `/Users/semostudio/scripts/cloudflare-dns-sync.sh`
+- Cloudflare API token stored in Vaultwarden (QUAD org → dev collection)
+- Documentation: `/Users/semostudio/scripts/CLOUDFLARE_DNS_MANAGEMENT.md`
+
+---
+
 ## Git Workflow & Repository Structure
 
 ### Organizations
