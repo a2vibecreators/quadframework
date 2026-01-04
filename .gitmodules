@@ -1,18 +1,18 @@
 [submodule "quad-database"]
 	path = quad-database
-	url = git@github.com:a2vibecreators/quad-database.git
+	url = git@github.com:a2vibecreators/QUAD-database.git
 [submodule "quad-services"]
 	path = quad-services
-	url = git@github.com:a2vibecreators/quad-services.git
+	url = git@github.com:a2vibecreators/QUAD-services.git
 [submodule "quad-web"]
 	path = quad-web
-	url = git@github.com:a2vibecreators/quad-web.git
+	url = git@github.com:a2vibecreators/QUAD-web.git
 [submodule "quad-ios"]
 	path = quad-ios
-	url = git@github.com:a2vibecreators/quad-ios.git
+	url = git@github.com:a2vibecreators/QUAD-ios.git
 [submodule "quad-android"]
 	path = quad-android
-	url = git@github.com:a2vibecreators/quad-android.git
+	url = git@github.com:a2vibecreators/QUAD-android.git
 [submodule "quad-vscode"]
 	path = quad-vscode
-	url = git@github.com:a2vibecreators/quad-vscode.git
+	url = git@github.com:a2vibecreators/QUAD-vscode.git
