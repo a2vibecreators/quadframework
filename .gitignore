@@ -12,12 +12,13 @@ dist/
 # Testing
 coverage/
 
-# Environment files
+# Environment files - NEVER commit these
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+*.env.local
+.env.*.local
+!.env.example
+.env.deploy
 
 # Debug logs
 npm-debug.log*
@@ -38,9 +39,15 @@ Thumbs.db
 *.tsbuildinfo
 next-env.d.ts
 
+# Bitwarden/Vaultwarden session
+.bw-session
+
+# Local credentials cache
+credentials/
+.credentials/
+
 # Misc
 *.log
-.env.deploy
 
 /src/generated/prisma
 

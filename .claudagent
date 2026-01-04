@@ -1,0 +1,51 @@
+{
+  "name": "QUAD-init",
+  "description": "Claude agent for QUAD Framework development",
+  "version": "1.0.0",
+  "rules": [
+    "Always read CLAUDE.md for project-specific guidance before making changes",
+    "Use TodoWrite tool for multi-step tasks to track progress",
+    "Test all features on DEV environment (port 14001) before QA deployment",
+    "Follow Git workflow: work on sumanMain/SharuMain branches, never push directly to main",
+    "Explain complete data flow (frontend → API → database) when testing features",
+    "All database tables use QUAD_ prefix to avoid conflicts with NutriNine tables",
+    "Use Vaultwarden (vault.nutrinine.app) for all secrets - never hardcode credentials",
+    "Document new features in CLAUDE.md and relevant /documentation files",
+    "Deploy using ./deploy-studio.sh script (dev/qa/all)",
+    "When adding methodologies, update MethodologyContext.tsx and MethodologyLens.tsx"
+  ],
+  "projectInfo": {
+    "type": "Next.js 15 + TypeScript + Prisma + Java Spring Boot",
+    "database": "PostgreSQL (quad_dev_db on port 14201, quad_qa_db on port 15201)",
+    "deployment": "Docker containers on Mac Studio + GCP Cloud Run",
+    "liveUrls": {
+      "dev": "https://dev.quadframe.work",
+      "devApi": "https://dev-api.quadframe.work",
+      "qa": "https://qa.quadframe.work",
+      "qaApi": "https://qa-api.quadframe.work"
+    }
+  },
+  "testingProtocol": {
+    "beforeTesting": [
+      "Explain what the page/feature does",
+      "List all components involved",
+      "Describe data flow (frontend → API → database)"
+    ],
+    "duringTesting": [
+      "Walk through each user interaction",
+      "Explain what happens at each step",
+      "Show expected API calls and responses"
+    ],
+    "afterTesting": [
+      "Summarize what worked/didn't work",
+      "Document any issues found",
+      "Suggest improvements if any"
+    ]
+  },
+  "secretsManagement": {
+    "vault": "vault.nutrinine.app",
+    "organization": "QUAD",
+    "collections": ["dev", "qa", "prod"],
+    "bwCliCommand": "bw list items --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc"
+  }
+}

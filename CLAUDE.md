@@ -403,6 +403,129 @@ quadframework/
 
 ---
 
+## Secrets Management (Vaultwarden)
+
+### Vault Structure
+
+All secrets are stored in Vaultwarden at **vault.nutrinine.app**
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║                    VAULTWARDEN VAULT STRUCTURE                   ║
+╚══════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 📁 QUAD Organization (id: 579c22f3-4f13-447c-a861-9a4aa0ab7fbc) │
+├─────────────────────────────────────────────────────────────────┤
+│   📂 dev/                                                       │
+│      🔐 Anthropic API Key                                       │
+│      🔐 Database                                                │
+│      🔐 GitHub OAuth                                            │
+│      🔐 Google OAuth                                            │
+│      🔐 NextAuth Secret                                         │
+│   📂 qa/                                                        │
+│      🔐 (same items as dev)                                     │
+│   📂 prod/                                                      │
+│      🔐 (same items as dev)                                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 📁 NutriNine Organization (id: a2608572-3e25-4b3a-996b-cd5be95b12c0) │
+├─────────────────────────────────────────────────────────────────┤
+│   📂 dev/                                                       │
+│      🔐 AWS Credentials                                         │
+│      🔐 Database                                                │
+│      🔐 Email HMAC Secret                                       │
+│      🔐 GitHub Backup Sync                                      │
+│      🔐 Gmail SMTP                                              │
+│      🔐 Google Gemini API Key                                   │
+│      🔐 JWT Secret                                              │
+│      🔐 MSG91 (India OTP)                                       │
+│      🔐 Sarvam AI                                               │
+│      🔐 Twilio                                                  │
+│      🔐 Zoho SMTP                                               │
+│   📂 qa/                                                        │
+│      🔐 (same items as dev)                                     │
+│   📂 prod/                                                      │
+│      🔐 (same items as dev)                                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Environment Variables Mapping
+
+| Secret in Vault | Environment Variable | Used In |
+|-----------------|---------------------|---------|
+| NextAuth Secret | `NEXTAUTH_SECRET` | .env.local |
+| Google OAuth | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | .env.local |
+| GitHub OAuth | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | .env.local |
+| Anthropic API Key | `ANTHROPIC_API_KEY` | .env.local |
+| Database | `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DATABASE_URL` | .env.local |
+
+### Local Development Setup
+
+1. **Get Vaultwarden Access**: Request access from admin (sumanaddanki)
+2. **Login to Vault**: https://vault.nutrinine.app
+3. **Navigate to**: QUAD org → dev collection
+4. **Create `.env.local`** from template:
+   ```bash
+   cp .env.example .env.local
+   ```
+5. **Fill in secrets** from vault
+
+### Using bw CLI
+
+```bash
+# Login to Vaultwarden
+export BW_SESSION=$(bw unlock --raw)
+
+# List all organizations
+bw list organizations
+
+# List QUAD secrets (dev collection)
+bw list items --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc --collectionid e4f03d1a-b8ac-4186-a384-0fb62d431ddd
+
+# List NutriNine secrets (dev collection)
+bw list items --organizationid a2608572-3e25-4b3a-996b-cd5be95b12c0 --collectionid c792c297-8ccd-46a1-b691-7955ede25eb5
+
+# Get specific secret from QUAD
+bw get item "NextAuth Secret" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
+
+# Get Database credentials
+bw get item "Database" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc --collectionid e4f03d1a-b8ac-4186-a384-0fb62d431ddd
+```
+
+### Organization IDs
+
+| Organization | ID |
+|--------------|-----|
+| QUAD | `579c22f3-4f13-447c-a861-9a4aa0ab7fbc` |
+| NutriNine | `a2608572-3e25-4b3a-996b-cd5be95b12c0` |
+
+### Collection IDs (QUAD)
+
+| Collection | ID |
+|------------|-----|
+| dev | `e4f03d1a-b8ac-4186-a384-0fb62d431ddd` |
+| qa | `75fb3b57-9e84-4e2d-8b4f-447518e0a315` |
+| prod | `cc4a16a2-9acc-459a-ad37-a8ef99592366` |
+
+### Collection IDs (NutriNine)
+
+| Collection | ID |
+|------------|-----|
+| dev | `c792c297-8ccd-46a1-b691-7955ede25eb5` |
+| qa | `532a3e70-d93b-42d8-8ebb-87ab0706786c` |
+| prod | `97a77f38-24f3-4782-90c7-bc37e078e029` |
+
+### Team Member Access
+
+| Member | QUAD Org | NutriNine Org | Access Level |
+|--------|----------|---------------|--------------|
+| sumanaddanki | ✅ Owner | ✅ Owner | All collections (dev/qa/prod) |
+| sharuuu | ✅ Member | ✅ Member | dev/qa only (no prod access) |
+
+---
+
 ## Database Setup
 
 **QUAD has its own PostgreSQL database, separate from NutriNine:**
@@ -537,33 +660,40 @@ export async function GET() {
 ./deploy-studio.sh all
 ```
 
-**Container Details:**
-| Environment | Service | Container | Port | URL |
-|-------------|---------|-----------|------|-----|
-| DEV | Web | quadframework-dev | 14001 | https://dev.quadframe.work |
+**QUAD Framework Ports (Mac Studio DEV/QA):**
+
+| Environment | Service | Container Name | Port | URL |
+|-------------|---------|----------------|------|-----|
+| DEV | Web | quad-web-dev | 14001 | https://dev.quadframe.work |
 | DEV | Java API | quad-services-dev | 14101 | https://dev-api.quadframe.work |
 | DEV | Database | postgres-quad-dev | 14201 | localhost:14201 |
-| QA | Web | quadframework-qa | 15001 | https://qa.quadframe.work |
+| QA | Web | quad-web-qa | 15001 | https://qa.quadframe.work |
 | QA | Java API | quad-services-qa | 15101 | https://qa-api.quadframe.work |
 | QA | Database | postgres-quad-qa | 15201 | localhost:15201 |
 
-**Port Scheme (A2Vibe Creators Infrastructure):**
-- A2Vibe Website: 11xxx (DEV), 12xxx (QA)
-- QUAD Framework: 14xxx (DEV), 15xxx (QA)
-- NutriNine: 16xxx (DEV), 17xxx (QA)
+**Port Allocation:**
+- QUAD DEV: 14xxx range (14001, 14101, 14201)
+- QUAD QA: 15xxx range (15001, 15101, 15201)
+
+**Shared Services (used by QUAD):**
+- Vaultwarden: Port 10000 (shared by all projects)
+- Caddy Reverse Proxy: Ports 80/443 (shared by all projects)
 
 **Docker Networks:** `dev-network` and `qa-network`
 
-**Complete Infrastructure:** See `/Users/semostudio/scripts/INFRASTRUCTURE_PORTS.md`
+**Related Documentation:**
+- Master Infrastructure Port Scheme: `/Users/semostudio/scripts/INFRASTRUCTURE_PORTS.md`
+- NutriNine Ports: `/Users/semostudio/git/a2vibecreators/nutrinine/CLAUDE.md`
+- A2Vibe Ports: `/Users/semostudio/git/a2vibecreators/a2vibecreators-web/CLAUDE.md`
 
 **Caddy Configuration:** `/Users/semostudio/docker/caddy/Caddyfile`
 ```
 # QUAD Web
 dev.quadframe.work {
-    reverse_proxy quadframework-dev:3000
+    reverse_proxy quad-web-dev:3000
 }
 qa.quadframe.work {
-    reverse_proxy quadframework-qa:3000
+    reverse_proxy quad-web-qa:3000
 }
 
 # QUAD Java API
@@ -574,6 +704,71 @@ qa-api.quadframe.work {
     reverse_proxy quad-services-qa:15101
 }
 ```
+
+---
+
+## GCP Cloud Infrastructure
+
+**Project:** `nutrinine-prod` (Display Name: "A2Vibe Creators")
+**Account:** madhuri.recherla@gmail.com
+**Region:** us-east1
+**Budget:** $300 free tier credits (valid ~2 months)
+
+### Current Production Services (Jan 4, 2026)
+
+**Cloud Run Services (4 active):**
+```
+├── a2vibecreators-web      → https://a2vibecreators-web-605414080358.us-east1.run.app
+├── nutrinine-api           → https://nutrinine-api-605414080358.us-east1.run.app
+├── nutrinine-web           → https://nutrinine-web-605414080358.us-east1.run.app
+└── quadframework-prod      → https://quadframework-prod-605414080358.us-east1.run.app
+```
+
+**Cloud SQL (1 instance):**
+```
+└── nutrinine-db (PostgreSQL 15, f1-micro) → 34.148.105.158
+```
+
+**Cloud Storage:**
+```
+└── nutrinine-health-reports (us-east1)
+```
+
+### Recent Cleanup (Jan 4, 2026)
+
+**Deleted Services:**
+- ❌ `nutrinine-voice` - Not deployed to PROD (using Sarvam AI instead)
+- ❌ `a2vibecreators-web-dev` - Runs on Mac Studio only
+- ❌ `a2vibecreators-web-qa` - Runs on Mac Studio only
+
+**Rationale:** DEV/QA run on Mac Studio Docker, only PROD deploys to GCP Cloud Run.
+
+### Future: PROD Deployment Plan (On Hold)
+
+**After DEV/QA are stable, deploy to PROD:**
+
+1. **Create separate QUAD database:**
+   ```bash
+   gcloud sql instances create quad-prod-db \
+     --database-version=POSTGRES_15 \
+     --tier=db-f1-micro \
+     --region=us-east1
+   ```
+
+2. **Split QUAD into microservices (3 services):**
+   ```
+   Current:
+   └── quadframework-prod (Next.js monolith)
+
+   Future:
+   ├── quadframework-web      (Next.js frontend)
+   ├── quadframework-api      (Next.js API routes)
+   └── quadframework-services (Java Spring Boot backend)
+   ```
+
+3. **Update deployment scripts** in `/deployment/prod/`
+
+**Status:** Documented for future implementation. Focus on DEV/QA first.
 
 ---
 

@@ -25,12 +25,12 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_NAME="quadframework"
-NETWORK_NAME="caddy-network"
+PROJECT_NAME="quad-web"
+NETWORK_NAME="dev-network"
 
 # Port assignments
-DEV_PORT=18001
-QA_PORT=18501
+DEV_PORT=14001
+QA_PORT=15001
 
 # Load secrets from Vaultwarden if available
 load_vault_secrets() {
@@ -70,9 +70,9 @@ deploy_env() {
 
     print_status "Deploying ${PROJECT_NAME} to ${ENV}..."
 
-    # Build the Docker image
+    # Build the Docker image from quad-web subdirectory
     print_status "Building Docker image: ${IMAGE_NAME}"
-    docker build -t ${IMAGE_NAME} .
+    docker build -t ${IMAGE_NAME} ./quad-web
 
     # Stop and remove existing container if it exists
     if docker ps -a --format '{{.Names}}' | grep -q "^${CONTAINER_NAME}$"; then
@@ -92,21 +92,21 @@ deploy_env() {
     # Set environment-specific credentials
     # Priority: Vault > .env.deploy > defaults
     if [ "${ENV}" = "dev" ]; then
-        DB_HOST="${QUAD_DB_HOST:-${DEV_DB_HOST:-postgres-dev}}"
+        DB_HOST="${QUAD_DB_HOST:-${DEV_DB_HOST:-postgres-quad-dev}}"
         DB_NAME="${QUAD_DB_NAME:-${DEV_DB_NAME:-quad_dev_db}}"
         DB_PASS="${QUAD_DB_PASSWORD:-${DEV_DB_PASS:-quad_dev_pass}}"
         GOOGLE_CLIENT_ID="${QUAD_GOOGLE_CLIENT_ID:-${DEV_GOOGLE_CLIENT_ID:?ERROR: Google OAuth credentials required}}"
         GOOGLE_CLIENT_SECRET="${QUAD_GOOGLE_CLIENT_SECRET:-${DEV_GOOGLE_CLIENT_SECRET:?ERROR: Google OAuth credentials required}}"
         NEXTAUTH_SECRET="${QUAD_NEXTAUTH_SECRET:-${DEV_NEXTAUTH_SECRET:?ERROR: NextAuth secret required}}"
-        NETWORK_NAME="docker_dev-network"
+        NETWORK_NAME="dev-network"
     else
-        DB_HOST="${QUAD_DB_HOST:-${QA_DB_HOST:-postgres-qa}}"
+        DB_HOST="${QUAD_DB_HOST:-${QA_DB_HOST:-postgres-quad-qa}}"
         DB_NAME="${QUAD_DB_NAME:-${QA_DB_NAME:-quad_qa_db}}"
         DB_PASS="${QUAD_DB_PASSWORD:-${QA_DB_PASS:-quad_qa_pass}}"
         GOOGLE_CLIENT_ID="${QUAD_GOOGLE_CLIENT_ID:-${QA_GOOGLE_CLIENT_ID:?ERROR: Google OAuth credentials required}}"
         GOOGLE_CLIENT_SECRET="${QUAD_GOOGLE_CLIENT_SECRET:-${QA_GOOGLE_CLIENT_SECRET:?ERROR: Google OAuth credentials required}}"
         NEXTAUTH_SECRET="${QUAD_NEXTAUTH_SECRET:-${QA_NEXTAUTH_SECRET:?ERROR: NextAuth secret required}}"
-        NETWORK_NAME="docker_qa-network"
+        NETWORK_NAME="qa-network"
     fi
 
     # Email configuration (from vault or .env.deploy)
@@ -219,9 +219,9 @@ print_status "Remember to update Caddyfile if this is first deployment!"
 print_status "Add these entries to /Users/semostudio/docker/caddy/Caddyfile:"
 echo ""
 echo "  dev.quadframe.work {"
-echo "      reverse_proxy quadframework-dev:80"
+echo "      reverse_proxy quad-web-dev:3000"
 echo "  }"
 echo ""
 echo "  qa.quadframe.work {"
-echo "      reverse_proxy quadframework-qa:80"
+echo "      reverse_proxy quad-web-qa:3000"
 echo "  }"
