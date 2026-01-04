@@ -17,7 +17,6 @@ jobs:
 
       - name: Push to a2vibecreators backup branch
         run: |
-          git remote add backup https://${{ secrets.BACKUP_PAT }}@github.com/a2vibecreators/QUAD.git
+          git config --unset-all http.https://github.com/.extraheader || true
+          git remote add backup https://x-access-token:${{ secrets.BACKUP_PAT }}@github.com/a2vibecreators/QUAD.git
           git push backup main:backup --force
-        env:
-          BACKUP_PAT: ${{ secrets.BACKUP_PAT }}
