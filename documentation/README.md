@@ -1,6 +1,6 @@
 # QUAD Platform Documentation Index
 
-**Last Updated:** January 3, 2026
+**Last Updated:** January 4, 2026
 **Total Documents:** 100+
 **Base Path:** `/documentation/`
 
@@ -126,6 +126,7 @@ Feature specifications and implementations.
 | [ONBOARDING_FLOW.md](features/ONBOARDING_FLOW.md) | User onboarding |
 | [MASTER_FLOWS.md](features/MASTER_FLOWS.md) | All user flows |
 | [AUTHENTICATION_FLOW.md](features/AUTHENTICATION_FLOW.md) | Login/SSO |
+| [OAUTH_IMPLEMENTATION.md](OAUTH_IMPLEMENTATION.md) | **OAuth 2.0 (Google, GitHub, Azure AD)** |
 | [ROLE_DASHBOARDS.md](features/ROLE_DASHBOARDS.md) | Role-based views |
 | [BLUEPRINT_AGENT.md](features/BLUEPRINT_AGENT.md) | AI project planning |
 | [BLUEPRINT_AGENT_Q3.md](features/BLUEPRINT_AGENT_Q3.md) | Phase Q3 |
@@ -373,6 +374,7 @@ Top-level platform docs.
 | Call an API | [api/API_REFERENCE.md](api/API_REFERENCE.md) |
 | See database schema | [database/DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md) |
 | Deploy to GCP | [deployment/GOOGLE_CLOUD_MIGRATION.md](deployment/GOOGLE_CLOUD_MIGRATION.md) |
+| Set up OAuth | [OAUTH_IMPLEMENTATION.md](OAUTH_IMPLEMENTATION.md) |
 | Set up SSO | [integration/SSO_SETUP_GUIDE.md](integration/SSO_SETUP_GUIDE.md) |
 | Run tests | [testing/TEST_STRATEGY.md](testing/TEST_STRATEGY.md) |
 | Understand pricing | [ai/AI_PRICING_TIERS.md](ai/AI_PRICING_TIERS.md) |

@@ -431,14 +431,17 @@ quadframework/
 │   └── lib/                     # Utilities, Prisma client
 ├── prisma/                      # Database schema
 │   └── schema.prisma            # QUAD tables (QUAD_ prefix)
-├── quad-services/          # Java Spring Boot backend
+├── quad-services/          # Java Spring Boot backend (CURRENT)
 │   ├── src/main/java/com/quad/services/
-│   │   ├── ai/                  # AI providers (Claude, OpenAI, Gemini)
-│   │   ├── memory/              # Context retrieval service
-│   │   ├── assignment/          # Ticket routing
-│   │   └── integrations/        # GitHub, Google Calendar
-│   ├── pom.xml                  # Maven config
-│   └── README.md                # Java service docs
+│   │   ├── controller/          # REST endpoints (Auth, User)
+│   │   ├── service/             # Business logic (AuthService, UserService)
+│   │   ├── repository/          # JPA repositories (UserRepository, OrganizationRepository)
+│   │   ├── entity/              # JPA entities (User, Organization)
+│   │   ├── dto/                 # Request/Response DTOs (SignupRequest, AuthResponse)
+│   │   ├── config/              # Spring config (SecurityConfig)
+│   │   └── security/            # JWT utilities
+│   ├── pom.xml                  # Maven config (Java 17, Spring Boot 3.2.1, Lombok 1.18.36)
+│   └── Dockerfile               # Multi-stage build (Maven + JRE 17)
 ├── quad-api/                    # API Gateway for external clients (submodule)
 │   ├── src/
 │   │   ├── index.js             # Express server
@@ -453,7 +456,55 @@ quadframework/
 └── CLAUDE.md                    # This file
 ```
 
-**Note:** `quad-services` is the primary backend. The TypeScript `quad-services` package is kept for reference during transition.
+**Note:** Java `quad-services` is the primary backend.
+
+---
+
+## Java Backend (quad-services)
+
+**Stack:** Spring Boot 3.2.1, PostgreSQL 15, JWT auth, BCrypt
+
+**Build Requirements:**
+- Java 17 (compilation): `brew install openjdk@17`
+- Maven 3.9+
+- Lombok 1.18.36 (Java 21 compatibility)
+
+**Endpoints:**
+
+| Endpoint | Method | Purpose | Auth |
+|----------|--------|---------|------|
+| `/auth/signup` | POST | Create organization + user | No |
+| `/auth/login` | POST | Email/password authentication | No |
+| `/users/email/{email}` | GET | User lookup (OAuth account linking) | No |
+| `/users/email/{email}/exists` | GET | Check user existence | No |
+| `/auth/health` | GET | Service health check | No |
+
+**Docker Build & Deploy:**
+```bash
+cd quad-services
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17
+mvn clean package -DskipTests
+docker build -t quad-services:dev .
+docker run -d \
+  --name quad-services-dev \
+  --network dev-network \
+  -p 14101:8080 \
+  -e SPRING_DATASOURCE_URL="jdbc:postgresql://postgres-quad-dev:5432/quad_dev_db" \
+  -e SPRING_DATASOURCE_USERNAME="quad_user" \
+  -e SPRING_DATASOURCE_PASSWORD="quad_dev_pass" \
+  -e JWT_SECRET="your-secret" \
+  quad-services:dev
+```
+
+**Network Requirements:**
+All containers must be on `dev-network`:
+```bash
+docker network connect dev-network postgres-quad-dev
+docker network connect dev-network quad-services-dev
+docker network connect dev-network quad-web-dev
+```
+
+**See:** [OAuth Implementation Guide](documentation/OAUTH_IMPLEMENTATION.md)
 
 ---
 
@@ -546,6 +597,35 @@ bw get item "NextAuth Secret" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7
 
 # Get Database credentials
 bw get item "Database" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc --collectionid e4f03d1a-b8ac-4186-a384-0fb62d431ddd
+```
+
+### OAuth Configuration (Google Sign-In)
+
+**Status:** ✅ **Google OAuth configured and enabled** (Jan 4, 2026)
+
+**Google Cloud Setup:**
+- **Project:** "QUAD Platform" (ID: quad-platform)
+- **OAuth Client:** "QUAD Platform Dev"
+- **Client ID:** `805817782076-b6975p184nj0kqcs9l0hurjj2bv6gkev.apps.googleusercontent.com`
+- **Authorized Origins:** dev.quadframe.work, qa.quadframe.work, quadframe.work
+- **Redirect URIs:**
+  - `https://dev.quadframe.work/api/auth/callback/google`
+  - `https://qa.quadframe.work/api/auth/callback/google`
+  - `https://quadframe.work/api/auth/callback/google`
+
+**Storage:**
+- Client ID & Secret stored in `.env.local`
+- Also documented in Vaultwarden (QUAD org → dev → Google OAuth)
+
+**GitHub OAuth:** Not configured yet (GitHub sign-in disabled)
+
+**Testing Google Sign-In:**
+```bash
+# Go to login page
+https://dev.quadframe.work/auth/login
+
+# You should now see "Sign in with Google" button
+# Click it to test OAuth flow
 ```
 
 ### Organization IDs
@@ -666,13 +746,19 @@ docker exec postgres-dev psql -U nutrinine_user -d quad_dev_db -f /tmp/journey1_
 
 ## Authentication (NextAuth)
 
-**Provider:** Credentials (email/password with bcrypt)
+**Providers:**
+- Credentials (email/password with bcrypt)
+- OAuth 2.0 (Google, GitHub, Azure AD, Okta, Auth0)
 
 **Session Strategy:** JWT tokens stored in cookies
 
+**OAuth Flow:** See [OAuth Implementation Guide](documentation/OAUTH_IMPLEMENTATION.md)
+
 **Key Files:**
-- `src/lib/authOptions.ts` - NextAuth configuration
-- `src/app/api/auth/[...nextauth]/route.ts` - Auth endpoints
+- `src/lib/authOptions.ts` - NextAuth config, OAuth providers, callbacks
+- `src/app/api/auth/[...nextauth]/route.ts` - NextAuth endpoints
+- `src/app/api/auth/complete-oauth-signup/route.ts` - Complete OAuth signup
+- `src/lib/java-backend.ts` - getUserByEmail() for account linking
 - `src/types/next-auth.d.ts` - TypeScript session extensions
 
 **Session includes:**
@@ -869,15 +955,35 @@ npx prisma studio
 
 ---
 
-## Claude AI Integration (Anthropic API)
+## Multi-Provider AI Integration
 
-**Status:** API key configured, client library implemented.
+**QUAD uses two AI providers for cost optimization and reliability:**
 
-**API Key Location:**
-- `.env` → `ANTHROPIC_API_KEY`
-- `.env.deploy` → `ANTHROPIC_API_KEY` (shared across DEV/QA/PROD)
+| Provider | Use Case | Status | Location |
+|----------|----------|--------|----------|
+| **Anthropic Claude** | Primary (coding, complex reasoning) | ⏳ Configured in vault | Vaultwarden (QUAD org → dev) |
+| **Google Gemini** | Secondary (simple tasks, cost optimization) | ✅ Configured | Shared with NutriNine |
 
-**Console:** https://console.anthropic.com/settings/usage (madhuri.recherla@gmail.com account)
+### Provider Configuration
+
+**1. Anthropic Claude (Primary)**
+- **API Key:** Stored in Vaultwarden (QUAD org → dev → "Anthropic API Key")
+- **Console:** https://console.anthropic.com/settings/usage
+- **Account:** madhuri.recherla@gmail.com
+- **Environment Variable:** `ANTHROPIC_API_KEY`
+- **Status:** Configured in vault, needs to be added to .env.local
+
+**2. Google Gemini (Secondary - Cost Optimization)**
+- **API Key:** `AIzaSyBA27fTF2AyRISvz0LAJTX9mCL8B2PJxBY`
+- **Google Cloud Project:** "NutriNine" (gen-lang-client-0961567683)
+- **Environment Variable:** `GEMINI_API_KEY`
+- **Status:** ✅ Configured in .env.local and deployed
+- **Note:** Shared with NutriNine project for cost efficiency
+
+**Why Multi-Provider?**
+- **Cost:** Gemini is 10x cheaper for simple tasks
+- **Reliability:** Fallback if one provider is down
+- **Smart Routing:** Route tasks to the best model for the job
 
 ### Token Optimization Strategy
 

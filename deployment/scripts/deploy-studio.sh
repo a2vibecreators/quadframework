@@ -125,6 +125,13 @@ deploy_env() {
     RESEND_KEY="${QUAD_RESEND_API_KEY:-${RESEND_API_KEY:-}}"
     EMAIL_FROM_ADDR="${QUAD_EMAIL_FROM:-${EMAIL_FROM:-QUAD Platform <quadframework@quadframe.work>}}"
 
+    # Java Backend API URL
+    if [ "${ENV}" = "dev" ]; then
+        QUAD_API_URL="${QUAD_API_URL:-http://quad-services-dev:8080}"
+    else
+        QUAD_API_URL="${QUAD_API_URL:-http://quad-services-qa:8080}"
+    fi
+
     # Construct DATABASE_URL for Prisma
     DATABASE_URL="postgresql://quad_user:${DB_PASS}@${DB_HOST}:5432/${DB_NAME}?schema=public"
 
@@ -146,6 +153,7 @@ deploy_env() {
         -e DB_NAME=${DB_NAME} \
         -e DB_USER=quad_user \
         -e DB_PASSWORD=${DB_PASS} \
+        -e QUAD_API_URL="${QUAD_API_URL}" \
         -e EMAIL_PROVIDER=resend \
         -e RESEND_API_KEY="${RESEND_KEY}" \
         -e EMAIL_FROM="${EMAIL_FROM_ADDR}" \
