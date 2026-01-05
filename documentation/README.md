@@ -1,7 +1,7 @@
 # QUAD Platform Documentation Index
 
 **Last Updated:** January 4, 2026
-**Total Documents:** 100+
+**Total Documents:** 130+
 **Base Path:** `/documentation/`
 
 Welcome to QUAD Platform documentation! This index helps you navigate all available documentation organized by topic.
@@ -11,20 +11,24 @@ Welcome to QUAD Platform documentation! This index helps you navigate all availa
 ## Table of Contents
 
 1. [Quick Start](#-quick-start)
-2. [Methodology](#-methodology-quad-approach)
-3. [AI Strategy](#-ai-strategy)
-4. [Architecture](#-architecture)
-5. [Features](#-features)
-6. [API Reference](#-api-reference)
-7. [Database](#-database)
-8. [Deployment](#-deployment)
-9. [Integration](#-integration)
-10. [Testing](#-testing)
-11. [Strategy](#-strategy)
-12. [Case Studies](#-case-studies)
-13. [Internal](#-internal)
-14. [Learning Paths](#-learning-paths)
-15. [Documentation Status](#-documentation-status)
+2. [Overview](#-overview)
+3. [Getting Started](#-getting-started)
+4. [Authentication](#-authentication)
+5. [Methodology](#-methodology-quad-approach)
+6. [Platform](#-platform)
+7. [Features](#-features)
+8. [Architecture](#-architecture)
+9. [AI Strategy](#-ai-strategy)
+10. [API Reference](#-api-reference)
+11. [Database](#-database)
+12. [Deployment](#-deployment)
+13. [Integration](#-integration)
+14. [Testing](#-testing)
+15. [Agents](#-agents)
+16. [Planning & Strategy](#-planning--strategy)
+17. [Case Studies](#-case-studies)
+18. [Internal](#-internal)
+19. [Documentation Status](#-documentation-status)
 
 ---
 
@@ -34,9 +38,48 @@ Welcome to QUAD Platform documentation! This index helps you navigate all availa
 
 | Document | Purpose | Read Time |
 |----------|---------|-----------|
-| [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) | What is QUAD Platform? | 15 min |
-| [GETTING_STARTED.md](GETTING_STARTED.md) | Local development setup | 10 min |
-| [FEATURES.md](FEATURES.md) | Complete feature list | 20 min |
+| [overview/PROJECT_OVERVIEW.md](overview/PROJECT_OVERVIEW.md) | What is QUAD Platform? | 15 min |
+| [getting-started/GETTING_STARTED.md](getting-started/GETTING_STARTED.md) | Local development setup | 10 min |
+| [overview/FEATURES.md](overview/FEATURES.md) | Complete feature list | 20 min |
+| [SITEMAP.md](SITEMAP.md) | Complete site navigation with auth flows | 30 min |
+
+---
+
+## 📋 Overview
+
+High-level project documentation and feature summaries.
+
+| Document | Description |
+|----------|-------------|
+| [PROJECT_OVERVIEW.md](overview/PROJECT_OVERVIEW.md) | Project goals, architecture overview |
+| [FEATURES.md](overview/FEATURES.md) | Complete list of features by category |
+| [DOCUMENTATION_STRUCTURE.md](overview/DOCUMENTATION_STRUCTURE.md) | How documentation is organized |
+
+---
+
+## 🎯 Getting Started
+
+Setup guides and onboarding documentation.
+
+| Document | Description |
+|----------|-------------|
+| [GETTING_STARTED.md](getting-started/GETTING_STARTED.md) | Quick start guide for developers |
+| [SETUP_INSTRUCTIONS.md](getting-started/SETUP_INSTRUCTIONS.md) | Detailed setup instructions |
+| [GITHUB_ORGANIZATION.md](getting-started/GITHUB_ORGANIZATION.md) | GitHub org setup and workflows |
+
+---
+
+## 🔐 Authentication
+
+Authentication flows, OAuth setup, and onboarding.
+
+| Document | Description |
+|----------|-------------|
+| [OAUTH_IMPLEMENTATION.md](auth/OAUTH_IMPLEMENTATION.md) | OAuth 2.0 implementation details |
+| [AUTHENTICATION_FLOW.md](auth/AUTHENTICATION_FLOW.md) | Complete authentication flows |
+| [ONBOARDING_FLOW.md](auth/ONBOARDING_FLOW.md) | User onboarding journey |
+| [AUTH_TESTING_GUIDE.md](testing/AUTH_TESTING_GUIDE.md) | How to test authentication |
+| [integration/SSO_SETUP_GUIDE.md](integration/SSO_SETUP_GUIDE.md) | Enterprise SSO configuration |
 
 ---
 
@@ -45,341 +88,350 @@ Welcome to QUAD Platform documentation! This index helps you navigate all availa
 The QUAD methodology documentation explains the **Q-U-A-D workflow** framework.
 
 ### Core Concepts
-| Document | Description |
-|----------|-------------|
-| [QUAD.md](methodology/QUAD.md) | Core methodology |
-| [QUAD_SUMMARY.md](methodology/QUAD_SUMMARY.md) | Executive summary |
-| [QUAD_DETAILS.md](methodology/QUAD_DETAILS.md) | Deep dive |
-| [QUAD_FLOW.md](methodology/QUAD_FLOW.md) | Visual workflow |
-| [QUAD_PITCH.md](methodology/QUAD_PITCH.md) | Pitch deck |
-| [QUAD_JARGONS.md](methodology/QUAD_JARGONS.md) | Terminology glossary |
 
-### Platform & Discovery
 | Document | Description |
 |----------|-------------|
-| [QUAD_PLATFORM.md](methodology/QUAD_PLATFORM.md) | Platform description |
-| [QUAD_DISCOVERY.md](methodology/QUAD_DISCOVERY.md) | Discovery phase |
-| [QUAD_ONBOARDING.md](methodology/QUAD_ONBOARDING.md) | User onboarding |
-| [QUAD_CASE_STUDY.md](methodology/QUAD_CASE_STUDY.md) | Case studies overview |
-| [QUAD_AGENT_ARCHITECTURE.md](methodology/QUAD_AGENT_ARCHITECTURE.md) | AI agent architecture |
+| [QUAD.md](methodology/QUAD.md) | Core methodology overview |
+| [QUAD_DETAILS.md](methodology/QUAD_DETAILS.md) | Detailed breakdown of each stage |
+| [QUAD_FLOW.md](methodology/QUAD_FLOW.md) | Flow visualization and examples |
+| [QUAD_JARGONS.md](methodology/QUAD_JARGONS.md) | Terminology guide |
+| [QUAD_SUMMARY.md](methodology/QUAD_SUMMARY.md) | One-page summary |
+| [QUAD_DISCOVERY.md](methodology/QUAD_DISCOVERY.md) | Discovery wizard flow |
+| [QUAD_ONBOARDING.md](methodology/QUAD_ONBOARDING.md) | Team onboarding guide |
+| [QUAD_PITCH.md](methodology/QUAD_PITCH.md) | Sales pitch deck |
+| [QUAD_CASE_STUDY.md](methodology/QUAD_CASE_STUDY.md) | Real-world case study |
 
 ### Workflow Details
+
 | Document | Description |
 |----------|-------------|
-| [QUAD_PROJECT_LIFECYCLE.md](methodology/quad-workflow/QUAD_PROJECT_LIFECYCLE.md) | Full project lifecycle |
-| [QUAD_ADOPTION_LEVELS.md](methodology/quad-workflow/QUAD_ADOPTION_LEVELS.md) | AI adoption maturity |
 | [QUAD_ADOPTION_JOURNEY.md](methodology/quad-workflow/QUAD_ADOPTION_JOURNEY.md) | Adoption roadmap |
-| [QUAD_COMMANDS.md](methodology/quad-workflow/QUAD_COMMANDS.md) | CLI commands |
-| [QUAD_STORY_LABELS.md](methodology/quad-workflow/QUAD_STORY_LABELS.md) | Story categorization |
-| [QUAD_CUSTOM_AGENTS.md](methodology/quad-workflow/QUAD_CUSTOM_AGENTS.md) | Custom AI agents |
-| [QUAD_ASSIGNMENT_AGENT.md](methodology/quad-workflow/QUAD_ASSIGNMENT_AGENT.md) | Task assignment AI |
-| [QUAD_CUSTOMIZABLE_TRIGGERS.md](methodology/quad-workflow/QUAD_CUSTOMIZABLE_TRIGGERS.md) | Workflow triggers |
+| [QUAD_ADOPTION_LEVELS.md](methodology/quad-workflow/QUAD_ADOPTION_LEVELS.md) | Skill/Trust matrix levels |
+| [QUAD_ASSIGNMENT_AGENT.md](methodology/quad-workflow/QUAD_ASSIGNMENT_AGENT.md) | Ticket routing logic |
+| [QUAD_COMMANDS.md](methodology/quad-workflow/QUAD_COMMANDS.md) | CLI commands reference |
+| [QUAD_CUSTOMIZABLE_TRIGGERS.md](methodology/quad-workflow/QUAD_CUSTOMIZABLE_TRIGGERS.md) | Workflow automation |
+| [QUAD_CUSTOM_AGENTS.md](methodology/quad-workflow/QUAD_CUSTOM_AGENTS.md) | Creating custom agents |
 | [QUAD_INTEGRATION_ARCHITECTURE.md](methodology/quad-workflow/QUAD_INTEGRATION_ARCHITECTURE.md) | Integration patterns |
-| [QUAD_SAMPLE_ENVIRONMENT.md](methodology/quad-workflow/QUAD_SAMPLE_ENVIRONMENT.md) | Sample setup |
+| [QUAD_PROJECT_LIFECYCLE.md](methodology/quad-workflow/QUAD_PROJECT_LIFECYCLE.md) | Full project lifecycle |
+| [QUAD_SAMPLE_ENVIRONMENT.md](methodology/quad-workflow/QUAD_SAMPLE_ENVIRONMENT.md) | Example setups |
+| [QUAD_STORY_LABELS.md](methodology/quad-workflow/QUAD_STORY_LABELS.md) | Jira label conventions |
 
 ---
 
-## 🤖 AI Strategy
+## 🏗️ Platform
 
-Documentation for AI integration, pricing, and context management.
-
-| Document | Description |
-|----------|-------------|
-| [AI_MODELS_CATALOG.md](ai/AI_MODELS_CATALOG.md) | Supported AI models |
-| [AI_PLATFORM_COMPARISON.md](ai/AI_PLATFORM_COMPARISON.md) | vs Cursor, Copilot |
-| [AI_PRICING_TIERS.md](ai/AI_PRICING_TIERS.md) | Turbo/Balanced/Quality |
-| [AI_PIPELINE_TIERS.md](ai/AI_PIPELINE_TIERS.md) | Task routing |
-| [AI_ACTIVITIES.md](ai/AI_ACTIVITIES.md) | AI-powered activities |
-| [AI_CONTEXT_MANAGEMENT.md](ai/AI_CONTEXT_MANAGEMENT.md) | Memory system |
-| [TOKEN_OPTIMIZATION.md](ai/TOKEN_OPTIMIZATION.md) | Cost optimization |
-
----
-
-## 🏗️ Architecture
-
-System architecture and technical design.
+Platform technical overview and architecture.
 
 | Document | Description |
 |----------|-------------|
-| [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | System overview |
-| [ARCHITECTURE_ROADMAP.md](architecture/ARCHITECTURE_ROADMAP.md) | Future plans |
-| [OBJECT_MODEL.md](architecture/OBJECT_MODEL.md) | Domain objects |
-| [SESSION_MANAGEMENT.md](architecture/SESSION_MANAGEMENT.md) | User sessions |
-| [MULTI_TENANT_SETUP.md](architecture/MULTI_TENANT_SETUP.md) | Multi-tenancy |
-| [SMART_AGENT_ARCHITECTURE.md](architecture/SMART_AGENT_ARCHITECTURE.md) | AI agent design |
-| [AGENT_BEHAVIOR_RULES.md](architecture/AGENT_BEHAVIOR_RULES.md) | Agent rules |
-| [DOCUMENTATION_INTEGRATION.md](architecture/DOCUMENTATION_INTEGRATION.md) | Doc integration |
-| [QUAD_SERVICES_SPEC.md](architecture/QUAD_SERVICES_SPEC.md) | Service specs |
-| [QUAD_SUBMODULES.md](architecture/QUAD_SUBMODULES.md) | Git submodules |
-| [QUAD_PLATFORM_DATABASE_DESIGN.md](architecture/QUAD_PLATFORM_DATABASE_DESIGN.md) | DB design |
+| [TECHNICAL_OVERVIEW.md](platform/TECHNICAL_OVERVIEW.md) | Platform architecture and deployment |
+| [QUAD_PLATFORM.md](methodology/QUAD_PLATFORM.md) | Platform features and capabilities |
+| [AGENT_MD_FORMAT.md](platform/AGENT_MD_FORMAT.md) | Agent documentation format |
 
 ---
 
 ## ✨ Features
 
-Feature specifications and implementations.
+Feature specifications and implementation guides.
 
 | Document | Description |
 |----------|-------------|
-| [PHASE1_WORKFLOW.md](features/PHASE1_WORKFLOW.md) | Phase 1 features |
-| [PHASE1_CROWD_PULLING.md](features/PHASE1_CROWD_PULLING.md) | Key differentiators |
-| [ONBOARDING_FLOW.md](features/ONBOARDING_FLOW.md) | User onboarding |
-| [MASTER_FLOWS.md](features/MASTER_FLOWS.md) | All user flows |
-| [AUTHENTICATION_FLOW.md](features/AUTHENTICATION_FLOW.md) | Login/SSO |
-| [OAUTH_IMPLEMENTATION.md](OAUTH_IMPLEMENTATION.md) | **OAuth 2.0 (Google, GitHub, Azure AD)** |
-| [ROLE_DASHBOARDS.md](features/ROLE_DASHBOARDS.md) | Role-based views |
-| [BLUEPRINT_AGENT.md](features/BLUEPRINT_AGENT.md) | AI project planning |
-| [BLUEPRINT_AGENT_Q3.md](features/BLUEPRINT_AGENT_Q3.md) | Phase Q3 |
-| [BLUEPRINT_AGENT_Q4_Q10.md](features/BLUEPRINT_AGENT_Q4_Q10.md) | Phases Q4-Q10 |
-| [REPORTS_SYSTEM.md](features/REPORTS_SYSTEM.md) | Reporting |
+| [BLUEPRINT_AGENT.md](features/BLUEPRINT_AGENT.md) | Blueprint Agent feature overview |
+| [BLUEPRINT_AGENT_Q3.md](features/BLUEPRINT_AGENT_Q3.md) | Q3 implementation decisions |
+| [BLUEPRINT_AGENT_Q4_Q10.md](features/BLUEPRINT_AGENT_Q4_Q10.md) | Q4-Q10 implementation decisions |
+| [MASTER_FLOWS.md](features/MASTER_FLOWS.md) | Complete workflow visualizations |
+| [ONBOARDING_FLOW.md](auth/ONBOARDING_FLOW.md) | User onboarding flow |
+| [PHASE1_CROWD_PULLING.md](features/PHASE1_CROWD_PULLING.md) | Phase 1 go-to-market strategy |
+| [PHASE1_WORKFLOW.md](features/PHASE1_WORKFLOW.md) | Phase 1 implementation plan |
+| [REPORTS_SYSTEM.md](features/REPORTS_SYSTEM.md) | Analytics and reporting |
+| [ROLE_DASHBOARDS.md](features/ROLE_DASHBOARDS.md) | Role-specific dashboard designs |
+| [SCHEMA_NAMING_DETECTION.md](features/SCHEMA_NAMING_DETECTION.md) | Auto-detect naming conventions |
 
 ---
 
-## 🔌 API Reference
+## 🏛️ Architecture
 
-API documentation and service specifications.
+System architecture, design patterns, and technical specifications.
 
 | Document | Description |
 |----------|-------------|
-| [API_REFERENCE.md](api/API_REFERENCE.md) | **Complete API (115+ routes)** |
-| [BLUEPRINT_AGENT_API.md](api/BLUEPRINT_AGENT_API.md) | Blueprint endpoints |
-| [BLUEPRINT_AGENT_SERVICES.md](api/BLUEPRINT_AGENT_SERVICES.md) | Service layer |
-| [DATABASE_AGENT_DESIGN.md](api/DATABASE_AGENT_DESIGN.md) | DB operations |
+| [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | Overall system architecture |
+| [ARCHITECTURE_ROADMAP.md](architecture/ARCHITECTURE_ROADMAP.md) | Architecture evolution plan |
+| [AI_AGENT_ARCHITECTURE.md](architecture/AI_AGENT_ARCHITECTURE.md) | AI agent system design |
+| [SMART_AGENT_ARCHITECTURE.md](architecture/SMART_AGENT_ARCHITECTURE.md) | Smart routing and assignment |
+| [MULTI_TENANT_SETUP.md](architecture/MULTI_TENANT_SETUP.md) | Multi-tenancy architecture |
+| [OBJECT_MODEL.md](architecture/OBJECT_MODEL.md) | Core data models |
+| [SESSION_MANAGEMENT.md](architecture/SESSION_MANAGEMENT.md) | Session handling |
+| [SANDBOX_ARCHITECTURE.md](architecture/SANDBOX_ARCHITECTURE.md) | Isolated execution environments |
+| [MESSENGER_CHANNEL_ARCHITECTURE.md](architecture/MESSENGER_CHANNEL_ARCHITECTURE.md) | Chat integration design |
+| [BROWSER_IDE_RESEARCH.md](architecture/BROWSER_IDE_RESEARCH.md) | In-browser IDE options |
+| [AGENT_BEHAVIOR_RULES.md](architecture/AGENT_BEHAVIOR_RULES.md) | Agent behavior guidelines |
+| [AGENT_DOCUMENTATION.md](architecture/AGENT_DOCUMENTATION.md) | Agent documentation standards |
+| [DOCUMENTATION_INTEGRATION.md](architecture/DOCUMENTATION_INTEGRATION.md) | Doc integration patterns |
+| [QUAD_SERVICES_SPEC.md](architecture/QUAD_SERVICES_SPEC.md) | Backend services specification |
+| [QUAD_SUBMODULES.md](architecture/QUAD_SUBMODULES.md) | Git submodule structure |
+| [QUAD_PLATFORM_DATABASE_DESIGN.md](architecture/QUAD_PLATFORM_DATABASE_DESIGN.md) | Database design document |
 
-**Quick Links:**
-- Authentication: [API_REFERENCE.md#authentication](api/API_REFERENCE.md#authentication)
-- Domains: [API_REFERENCE.md#domains](api/API_REFERENCE.md#domains)
-- Flows: [API_REFERENCE.md#flows](api/API_REFERENCE.md#flows)
-- AI/Chat: [API_REFERENCE.md#ai--chat](api/API_REFERENCE.md#ai--chat)
+---
+
+## 🤖 AI Strategy
+
+AI provider integration, token optimization, and cost management.
+
+| Document | Description |
+|----------|-------------|
+| [AI_ACTIVITIES.md](ai/AI_ACTIVITIES.md) | Complete list of AI-powered activities |
+| [AI_CONTEXT_MANAGEMENT.md](ai/AI_CONTEXT_MANAGEMENT.md) | Context window optimization |
+| [AI_MODELS_CATALOG.md](ai/AI_MODELS_CATALOG.md) | Available AI models and capabilities |
+| [AI_PIPELINE_TIERS.md](ai/AI_PIPELINE_TIERS.md) | User-facing AI tier options |
+| [AI_PLATFORM_COMPARISON.md](ai/AI_PLATFORM_COMPARISON.md) | Claude vs OpenAI vs Gemini comparison |
+| [AI_PRICING_TIERS.md](ai/AI_PRICING_TIERS.md) | AI pricing model breakdown |
+| [HOW_CLAUDE_CODE_WORKS.md](ai/HOW_CLAUDE_CODE_WORKS.md) | Claude Code internals |
+| [HOW_IDE_AI_TOOLS_WORK.md](ai/HOW_IDE_AI_TOOLS_WORK.md) | IDE AI integration patterns |
+| [MULTI_PROVIDER_STRATEGY.md](ai/MULTI_PROVIDER_STRATEGY.md) | Multi-provider routing strategy |
+| [QUAD_STRUCTURED_AI_ARCHITECTURE.md](ai/QUAD_STRUCTURED_AI_ARCHITECTURE.md) | Structured AI approach |
+| [TOKEN_OPTIMIZATION.md](ai/TOKEN_OPTIMIZATION.md) | Token usage optimization strategies |
+
+---
+
+## 📡 API Reference
+
+REST API documentation and service specifications.
+
+| Document | Description |
+|----------|-------------|
+| [API_REFERENCE.md](api/API_REFERENCE.md) | Complete REST API reference |
+| [BLUEPRINT_AGENT_API.md](api/BLUEPRINT_AGENT_API.md) | Blueprint Agent API endpoints |
+| [BLUEPRINT_AGENT_SERVICES.md](api/BLUEPRINT_AGENT_SERVICES.md) | Blueprint Agent backend services |
+| [DATABASE_AGENT_DESIGN.md](api/DATABASE_AGENT_DESIGN.md) | Database Agent service design |
 
 ---
 
 ## 🗄️ Database
 
-Database schema and design documentation.
+Database schema, migrations, and data models.
 
 | Document | Description |
 |----------|-------------|
-| [DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md) | Schema reference |
-| [CODEBASE_INDEX_SYSTEM.md](database/CODEBASE_INDEX_SYSTEM.md) | Code indexing |
-
-**Quick Stats:**
-- **124 Prisma models** (database tables)
-- **EAV pattern** for flexible attributes
-- **PostgreSQL 15** on GCP Cloud SQL
+| [DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md) | Complete PostgreSQL schema |
+| [DATABASE_ARCHITECTURE.md](database/DATABASE_ARCHITECTURE.md) | Database design principles |
+| [CODEBASE_INDEX_SYSTEM.md](database/CODEBASE_INDEX_SYSTEM.md) | Code indexing for AI context |
 
 ---
 
 ## 🚀 Deployment
 
-Deployment guides and infrastructure.
+Deployment guides, infrastructure setup, and cloud migrations.
 
 | Document | Description |
 |----------|-------------|
-| [DEPLOYMENT_MODES.md](deployment/DEPLOYMENT_MODES.md) | O(1)/O(n)/O(n²) modes |
-| [GOOGLE_CLOUD_MIGRATION.md](deployment/GOOGLE_CLOUD_MIGRATION.md) | GCP setup |
-| [INFRASTRUCTURE_STRATEGY.md](deployment/INFRASTRUCTURE_STRATEGY.md) | Infra decisions |
-| [ENFORCED_DEPLOYMENT_WORKFLOWS.md](deployment/ENFORCED_DEPLOYMENT_WORKFLOWS.md) | CI/CD |
-| [MASS_MUTUAL_DEMO_SETUP.md](deployment/MASS_MUTUAL_DEMO_SETUP.md) | Demo environment |
+| [DEPLOYMENT_MODES.md](deployment/DEPLOYMENT_MODES.md) | Available deployment options |
+| [ENFORCED_DEPLOYMENT_WORKFLOWS.md](deployment/ENFORCED_DEPLOYMENT_WORKFLOWS.md) | CI/CD workflows |
+| [GOOGLE_CLOUD_MIGRATION.md](deployment/GOOGLE_CLOUD_MIGRATION.md) | GCP deployment guide |
+| [INFRASTRUCTURE_STRATEGY.md](deployment/INFRASTRUCTURE_STRATEGY.md) | Infrastructure planning |
+| [MASS_MUTUAL_DEMO_SETUP.md](deployment/MASS_MUTUAL_DEMO_SETUP.md) | Mass Mutual demo environment |
 
 ---
 
-## 🔗 Integration
+## 🔌 Integration
 
-Third-party integrations and SSO setup.
+Third-party integrations, SSO setup, and tool connections.
 
 | Document | Description |
 |----------|-------------|
-| [SSO_SETUP_GUIDE.md](integration/SSO_SETUP_GUIDE.md) | **Enterprise SSO (Okta, Azure AD)** |
-| [CLOUDFLARE_INTEGRATION.md](integration/CLOUDFLARE_INTEGRATION.md) | CDN/DNS |
-| [INTEGRATION_REQUEST_WORKFLOW.md](integration/INTEGRATION_REQUEST_WORKFLOW.md) | Adding integrations |
-| [TOOL_INTEGRATION_METHODS.md](integration/TOOL_INTEGRATION_METHODS.md) | OAuth, webhooks |
-| [AGENT_TOOLS_REFERENCE.md](integration/AGENT_TOOLS_REFERENCE.md) | MCP tools |
+| [AGENT_TOOLS_REFERENCE.md](integration/AGENT_TOOLS_REFERENCE.md) | Available agent tools |
+| [CLOUDFLARE_INTEGRATION.md](integration/CLOUDFLARE_INTEGRATION.md) | Cloudflare DNS setup |
+| [CONNECTIVITY_TYPES.md](integration/CONNECTIVITY_TYPES.md) | Integration connectivity patterns |
+| [INTEGRATION_REQUEST_WORKFLOW.md](integration/INTEGRATION_REQUEST_WORKFLOW.md) | How to request new integrations |
+| [SSO_SETUP_GUIDE.md](integration/SSO_SETUP_GUIDE.md) | Enterprise SSO configuration |
+| [TOOL_INTEGRATION_METHODS.md](integration/TOOL_INTEGRATION_METHODS.md) | Tool integration approaches |
 
 ---
 
 ## 🧪 Testing
 
-Testing documentation and test journeys.
+Test strategies, test journeys, and QA processes.
 
 | Document | Description |
 |----------|-------------|
-| [TEST_STRATEGY.md](testing/TEST_STRATEGY.md) | Testing strategy |
-| [AUTH_TESTING_GUIDE.md](testing/AUTH_TESTING_GUIDE.md) | Auth testing |
-| [PHASE1_GAP_ANALYSIS.md](testing/PHASE1_GAP_ANALYSIS.md) | Gap analysis |
-| [TEST_JOURNEYS.md](TEST_JOURNEYS.md) | Journey tests |
+| [TEST_JOURNEYS.md](testing/TEST_JOURNEYS.md) | Complete test scenario library |
+| [TEST_STRATEGY.md](testing/TEST_STRATEGY.md) | Overall testing strategy |
+| [TEST_README.md](testing/TEST_README.md) | Testing documentation index |
+| [AUTH_TESTING_GUIDE.md](testing/AUTH_TESTING_GUIDE.md) | Authentication testing guide |
+| [PHASE1_GAP_ANALYSIS.md](testing/PHASE1_GAP_ANALYSIS.md) | Phase 1 feature gaps |
 
 ### Test Journeys
-| Journey | Description |
-|---------|-------------|
-| [JOURNEY_01_ONBOARDING.md](testing/journeys/JOURNEY_01_ONBOARDING.md) | Onboarding flow |
-| [JOURNEY_02_Q_STAGE.md](testing/journeys/JOURNEY_02_Q_STAGE.md) | Q-Stage testing |
-| [JOURNEY_03_U_STAGE.md](testing/journeys/JOURNEY_03_U_STAGE.md) | U-Stage testing |
+
+| Document | Description |
+|----------|-------------|
+| [JOURNEY_01_ONBOARDING.md](testing/journeys/JOURNEY_01_ONBOARDING.md) | User onboarding test journey |
+| [JOURNEY_02_Q_STAGE.md](testing/journeys/JOURNEY_02_Q_STAGE.md) | Q (Question) stage testing |
+| [JOURNEY_03_U_STAGE.md](testing/journeys/JOURNEY_03_U_STAGE.md) | U (Understand) stage testing |
 
 ---
 
-## 📊 Strategy
+## 🤖 Agents
 
-Business strategy and competitive analysis.
+Agent specifications, tools, and behavior rules.
 
 | Document | Description |
 |----------|-------------|
-| [COMPETITION.md](strategy/COMPETITION.md) | Market landscape |
-| [COMPETITOR_COMPARISON.md](strategy/COMPETITOR_COMPARISON.md) | vs Linear, Jira |
-| [SUCCESS_STORY.md](strategy/SUCCESS_STORY.md) | Market opportunity |
-| [SUCCESS.md](strategy/SUCCESS.md) | Success metrics |
-| [ADOPTION.md](strategy/ADOPTION.md) | Adoption strategy |
-| [IP_STRATEGY.md](strategy/IP_STRATEGY.md) | Patents, trademarks |
-| [SERVICE_MODEL_ANALYSIS.md](strategy/SERVICE_MODEL_ANALYSIS.md) | Pricing |
-| [DEVELOPMENT_MODEL.md](strategy/DEVELOPMENT_MODEL.md) | 4-4-4 principle |
+| [AGENT_RULES.md](agents/AGENT_RULES.md) | Core agent behavior rules |
+| [INTEGRATION_MAPPING.md](agents/INTEGRATION_MAPPING.md) | Agent-to-tool mapping |
+| [MCP_AGENT_VS_USER_AGENTS.md](agents/MCP_AGENT_VS_USER_AGENTS.md) | MCP vs user agent comparison |
+
+### Agent Definitions
+
+| Document | Role |
+|----------|------|
+| [agent-base.md](agents/agent-base.md) | Base agent template |
+| [agent-database.md](agents/agent-database.md) | Database Agent (schema migrations) |
+| [agent-developer.md](agents/agent-developer.md) | Developer Agent (coding tasks) |
+| [agent-infrastructure-engineer.md](agents/agent-infrastructure-engineer.md) | Infrastructure Agent (DevOps) |
+| [agent-ios.md](agents/agent-ios.md) | iOS Agent (mobile development) |
+| [agent-product-manager.md](agents/agent-product-manager.md) | Product Manager Agent (requirements) |
+| [agent-product-tech-lead.md](agents/agent-product-tech-lead.md) | Tech Lead Agent (architecture) |
+| [agent-qa-engineer.md](agents/agent-qa-engineer.md) | QA Agent (testing) |
+| [agent-solution-architect.md](agents/agent-solution-architect.md) | Solution Architect Agent (design) |
+| [agent-ui.md](agents/agent-ui.md) | UI/UX Agent (frontend) |
+
+---
+
+## 📋 Planning & Strategy
+
+Roadmaps, next steps, and strategic planning documents.
+
+| Document | Description |
+|----------|-------------|
+| [NEXT_STEPS.md](planning/NEXT_STEPS.md) | General next steps and roadmap |
+| [JANUARY_2026_NEXT_STEPS.md](planning/JANUARY_2026_NEXT_STEPS.md) | January 2026 specific action plan |
+| [ADOPTION.md](strategy/ADOPTION.md) | User adoption strategy |
+| [COMPETITION.md](strategy/COMPETITION.md) | Competitive landscape |
+| [COMPETITOR_COMPARISON.md](strategy/COMPETITOR_COMPARISON.md) | Detailed competitor analysis |
+| [DEVELOPMENT_MODEL.md](strategy/DEVELOPMENT_MODEL.md) | QUAD development model vs Agile |
+| [IP_STRATEGY.md](strategy/IP_STRATEGY.md) | Intellectual property strategy |
+| [SERVICE_MODEL_ANALYSIS.md](strategy/SERVICE_MODEL_ANALYSIS.md) | Service vs product model |
+| [SUCCESS.md](strategy/SUCCESS.md) | Success metrics and KPIs |
+| [SUCCESS_STORY.md](strategy/SUCCESS_STORY.md) | Customer success stories |
+| [TOP1_TOOL_STRATEGY.md](strategy/TOP1_TOOL_STRATEGY.md) | Becoming the #1 tool strategy |
 
 ---
 
 ## 📚 Case Studies
 
-Industry-specific implementations.
+Real-world implementation examples by industry.
 
-| Document | Description |
-|----------|-------------|
-| [00-QUAD-FRAMEWORK-GUIDE.md](case-studies/00-QUAD-FRAMEWORK-GUIDE.md) | Overview |
-| [01-ECOMMERCE.md](case-studies/01-ECOMMERCE.md) | E-commerce |
-| [02-HOSPITAL.md](case-studies/02-HOSPITAL.md) | Healthcare |
-| [03-EDUCATION.md](case-studies/03-EDUCATION.md) | Education |
-| [04-MANUFACTURING.md](case-studies/04-MANUFACTURING.md) | Manufacturing |
-| [05-SOFTWARE.md](case-studies/05-SOFTWARE.md) | Software agency |
-| [07-MULTI-TENANT-STRATEGY.md](case-studies/07-MULTI-TENANT-STRATEGY.md) | Multi-tenant |
+| Document | Industry |
+|----------|----------|
+| [00-QUAD-FRAMEWORK-GUIDE.md](case-studies/00-QUAD-FRAMEWORK-GUIDE.md) | General guide |
+| [01-ECOMMERCE.md](case-studies/01-ECOMMERCE.md) | E-commerce case study |
+| [02-HOSPITAL.md](case-studies/02-HOSPITAL.md) | Healthcare case study |
+| [03-EDUCATION.md](case-studies/03-EDUCATION.md) | Education case study |
+| [04-MANUFACTURING.md](case-studies/04-MANUFACTURING.md) | Manufacturing case study |
+| [05-SOFTWARE.md](case-studies/05-SOFTWARE.md) | Software company case study |
+| [07-MULTI-TENANT-STRATEGY.md](case-studies/07-MULTI-TENANT-STRATEGY.md) | Multi-tenant architecture |
 
 ---
 
 ## 🔒 Internal
 
-Internal development documentation (team only).
+Internal team documentation, discussions, and planning.
 
 | Document | Description |
 |----------|-------------|
-| [DISCUSSIONS_LOG.md](internal/DISCUSSIONS_LOG.md) | Decision log |
-| [IMPLEMENTATION_SUMMARY.md](internal/IMPLEMENTATION_SUMMARY.md) | Dev progress |
-| [GAMIFICATION_RANKING.md](internal/GAMIFICATION_RANKING.md) | Scoring system |
-| [WIREFRAMES.md](internal/WIREFRAMES.md) | UI mockups |
-| [BOOKS.md](internal/BOOKS.md) | Reference materials |
-| [PORTAL_ORG_PLAN.md](internal/PORTAL_ORG_PLAN.md) | Portal structure |
-| [TECH_STACK.md](internal/TECH_STACK.md) | Technology stack |
-| [DEV_AGENT_WORKFLOW.md](internal/DEV_AGENT_WORKFLOW.md) | Development workflow |
+| [BOOKS.md](internal/BOOKS.md) | Book downloads and resources |
+| [DEV_AGENT_WORKFLOW.md](internal/DEV_AGENT_WORKFLOW.md) | Internal development workflow |
+| [DISCUSSIONS_LOG.md](internal/DISCUSSIONS_LOG.md) | Team discussion archive |
+| [GAMIFICATION_RANKING.md](internal/GAMIFICATION_RANKING.md) | Gamification system design |
+| [IMPLEMENTATION_SUMMARY.md](internal/IMPLEMENTATION_SUMMARY.md) | Implementation progress |
+| [PORTAL_ORG_PLAN.md](internal/PORTAL_ORG_PLAN.md) | Organization portal plan |
+| [TECH_STACK.md](internal/TECH_STACK.md) | Technology stack decisions |
+| [WIREFRAMES.md](internal/WIREFRAMES.md) | UI wireframes and mockups |
 
 ---
 
-## 📈 Platform Documentation
+## 📊 Documentation Status
 
-Top-level platform docs.
+### By Category
 
-| Document | Description |
-|----------|-------------|
-| [QUAD_PLATFORM.md](QUAD_PLATFORM.md) | Platform overview |
-| [DOCUMENTATION_STRUCTURE.md](DOCUMENTATION_STRUCTURE.md) | Doc organization |
-
----
-
-## 🎓 Learning Paths
-
-### Path 1: Product Manager (30 min)
-
-1. [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) - Core concepts
-2. [FEATURES.md](FEATURES.md) - Feature list
-3. [methodology/QUAD_SUMMARY.md](methodology/QUAD_SUMMARY.md) - Methodology
-
-### Path 2: Frontend Developer (1 hour)
-
-1. [GETTING_STARTED.md](GETTING_STARTED.md) - Setup
-2. [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md) - Architecture
-3. [api/API_REFERENCE.md](api/API_REFERENCE.md) - API endpoints
-4. [features/AUTHENTICATION_FLOW.md](features/AUTHENTICATION_FLOW.md) - Auth flow
-
-### Path 3: Backend Developer (1.5 hours)
-
-1. [GETTING_STARTED.md](GETTING_STARTED.md) - Setup
-2. [database/DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md) - Schema
-3. [api/API_REFERENCE.md](api/API_REFERENCE.md) - API endpoints
-4. [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md) - Architecture
-
-### Path 4: DevOps Engineer (1 hour)
-
-1. [deployment/DEPLOYMENT_MODES.md](deployment/DEPLOYMENT_MODES.md) - Modes
-2. [deployment/GOOGLE_CLOUD_MIGRATION.md](deployment/GOOGLE_CLOUD_MIGRATION.md) - GCP
-3. [integration/SSO_SETUP_GUIDE.md](integration/SSO_SETUP_GUIDE.md) - SSO
-4. [architecture/MULTI_TENANT_SETUP.md](architecture/MULTI_TENANT_SETUP.md) - Multi-tenant
-
-### Path 5: Full-Stack (Complete Onboarding)
-
-**Day 1:** Understanding
-- [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)
-- [FEATURES.md](FEATURES.md)
-- [architecture/ARCHITECTURE.md](architecture/ARCHITECTURE.md)
-
-**Day 2:** Setup & Explore
-- [GETTING_STARTED.md](GETTING_STARTED.md)
-- Run dev server
-- Test API endpoints
-
-**Day 3:** Database
-- [database/DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md)
-- [api/API_REFERENCE.md](api/API_REFERENCE.md)
-
-**Day 4:** Features
-- [features/PHASE1_WORKFLOW.md](features/PHASE1_WORKFLOW.md)
-- [testing/journeys/JOURNEY_01_ONBOARDING.md](testing/journeys/JOURNEY_01_ONBOARDING.md)
-
-**Day 5:** Build
-- Implement first feature
-- Submit PR
-
----
-
-## 📋 Documentation Status
-
-| Category | Files | Status |
-|----------|-------|--------|
-| Methodology | 24 | ✅ Complete |
-| AI | 7 | ✅ Complete |
-| Architecture | 11 | ✅ Complete |
+| Category | Documents | Status |
+|----------|-----------|--------|
+| Getting Started | 3 | ✅ Complete |
+| Overview | 3 | ✅ Complete |
+| Authentication | 4 | ✅ Complete |
+| Methodology | 19 | ✅ Complete |
+| Platform | 3 | ✅ Complete |
 | Features | 10 | ✅ Complete |
+| Architecture | 16 | ✅ Complete |
+| AI Strategy | 11 | ✅ Complete |
 | API | 4 | ✅ Complete |
-| Database | 2 | ✅ Complete |
+| Database | 3 | ✅ Complete |
 | Deployment | 5 | ✅ Complete |
-| Integration | 5 | ✅ Complete |
-| Testing | 6 | ✅ Complete |
-| Strategy | 8 | ✅ Complete |
+| Integration | 6 | ✅ Complete |
+| Testing | 8 | ✅ Complete |
+| Agents | 13 | ✅ Complete |
+| Planning/Strategy | 12 | ✅ Complete |
 | Case Studies | 7 | ✅ Complete |
 | Internal | 8 | ✅ Complete |
-| **Total** | **100+** | **✅** |
+| **TOTAL** | **130+** | ✅ Complete |
+
+### Recent Updates (January 4, 2026)
+
+- ✅ Reorganized documentation structure (root → folders)
+- ✅ Created new folders: `getting-started/`, `overview/`, `auth/`, `planning/`
+- ✅ Moved files to logical groupings
+- ✅ Added comprehensive SITEMAP.md with auth flow diagrams
+- ✅ Updated this README.md with new paths
 
 ---
 
-## 📞 Support
+## 🔍 Finding Documentation
 
-- **Documentation Issues:** [GitHub Issues](https://github.com/a2vibecreators/quadframework/issues) (tag: `documentation`)
-- **Email:** support@quadframe.work
-- **Website:** https://quadframe.work
+### By Topic
+
+**Want to know about...?**
+
+- **Setup & Installation** → [getting-started/](getting-started/)
+- **Authentication** → [auth/](auth/)
+- **QUAD Methodology** → [methodology/](methodology/)
+- **AI Integration** → [ai/](ai/)
+- **Database Schema** → [database/](database/)
+- **API Endpoints** → [api/](api/)
+- **Deployment** → [deployment/](deployment/)
+- **Testing** → [testing/](testing/)
+- **Site Navigation** → [SITEMAP.md](SITEMAP.md)
+
+### By Role
+
+**I am a...**
+
+- **New Developer** → Start with [getting-started/GETTING_STARTED.md](getting-started/GETTING_STARTED.md)
+- **Product Manager** → Read [methodology/QUAD.md](methodology/QUAD.md) and [strategy/DEVELOPMENT_MODEL.md](strategy/DEVELOPMENT_MODEL.md)
+- **DevOps Engineer** → Check [deployment/](deployment/) and [architecture/](architecture/)
+- **QA Engineer** → Review [testing/](testing/)
+- **Solution Architect** → Study [architecture/](architecture/) and [case-studies/](case-studies/)
 
 ---
 
-## 🔗 Quick Reference
+## 🤝 Contributing
 
-**I want to...**
+To add or update documentation:
 
-| Goal | Document |
-|------|----------|
-| Understand QUAD | [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) |
-| Set up local dev | [GETTING_STARTED.md](GETTING_STARTED.md) |
-| See all features | [FEATURES.md](FEATURES.md) |
-| Call an API | [api/API_REFERENCE.md](api/API_REFERENCE.md) |
-| See database schema | [database/DATABASE_SCHEMA.md](database/DATABASE_SCHEMA.md) |
-| Deploy to GCP | [deployment/GOOGLE_CLOUD_MIGRATION.md](deployment/GOOGLE_CLOUD_MIGRATION.md) |
-| Set up OAuth | [OAUTH_IMPLEMENTATION.md](OAUTH_IMPLEMENTATION.md) |
-| Set up SSO | [integration/SSO_SETUP_GUIDE.md](integration/SSO_SETUP_GUIDE.md) |
-| Run tests | [testing/TEST_STRATEGY.md](testing/TEST_STRATEGY.md) |
-| Understand pricing | [ai/AI_PRICING_TIERS.md](ai/AI_PRICING_TIERS.md) |
-| See competitors | [strategy/COMPETITOR_COMPARISON.md](strategy/COMPETITOR_COMPARISON.md) |
+1. Follow the folder structure above
+2. Use markdown format (.md)
+3. Add your document to the appropriate category
+4. Update this README.md index
+5. Submit a pull request
+
+### Naming Conventions
+
+- Use SCREAMING_SNAKE_CASE for file names (e.g., `OAUTH_IMPLEMENTATION.md`)
+- Be descriptive but concise
+- Avoid duplicate names across folders
+- Use prefixes for related series (e.g., `BLUEPRINT_AGENT.md`, `BLUEPRINT_AGENT_Q3.md`)
 
 ---
 
-**Ready to start?** Begin with [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md) → [GETTING_STARTED.md](GETTING_STARTED.md) → [api/API_REFERENCE.md](api/API_REFERENCE.md)
+**Last Updated:** January 4, 2026
+**Maintained by:** Suman Addanki (via Claude Code)
+**Version:** 2.0 (Reorganized Structure)
