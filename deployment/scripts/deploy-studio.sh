@@ -204,6 +204,12 @@ case "${1}" in
         print_status "DEV deployed successfully!"
         print_status "URL: https://dev.quadframe.work"
         print_status "Local: http://localhost:${DEV_PORT}"
+
+        # Ensure Caddy networks are configured
+        if [ -f "/Users/semostudio/scripts/ensure-caddy-networks.sh" ]; then
+            echo ""
+            /Users/semostudio/scripts/ensure-caddy-networks.sh
+        fi
         ;;
     qa)
         deploy_env "qa" ${QA_PORT}
@@ -211,10 +217,23 @@ case "${1}" in
         print_status "QA deployed successfully!"
         print_status "URL: https://qa.quadframe.work"
         print_status "Local: http://localhost:${QA_PORT}"
+
+        # Ensure Caddy networks are configured
+        if [ -f "/Users/semostudio/scripts/ensure-caddy-networks.sh" ]; then
+            echo ""
+            /Users/semostudio/scripts/ensure-caddy-networks.sh
+        fi
         ;;
     all)
         deploy_env "dev" ${DEV_PORT}
         deploy_env "qa" ${QA_PORT}
+        echo ""
+
+        # Ensure Caddy networks are configured
+        if [ -f "/Users/semostudio/scripts/ensure-caddy-networks.sh" ]; then
+            echo ""
+            /Users/semostudio/scripts/ensure-caddy-networks.sh
+        fi
         echo ""
         print_status "Both environments deployed successfully!"
         print_status "DEV: https://dev.quadframe.work (localhost:${DEV_PORT})"
