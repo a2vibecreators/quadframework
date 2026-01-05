@@ -823,6 +823,20 @@ export async function GET() {
 
 **Docker Networks:** `dev-network` and `qa-network`
 
+**Infrastructure Verification Scripts:**
+- **Caddy Network Fixer:** `/Users/semostudio/scripts/ensure-caddy-networks.sh`
+  - Automatically runs after every deployment (dev/qa/all)
+  - Ensures Caddy is connected to dev-network and qa-network
+  - Creates networks if they don't exist
+  - Prevents 502 errors due to network misconfiguration
+
+- **Comprehensive Verifier:** `/Users/semostudio/scripts/verify-all-dns-and-networks.sh`
+  - Checks all DNS records (QUAD, A2Vibe, NutriNine for dev/qa)
+  - Verifies container network connectivity
+  - Tests HTTPS accessibility for all domains
+  - Auto-fixes Caddy network issues if found
+  - Run manually anytime: `/Users/semostudio/scripts/verify-all-dns-and-networks.sh`
+
 **Related Documentation:**
 - Master Infrastructure Port Scheme: `/Users/semostudio/scripts/INFRASTRUCTURE_PORTS.md`
 - NutriNine Ports: `/Users/semostudio/git/a2vibecreators/nutrinine/CLAUDE.md`
