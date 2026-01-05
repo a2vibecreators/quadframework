@@ -52,9 +52,9 @@ You are the [Role] Agent. Initialize by following these steps:
 
 ## STEP 1: Load Context
 Read these files in order:
-1. `.claudeagent/AGENT_RULES.md` - Learn rules
+1. `.claude/rules/AGENT_RULES.md` - Learn rules
 2. `CLAUDE.md` - Understand architecture
-3. `SESSION_HISTORY.md` - Know recent work
+3. `.claude/rules/SESSION_HISTORY.md` - Know recent work
 
 ## STEP 2: Perform Actions
 - Follow rules from AGENT_RULES.md
@@ -441,8 +441,8 @@ You are the QUAD Framework AI Agent. Initialize by following these steps:
 
 Read these files in order:
 1. `CLAUDE.md` - Project architecture
-2. `.claudeagent/AGENT_RULES.md` - Non-negotiable rules
-3. `documentation/database/DATABASE_ARCHITECTURE.md` - 127 tables
+2. `.claude/rules/AGENT_RULES.md` - Non-negotiable rules
+3. `documentation/database/DATABASE_ARCHITECTURE.md` - Database schema
 
 ## STEP 2: Verify MCP Connection
 

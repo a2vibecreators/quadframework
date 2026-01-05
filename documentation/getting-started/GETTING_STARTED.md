@@ -422,9 +422,9 @@ Go to GitHub and create PR from your branch to `main`.
 Now that you have the project running:
 
 1. **Explore the Dashboard:** http://localhost:3000/dashboard
-2. **Read API Documentation:** [BLUEPRINT_AGENT_API_REFERENCE.md](BLUEPRINT_AGENT_API_REFERENCE.md)
-3. **Understand Architecture:** [ARCHITECTURE.md](ARCHITECTURE.md)
-4. **Check Services:** [BLUEPRINT_AGENT_SERVICES.md](BLUEPRINT_AGENT_SERVICES.md)
+2. **Read API Documentation:** [BLUEPRINT_AGENT_API.md](../api/BLUEPRINT_AGENT_API.md)
+3. **Understand Architecture:** [ARCHITECTURE.md](../architecture/ARCHITECTURE.md)
+4. **Check Services:** [BLUEPRINT_AGENT_SERVICES.md](../api/BLUEPRINT_AGENT_SERVICES.md)
 
 ### Recommended Learning Path
 
@@ -453,10 +453,10 @@ Now that you have the project running:
 ## Support
 
 **Questions?**
-- Check [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)
+- Check [PROJECT_OVERVIEW.md](../overview/PROJECT_OVERVIEW.md)
 - Email: contact@a2vibecreators.com
 - GitHub Issues: https://github.com/a2vibecreators/quadframework/issues
 
 ---
 
-**Ready to build?** Start with [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)
+**Ready to build?** Start with [DEVELOPER_ONBOARDING.md](./DEVELOPER_ONBOARDING.md) for full setup details.

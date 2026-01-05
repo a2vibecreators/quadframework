@@ -25,10 +25,11 @@ Welcome to QUAD Platform documentation! This index helps you navigate all availa
 13. [Integration](#-integration)
 14. [Testing](#-testing)
 15. [Agents](#-agents)
-16. [Planning & Strategy](#-planning--strategy)
-17. [Case Studies](#-case-studies)
-18. [Internal](#-internal)
-19. [Documentation Status](#-documentation-status)
+16. [Guides](#-guides)
+17. [Planning & Strategy](#-planning--strategy)
+18. [Case Studies](#-case-studies)
+19. [Internal](#-internal)
+20. [Documentation Status](#-documentation-status)
 
 ---
 
@@ -63,6 +64,7 @@ Setup guides and onboarding documentation.
 
 | Document | Description |
 |----------|-------------|
+| [DEVELOPER_ONBOARDING.md](getting-started/DEVELOPER_ONBOARDING.md) | **Full developer onboarding** - Vaultwarden, secrets, troubleshooting |
 | [GETTING_STARTED.md](getting-started/GETTING_STARTED.md) | Quick start guide for developers |
 | [SETUP_INSTRUCTIONS.md](getting-started/SETUP_INSTRUCTIONS.md) | Detailed setup instructions |
 | [GITHUB_ORGANIZATION.md](getting-started/GITHUB_ORGANIZATION.md) | GitHub org setup and workflows |
@@ -294,6 +296,16 @@ Agent specifications, tools, and behavior rules.
 | [agent-qa-engineer.md](agents/agent-qa-engineer.md) | QA Agent (testing) |
 | [agent-solution-architect.md](agents/agent-solution-architect.md) | Solution Architect Agent (design) |
 | [agent-ui.md](agents/agent-ui.md) | UI/UX Agent (frontend) |
+
+---
+
+## 📚 Guides
+
+How-to guides and reference documentation for developers.
+
+| Document | Description |
+|----------|-------------|
+| [CLAUDE_CODE_ARCHITECTURE.md](guides/CLAUDE_CODE_ARCHITECTURE.md) | Commands, Skills, Subagents explained |
 
 ---
 

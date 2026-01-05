@@ -1,8 +1,27 @@
 # QUAD Framework - Developer Onboarding Guide
 
-## For New Developers (Sharath, Remote Team Members)
+**For New Developers (Sharath, Remote Team Members)**
 
 This guide walks you through setting up the QUAD Framework development environment on a **new machine**.
+
+---
+
+## Table of Contents
+
+1. [Prerequisites](#prerequisites)
+2. [Step 1: Clone the Repository](#step-1-clone-the-repository)
+3. [Step 2: Initialize Git Submodules](#step-2-initialize-git-submodules)
+4. [Step 3: Set Up Vaultwarden Access](#step-3-set-up-vaultwarden-access)
+5. [Step 4: Run Setup Script](#step-4-run-setup-script)
+6. [Step 5: Verify Database Connection](#step-5-verify-database-connection)
+7. [Step 6: Install Dependencies](#step-6-install-dependencies)
+8. [Step 7: Start Development Server](#step-7-start-development-server)
+9. [Step 8: Test Login](#step-8-test-login)
+10. [Troubleshooting](#troubleshooting)
+11. [Deploying to DEV/QA](#deploying-to-devqa)
+12. [Security Best Practices](#security-best-practices)
+13. [Next Steps After Setup](#next-steps-after-setup)
+14. [Quick Reference](#quick-reference)
 
 ---
 
@@ -328,8 +347,8 @@ docker stop quad-web-dev
 ## Next Steps After Setup
 
 1. **Read project documentation:**
-   - [CLAUDE.md](CLAUDE.md) - Complete project guide
-   - [README.md](README.md) - Quick start
+   - [CLAUDE.md](../../CLAUDE.md) - Complete project guide
+   - [README.md](../../README.md) - Quick start
 
 2. **Join communication channels:**
    - GitHub Discussions (for code questions)

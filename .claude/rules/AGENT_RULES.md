@@ -1,7 +1,29 @@
-# QUAD Platform - Agent Rules
+# QUAD Platform - Agent Rules (Claude Code)
 
 **Purpose:** Guidelines for Claude Code when working on QUAD Platform
-**Last Updated:** December 31, 2025
+**Last Updated:** January 4, 2026
+
+> **Note:** This is the Claude Code-specific version (11 rules).
+> For the full 40-rule developer reference, see [documentation/agents/AGENT_RULES.md](../../documentation/agents/AGENT_RULES.md)
+
+---
+
+## Table of Contents
+
+1. [Core Rules](#core-rules)
+   - [1. Session Management](#1-session-management)
+   - [2. Always Check Context First](#2-always-check-context-first)
+   - [3. Update Session History After Major Milestones](#3-update-session-history-after-major-milestones)
+   - [4. Use TodoWrite for Multi-Step Tasks](#4-use-todowrite-for-multi-step-tasks)
+   - [5. Database Tables Use QUAD_ Prefix](#5-database-tables-use-quad_-prefix)
+   - [6. Follow Architecture Decisions](#6-follow-architecture-decisions)
+   - [7. Agent Role Philosophy](#7-agent-role-philosophy-combined-by-default-flexible-for-enterprises)
+   - [8. Documentation Structure](#8-documentation-structure)
+   - [9. Ask Before Production Deployment](#9-ask-before-production-deployment)
+   - [10. Git Commit Messages](#10-git-commit-messages)
+   - [11. Code Style](#11-code-style)
+2. [Project-Specific Context](#project-specific-context)
+3. [When Context is Lost](#when-context-is-lost)
 
 ---
 
@@ -12,7 +34,7 @@
 **7-Day Active Context Window:**
 - Keep detailed context for last 7 days of work
 - After 7 days, compress conversation into "Problem → Solution" format
-- Archive compressed sessions in `.claudeagent/archive/`
+- Archive compressed sessions in `.claude/archive/`
 
 **Compression Format:**
 ```markdown
@@ -48,11 +70,9 @@
 ### 2. Always Check Context First
 
 Before starting work, read:
-```
-1. .claudeagent/SESSION_HISTORY.md
-2. .claudeagent/AGENT_CONTEXT_FILES.md
+1. [SESSION_HISTORY.md](SESSION_HISTORY.md) - Previous session context
+2. [CONTEXT_FILES.md](CONTEXT_FILES.md) - Key files reference
 3. Current TodoWrite list
-```
 
 ### 3. Update Session History After Major Milestones
 
@@ -172,7 +192,7 @@ separate agents for enterprises. Would you like us to split these into:
 - agent-tech-lead (technical decisions, architecture, code reviews)?"
 ```
 
-### 7. Documentation Structure
+### 8. Documentation Structure
 
 Follow NutriNine pattern:
 ```
@@ -183,14 +203,14 @@ documentation/
 └── testing/
 ```
 
-### 8. Ask Before Production Deployment
+### 9. Ask Before Production Deployment
 
 **Never deploy to production without explicit user approval.**
 
 DEV deployment: ✅ Can do freely
 QA/Production: ⚠️ Ask first
 
-### 9. Git Commit Messages
+### 10. Git Commit Messages
 
 Use conventional commits:
 ```
@@ -200,7 +220,7 @@ docs: Add SSO setup guide
 chore: Update .env.example with SSO vars
 ```
 
-### 10. Code Style
+### 11. Code Style
 
 - TypeScript strict mode
 - ESLint rules from Next.js
@@ -231,16 +251,14 @@ chore: Update .env.example with SSO vars
 
 If conversation compacts or user switches projects:
 
-**User types:** `/quadframework-init`
-
 **You should:**
-1. Read `.claudeagent/SESSION_HISTORY.md`
-2. Read `.claudeagent/AGENT_RULES.md` (this file)
-3. Read `.claudeagent/AGENT_CONTEXT_FILES.md`
+1. Read [SESSION_HISTORY.md](SESSION_HISTORY.md)
+2. Read [AGENT_RULES.md](AGENT_RULES.md) (this file)
+3. Read [CONTEXT_FILES.md](CONTEXT_FILES.md)
 4. Summarize current state
-5. Ask: "Ready to continue? What should I work on next?"
+5. Ask: "Ready to continue? What should I work on next, macha?"
 
 ---
 
-**Last Updated:** December 31, 2025
-**Maintained By:** Claude Code + Suman Addanke
+**Last Updated:** January 4, 2026
+**Maintained By:** Claude Code + Suman Addanki

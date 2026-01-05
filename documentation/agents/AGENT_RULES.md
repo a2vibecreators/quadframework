@@ -3,6 +3,8 @@
 **Version:** 1.0
 **Last Updated:** January 4, 2026
 
+> **See also:** [.claude/rules/AGENT_RULES.md](../../.claude/rules/AGENT_RULES.md) for the condensed Claude Code-specific version (11 rules)
+
 ---
 
 ## Table of Contents

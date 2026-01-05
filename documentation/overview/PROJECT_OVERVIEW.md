@@ -499,7 +499,7 @@ QUAD offers three deployment modes using mathematical complexity notation:
 | **O(n)** | Growth | Small Business (10-100 users) | Client (BYOK) |
 | **O(n²)** | Scale | Enterprise (100+ users) | Client (On-Premise) |
 
-**See:** [DEPLOYMENT_MODES.md](DEPLOYMENT_MODES.md) for pricing and details.
+**See:** [DEPLOYMENT_MODES.md](../deployment/DEPLOYMENT_MODES.md) for pricing and details.
 
 ---
 
@@ -527,10 +527,10 @@ QUAD offers three deployment modes using mathematical complexity notation:
 ## Getting Started
 
 **For Developers:**
-1. Read [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for table structure
-2. Review [TECH_STACK.md](TECH_STACK.md) for technology decisions
-3. Check [API_REFERENCE.md](API_REFERENCE.md) for endpoint documentation
-4. See [DEPLOYMENT_MODES.md](DEPLOYMENT_MODES.md) for hosting options
+1. Read [DATABASE_SCHEMA.md](../database/DATABASE_SCHEMA.md) for table structure
+2. Review [TECH_STACK.md](../internal/TECH_STACK.md) for technology decisions
+3. Check [API_REFERENCE.md](../api/API_REFERENCE.md) for endpoint documentation
+4. See [DEPLOYMENT_MODES.md](../deployment/DEPLOYMENT_MODES.md) for hosting options
 
 **For Business:**
 1. Browse [case-studies/](case-studies/) for industry examples

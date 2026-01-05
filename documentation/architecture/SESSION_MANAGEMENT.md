@@ -17,7 +17,7 @@ QUAD Platform uses an intelligent session management system that preserves conte
 - ❌ Conversation reset means Claude "forgets" what we're working on
 
 **Our Solution:**
-- ✅ `.claudeagent/` folder stores session state
+- ✅ `.claude/` folder stores session state
 - ✅ `quadframework-init` command restores full context
 - ✅ Session persists across conversation resets
 
@@ -28,15 +28,19 @@ QUAD Platform uses an intelligent session management system that preserves conte
 ### Directory Structure
 
 ```
-/Users/semostudio/git/a2vibecreators/quadframework/
-├── .claudeagent/
-│   ├── SESSION_HISTORY.md         # Compacted conversation summaries
-│   ├── AGENT_RULES.md             # Project-specific rules for Claude
-│   ├── AGENT_CONTEXT_FILES.md     # Important files Claude should read
-│   ├── DATABASE_CHANGELOG.md      # Why database changes were made
-│   └── archive/
-│       ├── session-2025-12-30.md  # Archived sessions
-│       └── session-2025-12-31.md
+/Users/semostudio/git/a2vibes/QUAD/
+├── .claude/
+│   ├── commands/
+│   │   └── quad-init.md           # /quad-init slash command
+│   ├── rules/
+│   │   ├── AGENT_RULES.md         # Project-specific rules for Claude
+│   │   ├── SESSION_HISTORY.md     # Compacted conversation summaries
+│   │   ├── CONTEXT_FILES.md       # Important files Claude should read
+│   │   └── DATABASE_CHANGELOG.md  # Why database changes were made
+│   ├── archive/
+│   │   └── session-YYYY-MM-DD.md  # Archived sessions
+│   ├── settings.json              # Team settings (in git)
+│   └── README.md                  # .claude/ folder documentation
 ```
 
 ### What Gets Stored
@@ -88,9 +92,9 @@ When you run `quadframework-init`, Claude Code:
 
 1. **Reads session files:**
    ```
-   .claudeagent/SESSION_HISTORY.md
-   .claudeagent/AGENT_RULES.md
-   .claudeagent/AGENT_CONTEXT_FILES.md
+   .claude/rules/SESSION_HISTORY.md
+   .claude/rules/AGENT_RULES.md
+   .claude/rules/CONTEXT_FILES.md
    ```
 
 2. **Restores context:**
@@ -181,9 +185,9 @@ You are working on **QUAD Platform**, a self-hosted enterprise SaaS for AI-power
 
 Before responding, read these files to restore session context:
 
-1. `.claudeagent/SESSION_HISTORY.md` - What we've built so far
-2. `.claudeagent/AGENT_RULES.md` - Project rules and conventions
-3. `.claudeagent/AGENT_CONTEXT_FILES.md` - Important files to review
+1. `.claude/rules/SESSION_HISTORY.md` - What we've built so far
+2. `.claude/rules/AGENT_RULES.md` - Project rules and conventions
+3. `.claude/rules/CONTEXT_FILES.md` - Important files to review
 4. `documentation/QUAD_PLATFORM.md` - Technical overview
 
 ## Project Summary
@@ -664,9 +668,9 @@ POST /api/ai/chat
 
 ## Related Documentation
 
-- [Agent Rules](.claudeagent/AGENT_RULES.md)
-- [Session History](.claudeagent/SESSION_HISTORY.md)
-- [Context Files](.claudeagent/AGENT_CONTEXT_FILES.md)
+- [Agent Rules](.claude/rules/AGENT_RULES.md)
+- [Session History](.claude/rules/SESSION_HISTORY.md)
+- [Context Files](.claude/rules/CONTEXT_FILES.md)
 - [QUAD Platform Overview](QUAD_PLATFORM.md)
 
 ---

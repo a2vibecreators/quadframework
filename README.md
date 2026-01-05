@@ -6,22 +6,92 @@ Website: [quadframe.work](https://quadframe.work)
 
 ---
 
-## Getting Started
+## Table of Contents
 
-**New developer?** Follow our platform-specific setup guide:
+1. [Quick Navigation](#quick-navigation) - Start here based on your role
+2. [First Time Setup (Sharath Start Here!)](#first-time-setup) - Step-by-step local setup
+3. [About QUAD](#about-quad) - What is QUAD methodology
+4. [Repository Structure](#repository-structure) - How code is organized
+5. [Working with Submodules](#working-with-submodules) - Git workflow
+6. [Tech Stack](#tech-stack) - Technologies used
+7. [Development](#development) - Daily development commands
+8. [Deployment](#deployment) - Deploy to DEV/QA/PROD
+9. [Related Documentation](#related-documentation) - More docs
 
-📚 **[Setup Guide](scripts/SETUP_GUIDE.md)** - Complete setup instructions for Windows, Mac, and Linux
+---
 
-**Quick Start:**
+## Quick Navigation
+
+| Who Are You? | Start Here | Then Read |
+|--------------|------------|-----------|
+| **Sharath (New Developer)** | [First Time Setup](#first-time-setup) below | [CLAUDE.md](CLAUDE.md) for project rules |
+| **Using Claude Code** | [CLAUDE.md](CLAUDE.md) | [.claude/](.claude/README.md) for commands |
+| **Understanding QUAD** | [Documentation](documentation/README.md) | [Sitemap](documentation/SITEMAP.md) |
+| **Returning Developer** | [Development](#development) section | Run `npm run dev` |
+
+---
+
+## First Time Setup
+
+**Hi Sharath!** Follow these steps to set up QUAD locally on your Windows or Mac.
+
+### Step 1: Prerequisites
+
+Make sure you have these installed:
+
+| Software | Windows | Mac |
+|----------|---------|-----|
+| **Git** | [Download](https://git-scm.com/download/win) | `brew install git` |
+| **Node.js 18+** | [Download](https://nodejs.org/) | `brew install node` |
+| **Docker Desktop** | [Download](https://www.docker.com/products/docker-desktop/) | [Download](https://www.docker.com/products/docker-desktop/) |
+| **Java JDK 17+** | [Download](https://adoptium.net/) | `brew install openjdk@17` |
+| **Maven** | [Download](https://maven.apache.org/download.cgi) | `brew install maven` |
+| **VS Code** | [Download](https://code.visualstudio.com/) | [Download](https://code.visualstudio.com/) |
+
+### Step 2: Clone the Repository
+
+```bash
+# Clone with all submodules
+git clone --recurse-submodules git@github.com:a2Vibes/QUAD.git
+
+# Navigate to project
+cd QUAD
+```
+
+### Step 3: Run Setup Script
 
 | Platform | Command |
 |----------|---------|
-| **Windows** | `powershell -ExecutionPolicy Bypass -File .\scripts\setup-prerequisites.ps1` |
+| **Windows (PowerShell)** | `powershell -ExecutionPolicy Bypass -File .\scripts\setup-prerequisites.ps1` |
 | **Mac/Linux** | `./scripts/setup-prerequisites.sh` |
 
-The setup script will check all prerequisites and guide you through installation.
+The script will check all prerequisites and guide you through installation.
 
-**Prerequisites:** Node.js 18+, Docker Desktop, Git, Java JDK 17+, Maven
+### Step 4: Start Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+Open [http://localhost:3003](http://localhost:3003) in your browser.
+
+### Step 5: Read Project Rules
+
+Before making any changes, read these files:
+
+1. [CLAUDE.md](CLAUDE.md) - Project architecture, tech stack, deployment
+2. [.claude/rules/AGENT_RULES.md](.claude/rules/AGENT_RULES.md) - 11 development rules
+3. [documentation/README.md](documentation/README.md) - All documentation
+
+### Need Help?
+
+- **Full developer onboarding:** [documentation/getting-started/DEVELOPER_ONBOARDING.md](documentation/getting-started/DEVELOPER_ONBOARDING.md)
+- Setup scripts: [scripts/SETUP_GUIDE.md](scripts/SETUP_GUIDE.md)
+- Ask Suman or check Slack #quad-dev
 
 ---
 
