@@ -304,17 +304,47 @@ git push
 
 ### Deep Dive Documentation
 
-**📚 Complete documentation with 130+ guides organized by topic:**
+**📚 Complete documentation with 144+ markdown files organized by topic:**
 
-➡️ **[documentation/README.md](documentation/README.md)** - Full documentation index with table of contents
+➡️ **[documentation/sitemap/sitemap_documentation.md](documentation/sitemap/sitemap_documentation.md)** - Complete documentation index (all 144 files)
 
-**Quick Links:**
-- **Getting Started:** [documentation/getting-started/GETTING_STARTED.md](documentation/getting-started/GETTING_STARTED.md)
-- **Architecture:** [documentation/architecture/ARCHITECTURE.md](documentation/architecture/ARCHITECTURE.md)
-- **Database:** [documentation/database/DATABASE_SCHEMA.md](documentation/database/DATABASE_SCHEMA.md)
-- **API Reference:** [documentation/api/API_REFERENCE.md](documentation/api/API_REFERENCE.md)
-- **Sitemap:** [documentation/SITEMAP.md](documentation/SITEMAP.md)
-- **QUAD Methodology:** [documentation/methodology/QUAD.md](documentation/methodology/QUAD.md)
+**Essential Guides:**
+| Document | Description |
+|----------|-------------|
+| [Getting Started](documentation/getting-started/GETTING_STARTED.md) | Quick start guide for QUAD Platform |
+| [Team Access](documentation/getting-started/TEAM_ACCESS.md) | Vaultwarden setup and team collaboration |
+| [QUAD Methodology](documentation/methodology/QUAD.md) | Core QUAD methodology (Q-U-A-D stages) |
+| [Agent Rules](documentation/agents/AGENT_RULES.md) | 40 rules for AI agent development |
+| [Architecture](documentation/architecture/ARCHITECTURE.md) | System architecture overview |
+| [Database Schema](documentation/database/DATABASE_SCHEMA.md) | Complete database schema (15 tables) |
+| [API Reference](documentation/api/API_REFERENCE.md) | REST API endpoints |
+| [Token Optimization](documentation/ai/TOKEN_OPTIMIZATION.md) | AI cost reduction strategies |
+| [OAuth Implementation](documentation/auth/OAUTH_IMPLEMENTATION.md) | OAuth SSO setup guide |
+| [Deployment Modes](documentation/deployment/DEPLOYMENT_MODES.md) | SaaS vs self-hosted vs hybrid |
+
+**Website Sitemaps:**
+| Sitemap | Description |
+|---------|-------------|
+| [sitemap_static.md](documentation/sitemap/sitemap_static.md) | Public marketing pages (/, /concept, /pitch) |
+| [sitemap_login.md](documentation/sitemap/sitemap_login.md) | Authenticated pages (/dashboard, /domains, /tickets) |
+| [sitemap_documentation.md](documentation/sitemap/sitemap_documentation.md) | Complete documentation index (this sitemap) |
+
+**Browse by Topic:**
+- 📁 [Getting Started](documentation/getting-started/) - Setup and onboarding
+- 📁 [Methodology](documentation/methodology/) - QUAD methodology docs
+- 📁 [Architecture](documentation/architecture/) - System design
+- 📁 [Features](documentation/features/) - Product features
+- 📁 [Authentication](documentation/auth/) - OAuth and security
+- 📁 [Agents](documentation/agents/) - AI agent templates
+- 📁 [AI & Optimization](documentation/ai/) - AI models and token costs
+- 📁 [API](documentation/api/) - API reference
+- 📁 [Database](documentation/database/) - Database schema
+- 📁 [Deployment](documentation/deployment/) - Deployment guides
+- 📁 [Integration](documentation/integration/) - Third-party integrations
+- 📁 [Testing](documentation/testing/) - Test strategies
+- 📁 [Strategy](documentation/strategy/) - Business strategy
+- 📁 [Case Studies](documentation/case-studies/) - Real-world examples
+- 📁 [Internal](documentation/internal/) - Team documentation
 
 ---
 
