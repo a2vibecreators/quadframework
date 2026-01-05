@@ -76,8 +76,16 @@ case "$ENV" in
         DB_NAME="$QA_DB_NAME"
         QUAD_API_URL="http://$QA_SERVICES_CONTAINER:8080"
         ;;
+    prod)
+        COLLECTION_ID="$PROD_COLLECTION_ID"
+        NEXTAUTH_URL="https://$PROD_DOMAIN"
+        DB_HOST="$PROD_DB_HOST"
+        DB_NAME="$PROD_DB_NAME"
+        QUAD_API_URL="$PROD_QUAD_API_URL"
+        ;;
     *)
         print_error "Invalid environment: $ENV"
+        echo "Usage: $0 {dev|qa|prod}"
         exit 1
         ;;
 esac

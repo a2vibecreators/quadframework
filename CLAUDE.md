@@ -652,10 +652,13 @@ https://dev.quadframe.work/auth/login
 
 ### Team Member Access
 
-| Member | QUAD Org | NutriNine Org | Access Level |
-|--------|----------|---------------|--------------|
-| sumanaddanki | ✅ Owner | ✅ Owner | All collections (dev/qa/prod) |
-| sharuuu | ✅ Member | ✅ Member | dev/qa only (no prod access) |
+| Member | QUAD Org | NutriNine Org | Access Level | Auth Method |
+|--------|----------|---------------|--------------|-------------|
+| sumanaddanki | ✅ Owner | ✅ Owner | All collections (dev/qa/prod) | Password |
+| sharuuu | ✅ Member | ✅ Member | dev/qa only (no prod access) | Password |
+| CI/CD Pipeline | ✅ Service | ❌ No access | dev/qa only (configurable) | API Key |
+
+**See:** [TEAM_ACCESS.md](documentation/TEAM_ACCESS.md) for complete setup guide
 
 ---
 
