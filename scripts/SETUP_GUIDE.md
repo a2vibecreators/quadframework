@@ -179,7 +179,7 @@ git submodule update --init --recursive
 **Option A: Using Vaultwarden (if you have access):**
 ```bash
 # Login to Vaultwarden
-bw config server https://vault.nutrinine.app
+bw config server https://vault.a2vibes.tech
 bw login
 
 # Unlock vault
@@ -313,7 +313,7 @@ After successful setup:
    - `documentation/TEST_JOURNEYS.md` - Test scenarios
 
 3. **Access Vaultwarden** (if team member):
-   - https://vault.nutrinine.app
+   - https://vault.a2vibes.tech
    - Request access from admin (sumanaddanki)
 
 4. **Join GitHub organization:**

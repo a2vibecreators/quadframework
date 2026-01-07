@@ -87,7 +87,7 @@ Submodule 'quad-web' checked out
 ### 3.1 Configure Vaultwarden Server
 
 ```bash
-bw config server https://vault.nutrinine.app
+bw config server https://vault.a2vibes.tech
 ```
 
 ### 3.2 Login to Vaultwarden
@@ -253,7 +253,7 @@ bw get item "GitHub OAuth" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
 ```
 
 **Fix 3: If vault credentials are wrong, update them**
-- Login to https://vault.nutrinine.app
+- Login to https://vault.a2vibes.tech
 - Navigate to QUAD org → dev collection
 - Update "Google OAuth" or "GitHub OAuth" item
 - Re-run setup script
@@ -324,7 +324,7 @@ docker stop quad-web-dev
 **If any credential from Vaultwarden doesn't work:**
 
 1. **Verify in vault UI:**
-   - Go to https://vault.nutrinine.app
+   - Go to https://vault.a2vibes.tech
    - Login and check QUAD org → dev collection
    - Compare credentials with what's in your `.env.local`
 
@@ -335,7 +335,7 @@ docker stop quad-web-dev
    ```
 
 3. **Update in Vaultwarden if wrong:**
-   - Update the item in https://vault.nutrinine.app
+   - Update the item in https://vault.a2vibes.tech
    - Re-run `./scripts/setup-dev-environment.sh`
    - Restart your dev server
 

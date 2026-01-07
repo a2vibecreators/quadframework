@@ -172,9 +172,9 @@ if [[ "$FETCH_SECRETS" =~ ^[Yy]$ ]]; then
         # Check if already logged in
         if ! bw status &> /dev/null; then
             echo "Login to Vaultwarden:"
-            echo "  Server: https://vault.nutrinine.app"
+            echo "  Server: https://vault.a2vibes.tech"
             echo ""
-            bw config server https://vault.nutrinine.app
+            bw config server https://vault.a2vibes.tech
             bw login
         fi
 

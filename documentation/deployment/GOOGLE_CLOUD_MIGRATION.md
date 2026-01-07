@@ -125,7 +125,7 @@ DEV_GOOGLE_CLIENT_SECRET=<new-secret>
 ```
 
 **Update Vaultwarden:**
-1. Open vault.nutrinine.app
+1. Open vault.a2vibes.tech
 2. Update "QUAD Google OAuth" entry with new credentials
 3. Update "QUAD Gemini API" entry if applicable
 
@@ -219,7 +219,7 @@ After successful migration:
 
 - [Deploy Script](../deployment/cloud/gcp/deploy.sh) - GCP deployment automation
 - [.env.deploy](../.env.deploy) - Environment credentials (gitignored)
-- [Vaultwarden](https://vault.nutrinine.app) - Secrets management
+- [Vaultwarden](https://vault.a2vibes.tech) - Secrets management
 
 ---
 

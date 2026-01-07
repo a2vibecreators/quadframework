@@ -28,7 +28,7 @@ fi
 # Check if logged in to Vaultwarden
 if ! bw login --check &> /dev/null; then
     echo -e "${YELLOW}🔐 Not logged in to Vaultwarden${NC}"
-    echo -e "${BLUE}Login with: bw config server https://vault.nutrinine.app && bw login${NC}"
+    echo -e "${BLUE}Login with: bw config server https://vault.a2vibes.tech && bw login${NC}"
     exit 1
 fi
 

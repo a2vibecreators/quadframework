@@ -1,9 +1,9 @@
 # QUAD Platform - Agent Rules (Claude Code)
 
 **Purpose:** Guidelines for Claude Code when working on QUAD Platform
-**Last Updated:** January 4, 2026
+**Last Updated:** January 5, 2026
 
-> **Note:** This is the Claude Code-specific version (11 rules).
+> **Note:** This is the Claude Code-specific version (14 rules).
 > For the full 40-rule developer reference, see [documentation/agents/AGENT_RULES.md](../../documentation/agents/AGENT_RULES.md)
 
 ---
@@ -22,6 +22,9 @@
    - [9. Ask Before Production Deployment](#9-ask-before-production-deployment)
    - [10. Git Commit Messages](#10-git-commit-messages)
    - [11. Code Style](#11-code-style)
+   - [12. Consistency is Critical](#12-consistency-is-critical-user-priority)
+   - [13. API Versioning Strategy](#13-api-versioning-strategy-branch-based)
+   - [14. Always Read Files Before Editing](#14-always-read-files-before-editing)
 2. [Project-Specific Context](#project-specific-context)
 3. [When Context is Lost](#when-context-is-lost)
 
@@ -85,6 +88,13 @@ Before starting work, read:
 - ❌ Small bug fixes
 - ❌ Minor documentation changes
 - ❌ Work in progress
+
+**CRITICAL:** When making ANY design/architecture change, ALSO update:
+1. ✅ Sitemap: `documentation/sitemap/sitemap_documentation.md`
+2. ✅ Project structure: `.claude/rules/PROJECT_STRUCTURE.md`
+3. ✅ Codebase index: If schema/API/component changes
+
+**Why:** Until version 1.0 is finalized, documentation MUST stay in sync with code changes.
 
 ### 4. Use TodoWrite for Multi-Step Tasks
 
@@ -226,6 +236,118 @@ chore: Update .env.example with SSO vars
 - ESLint rules from Next.js
 - Tailwind CSS for styling
 - Components use shadcn/ui when possible
+
+### 12. Consistency is Critical (User Priority)
+
+**"Macha, consistency is very important to me!"** - User emphasis on patterns and standards.
+
+**Always maintain consistency across:**
+1. **Naming Conventions**
+   - Java: camelCase methods, PascalCase classes
+   - TypeScript/React: camelCase variables, PascalCase components
+   - Database: snake_case table/column names with QUAD_ prefix
+   - Files: kebab-case for routes, PascalCase for components
+
+2. **Documentation Patterns**
+   - Javadoc for Java classes and methods (/** ... */)
+   - JSDoc for TypeScript functions
+   - Consistent comment style within each language
+   - Always include @author and @since tags
+
+3. **Code Structure**
+   - Follow established patterns in existing files
+   - If one controller has detailed @Operation annotations, all should
+   - If one DTO has validation, all should
+   - Match indentation, spacing, and formatting of surrounding code
+
+4. **API Patterns**
+   - Consistent response format (AuthResponse pattern)
+   - Consistent error handling (Map.of("error", message))
+   - Consistent endpoint naming (/resource/{id}/action)
+
+**Industry Standards Followed:**
+- RESTful API conventions
+- Spring Boot best practices
+- Next.js App Router patterns
+- PostgreSQL naming conventions
+
+**Remember:** Users care more about consistency than perfection. If the codebase does something in a certain way, follow that pattern even if there's a "better" way.
+
+### 13. API Versioning Strategy (Branch-Based)
+
+**User Philosophy:** "I hate AuthController2.java - use Git branches instead!"
+
+**The QUAD Way:**
+- Use Git branches (v1, v2) with SAME controller code
+- Version prefix comes from environment variable (`api.version.prefix`)
+- NO code duplication between versions
+- Deploy different branches as separate pods only when both versions need to run
+
+**Code Pattern:**
+```java
+@RestController
+@RequestMapping("${api.version.prefix:/v1}/auth")
+public class AuthController {
+    // Same code in v1 and v2 branches!
+}
+```
+
+**Properties Configuration:**
+```properties
+# application-dev.properties, application-qa.properties, application-prod.properties
+api.version.prefix=/v1
+```
+
+**When Creating v2:**
+1. Create v2 branch from main
+2. **NO code changes** to controllers
+3. Change properties: `api.version.prefix=/v2`
+4. Deploy v2 pod only if both versions need to run simultaneously
+5. Database changes **MUST be additive** (add columns/tables, never delete)
+
+**Why This Approach:**
+- ✅ Zero code duplication
+- ✅ Zero dependency on reverse proxies (Caddy not in PROD)
+- ✅ Gradual migration (v1 and v2 run on same database)
+- ✅ Simple rollback (keep v1 pod running)
+
+**Never Do:**
+- ❌ AuthController2.java
+- ❌ Hardcoded /v1 in @RequestMapping (use variable)
+- ❌ Breaking database changes (delete columns/tables)
+- ❌ Depend on Caddy/nginx for versioning (not in PROD)
+
+### 14. Always Read Files Before Editing
+
+**Critical Rule:** Never use Edit or Write tools without reading the file first.
+
+**Why:**
+- Edit tool will ERROR if file hasn't been read
+- You need current content to make correct changes
+- Prevents accidental overwrites or breaking changes
+
+**Correct Workflow:**
+1. ✅ Read file with Read tool
+2. ✅ Understand current content
+3. ✅ Use Edit tool with exact old_string/new_string
+4. ✅ Verify edit was successful
+
+**Wrong Workflow:**
+1. ❌ Use Edit tool directly (will fail)
+2. ❌ Guess what's in the file
+3. ❌ Use Write tool on existing files (overwrites everything)
+
+**Exception:** Only use Write tool for NEW files that don't exist yet.
+
+**Example:**
+```
+# WRONG
+<Edit file_path="SecurityConfig.java" old_string="..." />  ❌ ERROR: File not read
+
+# CORRECT
+<Read file_path="SecurityConfig.java" />  ✅ Read first
+<Edit file_path="SecurityConfig.java" old_string="..." />  ✅ Now can edit
+```
 
 ---
 

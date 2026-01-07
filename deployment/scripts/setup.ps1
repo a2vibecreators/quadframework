@@ -281,7 +281,7 @@ if ($SecretChoice -eq "2") {
     Write-Host ""
     Write-Host "Steps:"
     Write-Host "  1. Copy .env.example to .env in each environment folder"
-    Write-Host "  2. Fill in OAuth credentials from Vaultwarden (vault.nutrinine.app)"
+    Write-Host "  2. Fill in OAuth credentials from Vaultwarden (vault.a2vibes.tech)"
     Write-Host ""
     Write-Host "Example:"
     Write-Host "  cd quad-web\deployment\dev"

@@ -478,6 +478,64 @@ quadframework/
 | `/users/email/{email}/exists` | GET | Check user existence | No |
 | `/auth/health` | GET | Service health check | No |
 
+**API Documentation:**
+
+The Java backend now includes interactive API documentation powered by Springdoc OpenAPI (Swagger UI).
+
+| Documentation | URL | Description |
+|---------------|-----|-------------|
+| **Swagger UI** | `http://localhost:14101/swagger-ui.html` (DEV) | Interactive API testing interface |
+| **OpenAPI JSON** | `http://localhost:14101/v3/api-docs` (DEV) | OpenAPI 3.0 specification |
+| **QA Swagger UI** | `http://localhost:15101/swagger-ui.html` (QA) | QA environment docs |
+| **Prod Swagger UI** | `https://api.quadframe.work/swagger-ui.html` (PROD) | Production API docs |
+
+**Features:**
+- ✅ Interactive endpoint testing with "Try it out" button
+- ✅ JWT Bearer authentication support
+- ✅ Request/response schema documentation
+- ✅ Example values for all DTOs
+- ✅ Organized by controller tags (Authentication, User Management)
+
+**Usage:**
+1. Start the quad-services container
+2. Navigate to `http://localhost:14101/swagger-ui.html`
+3. Expand an endpoint → Click "Try it out" → Fill parameters → Execute
+4. For authenticated endpoints: Click "Authorize" → Enter JWT token → Authorize
+
+**API Versioning Strategy:**
+
+QUAD uses **branch-based versioning** with environment variables to enable multiple API versions without code duplication.
+
+**How It Works:**
+```
+v1 branch: AuthController.java has @RequestMapping("${api.version.prefix:/v1}/auth")
+v2 branch: SAME AuthController.java (NO code changes)
+```
+
+**Configuration:**
+```properties
+# application-dev.properties, application-qa.properties, application-prod.properties
+api.version.prefix=/v1
+```
+
+**When Creating v2:**
+1. Create v2 branch from main
+2. SAME code (AuthController.java unchanged)
+3. Change properties: `api.version.prefix=/v2`
+4. Deploy v2 pod if both versions need to run simultaneously
+5. Database changes MUST be additive (add columns/tables, never delete)
+
+**Benefits:**
+- ✅ No code duplication (NO AuthController2.java)
+- ✅ Zero dependency on reverse proxies (environment variable only)
+- ✅ Gradual migration (both v1 and v2 can run on same database)
+- ✅ Simple rollback (keep v1 pod running)
+
+**Example URLs:**
+- DEV v1: `http://localhost:14101/v1/auth/login`
+- QA v1: `http://localhost:15101/v1/auth/login`
+- PROD v1: `https://api.quadframe.work/v1/auth/login`
+
 **Docker Build & Deploy:**
 ```bash
 cd quad-services
@@ -509,9 +567,17 @@ docker network connect dev-network quad-web-dev
 
 ## Secrets Management (Vaultwarden)
 
+### Vault Architecture
+
+**Centralized Vault for All A2Vibe Projects:**
+- **URL:** https://vault.a2vibes.tech
+- **Hosting:** Google Cloud Platform (GCP) ONLY
+- **Purpose:** Single vault instance for all company projects (QUAD, NutriNine, A2Vibe Creators)
+- **NOT on Mac Studio:** Mac Studio runs DEV/QA environments only, not vault
+
 ### Vault Structure
 
-All secrets are stored in Vaultwarden at **vault.nutrinine.app**
+All secrets are stored in Vaultwarden at **vault.a2vibes.tech**
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
@@ -568,7 +634,7 @@ All secrets are stored in Vaultwarden at **vault.nutrinine.app**
 ### Local Development Setup
 
 1. **Get Vaultwarden Access**: Request access from admin (sumanaddanki)
-2. **Login to Vault**: https://vault.nutrinine.app
+2. **Login to Vault**: https://vault.a2vibes.tech
 3. **Navigate to**: QUAD org → dev collection
 4. **Create `.env.local`** from template:
    ```bash

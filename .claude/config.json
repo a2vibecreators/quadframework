@@ -9,7 +9,7 @@
     "Follow Git workflow: work on sumanMain/SharuMain branches, never push directly to main",
     "Explain complete data flow (frontend → API → database) when testing features",
     "All database tables use QUAD_ prefix to avoid conflicts with NutriNine tables",
-    "Use Vaultwarden (vault.nutrinine.app) for all secrets - never hardcode credentials",
+    "Use Vaultwarden (vault.a2vibes.tech) for all secrets - never hardcode credentials",
     "Document new features in CLAUDE.md and relevant /documentation files",
     "Deploy using ./deploy-studio.sh script (dev/qa/all)",
     "When adding methodologies, update MethodologyContext.tsx and MethodologyLens.tsx"
@@ -43,7 +43,7 @@
     ]
   },
   "secretsManagement": {
-    "vault": "vault.nutrinine.app",
+    "vault": "vault.a2vibes.tech",
     "organization": "QUAD",
     "collections": ["dev", "qa", "prod"],
     "bwCliCommand": "bw list items --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc"

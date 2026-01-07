@@ -53,9 +53,40 @@ HOME (/)
 ├── PLATFORM (Product Pages)
 │   ├── /platform ────────── QUAD Platform Overview
 │   ├── /pitch ───────────── Product Pitch
-│   ├── /mm-pitch ────────── Mass Mutual Demo Pitch
 │   ├── /blueprint-agent ─── Blueprint Agent Feature
 │   └── /onboarding ──────── Team Onboarding Guide
+│
+├── MASSMUTUAL (Partner Pitch Site)
+│   │   Subdomain: massmutual.quadframe.work
+│   │   Middleware rewrites to /massmutual/* routes
+│   │
+│   ├── /massmutual ─────────── Landing Page (Problem-Focused)
+│   │   ├── Hero: "Why Does a 1-Paragraph Feature Take 6 Weeks?"
+│   │   ├── The Real Problem (4 pain points)
+│   │   ├── The QUAD Answer (timeline comparison)
+│   │   ├── How It Actually Works (Q-U-A-D stages)
+│   │   └── The Paradigm Shift (Before/After)
+│   │
+│   ├── /massmutual/pitch ───── Pitch Deck (5 Slides)
+│   │   ├── Slide 1: Executive Summary
+│   │   ├── Slide 2: The QUAD Model
+│   │   ├── Slide 3: Competitive Advantage
+│   │   ├── Slide 4: Partnership Proposal
+│   │   └── Slide 5: The Ask (4 weeks, 1 team, $0)
+│   │
+│   ├── /massmutual/demo ────── Demo Options
+│   │   ├── Dashboard Demo link
+│   │   ├── QUAD Methodology link
+│   │   └── Demo Scenarios list
+│   │
+│   ├── /massmutual/roi ─────── ROI Calculator
+│   │   ├── Interactive sliders (devs, salary, cycle time)
+│   │   └── Real-time savings calculation
+│   │
+│   └── /massmutual/contact ─── Contact & Scheduling
+│       ├── Email contact
+│       ├── Calendar booking (coming soon)
+│       └── Team introductions
 │
 └── AUTHENTICATION (Login/Signup)
     ├── /auth/login ──────── Login Page → See "Login Flows" below

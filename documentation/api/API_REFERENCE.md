@@ -1,7 +1,7 @@
 # QUAD Platform - Complete API Reference
 
 **Version:** 2.0
-**Last Updated:** January 3, 2026
+**Last Updated:** January 5, 2026
 **Total Routes:** 115+
 **Base URL:** `/api`
 
@@ -10,6 +10,7 @@
 ## Table of Contents
 
 1. [Overview](#overview)
+   - [API Versioning](#api-versioning)
 2. [Authentication](#authentication)
 3. [Organizations](#organizations)
 4. [Users](#users)
@@ -105,6 +106,80 @@ Authorization: Bearer <jwt_token>
 | 404 | Not Found |
 | 409 | Conflict (duplicate entry) |
 | 500 | Internal Server Error |
+
+### API Versioning
+
+**QUAD uses branch-based versioning with environment variables for zero-code-duplication multi-version support.**
+
+#### Strategy Overview
+
+```
+Current: /v1/auth/login
+Future:  /v2/auth/login
+(SAME AuthController.java code, different Git branches)
+```
+
+#### How It Works
+
+1. **Version Prefix from Environment:**
+   - Controllers use `@RequestMapping("${api.version.prefix:/v1}/auth")`
+   - Property file sets: `api.version.prefix=/v1`
+   - Deploy v1 pod: `api.version.prefix=/v1`
+   - Deploy v2 pod: `api.version.prefix=/v2`
+
+2. **Git Branch Strategy:**
+   ```
+   main (current prod) → v1 branch → deploy as quad-services-v1:8080
+                      → v2 branch → deploy as quad-services-v2:8080
+   ```
+
+3. **Database Compatibility:**
+   - All schema changes **MUST be additive** (add columns/tables only)
+   - Never delete columns/tables (breaks v1 compatibility)
+   - Both v1 and v2 pods run on SAME database
+
+4. **Gradual Migration:**
+   - v1 pod serves existing clients
+   - v2 pod serves new clients
+   - Clients migrate when ready
+   - Eventually shut down v1 pod
+
+#### Configuration Files
+
+**application-dev.properties, application-qa.properties, application-prod.properties:**
+```properties
+# API Versioning - Version prefix for all endpoints
+# When v2 branch is created, this stays /v1 (no code changes needed)
+api.version.prefix=/v1
+```
+
+#### Benefits
+
+- ✅ **Zero Code Duplication** - NO AuthController2.java
+- ✅ **No Reverse Proxy Dependency** - Works in PROD (no Caddy/nginx needed)
+- ✅ **Gradual Migration** - Both versions run simultaneously
+- ✅ **Simple Rollback** - Keep v1 pod running if v2 has issues
+- ✅ **Database Compatibility** - Additive-only migrations
+
+#### Example URLs
+
+| Environment | v1 Endpoint | v2 Endpoint (future) |
+|-------------|-------------|----------------------|
+| DEV | `http://localhost:14101/v1/auth/login` | `http://localhost:14102/v2/auth/login` |
+| QA | `http://localhost:15101/v1/auth/login` | `http://localhost:15102/v2/auth/login` |
+| PROD | `https://api.quadframe.work/v1/auth/login` | `https://api.quadframe.work/v2/auth/login` |
+
+#### When to Create v2
+
+Create a new API version when:
+- Breaking changes to request/response format
+- Major new features that change endpoint behavior
+- Deprecated endpoints need removal
+
+**Do NOT create new version for:**
+- Adding new optional fields (backward compatible)
+- Bug fixes
+- Performance improvements
 
 ---
 

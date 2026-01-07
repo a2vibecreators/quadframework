@@ -43,7 +43,7 @@ What would you like to work on today, macha?
 - Frontend: Next.js 15 (App Router) + TypeScript + Tailwind
 - Backend: Java Spring Boot 3.2.1 + Maven
 - Database: PostgreSQL with Prisma ORM (quad-web) + JPA (quad-services)
-- Secrets: Vaultwarden (vault.nutrinine.app)
+- Secrets: Vaultwarden (vault.a2vibes.tech)
 
 **Deployment:**
 - DEV: https://dev.quadframe.work (port 14001)

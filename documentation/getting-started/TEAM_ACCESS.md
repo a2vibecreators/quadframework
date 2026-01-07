@@ -25,7 +25,7 @@ QUAD uses **Vaultwarden** (self-hosted Bitwarden) for secrets management. This e
 - ✅ Audit trail (who accessed what)
 - ✅ Easy credential rotation
 
-**Vaultwarden Server:** https://vault.nutrinine.app
+**Vaultwarden Server:** https://vault.a2vibes.tech
 
 ---
 
@@ -93,11 +93,11 @@ bw --version
 
 ```bash
 # Point CLI to our self-hosted server
-bw config server https://vault.nutrinine.app
+bw config server https://vault.a2vibes.tech
 
 # Verify configuration
 bw config server
-# Output: https://vault.nutrinine.app
+# Output: https://vault.a2vibes.tech
 ```
 
 ### Step 3: Accept Organization Invitation
@@ -301,7 +301,7 @@ bw config sessionTimeout 43200  # 30 days in minutes
 
 ### Can't Access Vaultwarden Web Interface
 
-**URL:** https://vault.nutrinine.app
+**URL:** https://vault.a2vibes.tech
 
 **Troubleshooting:**
 1. Check VPN (if required)
@@ -327,7 +327,7 @@ bw config sessionTimeout 43200  # 30 days in minutes
 - **Don't commit secrets** - Never commit `.env` files to git
 - **Don't deploy to prod without approval** - Always get Suman's review
 - **Don't share BW_SESSION token** - It grants full access to your vault
-- **Don't use same password as vault.nutrinine.app login** - Master password should be unique
+- **Don't use same password as vault.a2vibes.tech login** - Master password should be unique
 
 ---
 
@@ -391,7 +391,7 @@ cd quad-web
 
 ### Step 1: Create API Key (Suman Only)
 
-1. **Login to Vaultwarden web interface:** https://vault.nutrinine.app
+1. **Login to Vaultwarden web interface:** https://vault.a2vibes.tech
 2. **Go to Settings → Security → Keys & APIs**
 3. **Click "New API Key"**
 4. **Name:** `QUAD CI/CD Pipeline`
@@ -429,7 +429,7 @@ jobs:
         run: npm install -g @bitwarden/cli
 
       - name: Configure Vaultwarden
-        run: bw config server https://vault.nutrinine.app
+        run: bw config server https://vault.a2vibes.tech
 
       - name: Login with API Key
         run: |

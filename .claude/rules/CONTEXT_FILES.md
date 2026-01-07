@@ -8,10 +8,14 @@
 
 | Step | File | Purpose |
 |------|------|---------|
+| 0 | [../documentation/sitemap/sitemap_documentation.md](../documentation/sitemap/sitemap_documentation.md) | **⭐ DOCUMENTATION INDEX** - Check FIRST to avoid duplicates! |
 | 1 | [../CLAUDE.md](../CLAUDE.md) | Project overview, tech stack, deployment |
 | 2 | [AGENT_RULES.md](AGENT_RULES.md) | 10 core rules for Claude Code |
 | 3 | [SESSION_HISTORY.md](SESSION_HISTORY.md) | Previous session context |
-| 4 | This file | Quick reference for key files |
+| 4 | [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) | Where files live (prevents duplicates) |
+| 5 | This file | Quick reference for key files |
+
+**CRITICAL:** Until version 1.0 is finalized, ALWAYS check sitemap (Step 0) - it's actively maintained!
 
 ---
 

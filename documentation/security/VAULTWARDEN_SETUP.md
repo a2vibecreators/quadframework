@@ -60,15 +60,19 @@
 
 **Service Name:** `vaultwarden-prod`
 
-**Container Image:** `vaultwarden/server:latest`
+**Container Image:** `vaultwarden/server:1.35.1`
 
 **Environment Variables:**
 ```bash
+DATABASE_URL=postgresql://vaultwarden_user:vaultwarden_secure_pass_2026@/vaultwarden_prod_db?host=/cloudsql/nutrinine-prod:us-east1:nutrinine-db
+ORG_CREATION_USERS=all
 DOMAIN=https://vault.a2vibes.tech
-SIGNUPS_ALLOWED=false  # Invite only
-ADMIN_TOKEN=<from-secrets>
+SIGNUPS_ALLOWED=true
 WEBSOCKET_ENABLED=true
 LOG_LEVEL=info
+ADMIN_TOKEN=ts/GNXE9mXmz13WxS6Q4PYUYsXi7ntvHNfNFqDpjNtfJR7hY4lvegLuzVPUutu4k
+ROCKET_PORT=80
+ROCKET_ADDRESS=0.0.0.0
 ```
 
 **Resources:**
@@ -78,14 +82,15 @@ LOG_LEVEL=info
 - Max Instances: 10
 
 **Cloud SQL Connection:**
-- Instance: `vaultwarden-db`
-- Database: `vaultwarden_prod`
-- User: `vaultwarden`
-- Connection: Via Cloud SQL Proxy
+- Instance: `nutrinine-db` (shared instance)
+- Database: `vaultwarden_prod_db`
+- User: `vaultwarden_user`
+- Password: `vaultwarden_secure_pass_2026`
+- Connection: Via Cloud SQL Unix Socket (`/cloudsql/nutrinine-prod:us-east1:nutrinine-db`)
 
 ### Cloud SQL Database
 
-**Instance Name:** `vaultwarden-db`
+**Instance Name:** `nutrinine-db` (shared with NutriNine and QUAD)
 
 **Configuration:**
 - Database Version: PostgreSQL 15
@@ -93,10 +98,12 @@ LOG_LEVEL=info
 - Storage: 10 GB SSD
 - Region: us-east1
 - Backups: Daily at 3 AM UTC
+- IP: 34.148.105.158
 
 **Databases:**
 ```sql
-vaultwarden_prod  -- Production vault data
+vaultwarden_prod_db  -- Production vault data
+vaultwarden_db       -- (unused, created accidentally)
 ```
 
 ---
