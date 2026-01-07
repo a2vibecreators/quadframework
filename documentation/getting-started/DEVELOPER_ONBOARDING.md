@@ -31,7 +31,7 @@ Before starting, you need:
 
 1. **Mac Studio or macOS machine** (for local DEV/QA)
 2. **Vaultwarden Access** - Request from Suman
-   - Organization: QUAD (id: `579c22f3-4f13-447c-a861-9a4aa0ab7fbc`)
+   - Organization: QUAD (id: `7548352c-4c18-45ab-ba58-cabceb58a25b`)
    - Collections: dev, qa (NOT prod - limited access)
 3. **GitHub Access** - Added to a2Vibes organization
 4. **Tools Installed:**
@@ -115,7 +115,7 @@ export BW_SESSION=$(cat ~/.bw-session)
 
 ```bash
 bw list organizations
-# Should show: QUAD org with id 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
+# Should show: QUAD org with id 7548352c-4c18-45ab-ba58-cabceb58a25b
 ```
 
 ---
@@ -221,7 +221,7 @@ docker ps | grep postgres-quad-dev
 **Check 2: Verify credentials in Vaultwarden**
 ```bash
 export BW_SESSION=$(bw unlock --raw)
-bw get item "Database" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
+bw get item "Database" --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b
 ```
 
 **Check 3: Re-run setup script**
@@ -248,8 +248,8 @@ docker exec postgres-quad-dev psql -U quad_user -d quad_dev_db -c "SELECT 1;"
 
 **Fix 2: Manually check vault**
 ```bash
-bw get item "Google OAuth" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
-bw get item "GitHub OAuth" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
+bw get item "Google OAuth" --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b
+bw get item "GitHub OAuth" --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b
 ```
 
 **Fix 3: If vault credentials are wrong, update them**
@@ -370,8 +370,8 @@ docker stop quad-web-dev
 ## Quick Reference
 
 **Vault Organization IDs:**
-- QUAD Org: `579c22f3-4f13-447c-a861-9a4aa0ab7fbc`
-- DEV Collection: `e4f03d1a-b8ac-4186-a384-0fb62d431ddd`
+- QUAD Org: `7548352c-4c18-45ab-ba58-cabceb58a25b`
+- DEV Collection: `bd26fd3e-b01f-47a9-80e9-9841b52fc1c6`
 - QA Collection: `75fb3b57-9e84-4e2d-8b4f-447518e0a315`
 
 **Ports:**
@@ -398,7 +398,7 @@ docker exec postgres-quad-dev psql -U quad_user -d quad_dev_db
 
 # Vault
 export BW_SESSION=$(bw unlock --raw)
-bw list items --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
+bw list items --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b
 ```
 
 ---

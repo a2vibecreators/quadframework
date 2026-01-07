@@ -585,7 +585,7 @@ All secrets are stored in Vaultwarden at **vault.a2vibes.tech**
 ╚══════════════════════════════════════════════════════════════════╝
 
 ┌─────────────────────────────────────────────────────────────────┐
-│ 📁 QUAD Organization (id: 579c22f3-4f13-447c-a861-9a4aa0ab7fbc) │
+│ 📁 QUAD Organization (id: 7548352c-4c18-45ab-ba58-cabceb58a25b) │
 ├─────────────────────────────────────────────────────────────────┤
 │   📂 dev/                                                       │
 │      🔐 Anthropic API Key                                       │
@@ -600,7 +600,7 @@ All secrets are stored in Vaultwarden at **vault.a2vibes.tech**
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
-│ 📁 NutriNine Organization (id: a2608572-3e25-4b3a-996b-cd5be95b12c0) │
+│ 📁 NutriNine Organization (id: c1c58783-3eee-4a54-8d9d-5489538e9ba9) │
 ├─────────────────────────────────────────────────────────────────┤
 │   📂 dev/                                                       │
 │      🔐 AWS Credentials                                         │
@@ -652,16 +652,16 @@ export BW_SESSION=$(bw unlock --raw)
 bw list organizations
 
 # List QUAD secrets (dev collection)
-bw list items --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc --collectionid e4f03d1a-b8ac-4186-a384-0fb62d431ddd
+bw list items --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b --collectionid bd26fd3e-b01f-47a9-80e9-9841b52fc1c6
 
 # List NutriNine secrets (dev collection)
-bw list items --organizationid a2608572-3e25-4b3a-996b-cd5be95b12c0 --collectionid c792c297-8ccd-46a1-b691-7955ede25eb5
+bw list items --organizationid c1c58783-3eee-4a54-8d9d-5489538e9ba9 --collectionid c792c297-8ccd-46a1-b691-7955ede25eb5
 
 # Get specific secret from QUAD
-bw get item "NextAuth Secret" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
+bw get item "NextAuth Secret" --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b
 
 # Get Database credentials
-bw get item "Database" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc --collectionid e4f03d1a-b8ac-4186-a384-0fb62d431ddd
+bw get item "Database" --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b --collectionid bd26fd3e-b01f-47a9-80e9-9841b52fc1c6
 ```
 
 ### OAuth Configuration (Google Sign-In)
@@ -697,16 +697,16 @@ https://dev.quadframe.work/auth/login
 
 | Organization | ID |
 |--------------|-----|
-| QUAD | `579c22f3-4f13-447c-a861-9a4aa0ab7fbc` |
-| NutriNine | `a2608572-3e25-4b3a-996b-cd5be95b12c0` |
+| QUAD | `7548352c-4c18-45ab-ba58-cabceb58a25b` |
+| NutriNine | `c1c58783-3eee-4a54-8d9d-5489538e9ba9` |
 
 ### Collection IDs (QUAD)
 
 | Collection | ID |
 |------------|-----|
-| dev | `e4f03d1a-b8ac-4186-a384-0fb62d431ddd` |
-| qa | `75fb3b57-9e84-4e2d-8b4f-447518e0a315` |
-| prod | `cc4a16a2-9acc-459a-ad37-a8ef99592366` |
+| dev | `bd26fd3e-b01f-47a9-80e9-9841b52fc1c6` |
+| qa | `5b3ffa64-ee2e-41e2-a05a-11d4603f5496` |
+| prod | `0dc1c5d4-0b3d-49fc-8ab9-2322e1e2db67` |
 
 ### Collection IDs (NutriNine)
 

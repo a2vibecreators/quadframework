@@ -33,9 +33,9 @@ QUAD uses **Vaultwarden** (self-hosted Bitwarden) for secrets management. This e
 
 ### QUAD Organization
 ```
-QUAD Organization (579c22f3-4f13-447c-a861-9a4aa0ab7fbc)
+QUAD Organization (7548352c-4c18-45ab-ba58-cabceb58a25b)
 ├── Collections (Folder-Level Authorization)
-│   ├── dev (e4f03d1a-b8ac-4186-a384-0fb62d431ddd)
+│   ├── dev (bd26fd3e-b01f-47a9-80e9-9841b52fc1c6)
 │   │   ├── Google OAuth
 │   │   ├── GitHub OAuth
 │   │   ├── NextAuth Secret
@@ -155,7 +155,7 @@ bwu
 
 ```bash
 # List all items you have access to
-bw list items --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
+bw list items --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b
 
 # You should see secrets from dev and qa collections
 # If you see prod secrets, contact Suman (you shouldn't have prod access yet)
@@ -343,10 +343,10 @@ export BW_SESSION=$(bw unlock --raw)
 bw lock
 
 # List accessible secrets
-bw list items --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
+bw list items --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b
 
 # Get specific secret
-bw get item "Google OAuth" --organizationid 579c22f3-4f13-447c-a861-9a4aa0ab7fbc
+bw get item "Google OAuth" --organizationid 7548352c-4c18-45ab-ba58-cabceb58a25b
 
 # Fetch secrets for deployment
 ./deployment/scripts/fetch-secrets.sh dev   # DEV
@@ -471,11 +471,11 @@ jobs:
 
 | Environment | Collection ID |
 |-------------|---------------|
-| dev | `e4f03d1a-b8ac-4186-a384-0fb62d431ddd` |
+| dev | `bd26fd3e-b01f-47a9-80e9-9841b52fc1c6` |
 | qa | `75fb3b57-9e84-4e2d-8b4f-447518e0a315` |
 | prod | `cc4a16a2-9acc-459a-ad37-a8ef99592366` |
 
-**Organization ID:** `579c22f3-4f13-447c-a861-9a4aa0ab7fbc`
+**Organization ID:** `7548352c-4c18-45ab-ba58-cabceb58a25b`
 
 ---
 

@@ -1,9 +1,9 @@
 # QUAD Platform - Database Schema Documentation
 
-**Date:** January 1, 2026
+**Date:** January 7, 2026
 **PostgreSQL Version:** 15.x
-**Total Tables:** 15
-**Total Functions:** 4
+**Total Tables:** 16
+**Total Functions:** 5
 
 ---
 
@@ -421,9 +421,48 @@ CREATE TABLE QUAD_workload_metrics (
 
 ---
 
+## Configuration Tables
+
+### 14. QUAD_demo_settings ✨ NEW
+
+**Purpose:** Feature toggle settings per organization for demos/partners
+
+```sql
+CREATE TABLE quad_demo_settings (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id          UUID NOT NULL,                 -- References QUAD_organizations.id
+  config_name     VARCHAR(100) NOT NULL DEFAULT 'default',
+  preset_key      VARCHAR(50),                   -- 'FULL_MATRIX', 'PILOT_VECTOR', etc.
+  enabled_features JSONB NOT NULL DEFAULT '{}'::JSONB,
+  description     VARCHAR(255),
+  is_default      BOOLEAN DEFAULT false,
+  is_active       BOOLEAN DEFAULT true,
+  created_at      TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at      TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  created_by      UUID,
+  UNIQUE (org_id, config_name)
+);
+```
+
+**Preset Keys:**
+| Preset | Description |
+|--------|-------------|
+| FULL_MATRIX | All features enabled (100+ features) |
+| PILOT_VECTOR | Core features for pilot demos (~40 features) |
+| GROWTH_PLANE | Mid-tier features for growth phase (~70 features) |
+| CUSTOM_PATH | User-defined feature selection |
+
+**API Endpoints:**
+- `GET /api/demo-settings?orgId=xxx` - Get settings
+- `POST /api/demo-settings` - Save settings
+- `GET /api/demo-settings/list?orgId=xxx` - List all configs
+- `DELETE /api/demo-settings?orgId=xxx&configName=xxx` - Delete config
+
+---
+
 ## Resource/Attribute Tables (EAV Pattern)
 
-### 14. QUAD_domain_resources
+### 15. QUAD_domain_resources (renumbered)
 
 **Purpose:** Resources belonging to domains (projects, integrations, repos)
 
