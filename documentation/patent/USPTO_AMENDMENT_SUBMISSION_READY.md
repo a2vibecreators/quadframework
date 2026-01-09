@@ -1,7 +1,7 @@
-# USPTO AMENDMENT - READY TO FILE TODAY
+# USPTO AMENDMENT - READY TO FILE (WAIT 24-48 HOURS)
 ## Application No. 63/956,810
 
-**Filing Instructions:** Copy this entire document to PDF, submit via Patent Center
+**Filing Instructions:** Copy this entire document to PDF, submit via Patent Center **AFTER** original application appears in system (24-48 hours after filing)
 
 ---
 
@@ -328,7 +328,23 @@ Date: January 9, 2026
 
 ---
 
-## FILING INSTRUCTIONS (DO THIS TODAY)
+## FILING INSTRUCTIONS
+
+### ⏰ IMPORTANT: Wait 24-48 Hours After Original Filing
+
+**If you filed the original patent TODAY (January 9, 2026):**
+- ❌ Application won't appear in USPTO system yet
+- ⏳ Wait 24-48 hours (until January 11-12, 2026)
+- ✅ Then follow steps below
+
+**Why wait?** USPTO needs time to process your original application before you can file amendments.
+
+**What to do while waiting:**
+1. Focus on other priorities (Vaibhav meeting, product development)
+2. Check Patent Center daily to see when application appears
+3. Once it appears, proceed with filing
+
+---
 
 ### Step 1: Login to Patent Center
 
@@ -338,9 +354,9 @@ Date: January 9, 2026
 
 ### Step 2: Find Your Application
 
-1. Click "Applications" in left menu
-2. Search for: 63/956,810
-3. Click on application number
+1. Click "Workbench" or "Existing submissions" (NOT search bar)
+2. Look for application 63/956,810 in YOUR applications list
+3. If it doesn't appear yet, wait another 24 hours and check again
 
 ### Step 3: File Amendment
 
@@ -404,7 +420,7 @@ Email: gopi@quadframe.work
 | **Attorney Review** | $500-$1,000 | 1-2 days |
 | **Full Attorney Filing** | $2,000-$3,000 | 1 week |
 
-**Recommendation:** File DIY today (free), then get attorney review for non-provisional conversion in August 2026.
+**Recommendation:** Wait 24-48 hours → File DIY (free) → Get attorney review for non-provisional conversion in August 2026.
 
 ---
 
@@ -437,7 +453,7 @@ Email: gopi@quadframe.work
 
 ---
 
-**File this TODAY. Takes 1 hour. Costs $0.**
+**File this in 24-48 hours (after original application appears in system). Takes 1 hour. Costs $0.**
 
 **Patent Center:** https://patentcenter.uspto.gov
 
