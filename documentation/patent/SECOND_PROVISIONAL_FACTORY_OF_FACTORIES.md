@@ -12,9 +12,9 @@
 ## INVENTOR INFORMATION
 
 **Inventor:** Gopi S Addanke
-**Address:** [Your address]
-**Phone:** [Your phone]
-**Email:** gopi@quadframe.work
+**Address:** 404 Cobblestone Ct, Monmouth Jct, NJ 08852
+**Phone:** (201) 238-9017
+**Email:** SUMAN.ADDANKI@GMAIL.COM
 
 **Entity Status:** Micro Entity (individual inventor, no previous patent filings, income < $200K)
 
