@@ -19,3 +19,6 @@
 [submodule "quad-api"]
 	path = quad-api
 	url = git@github.com:a2Vibes/quad-api.git
+[submodule "quad-plugin"]
+	path = quad-plugin
+	url = git@github.com:a2Vibes/quad-plugin.git
