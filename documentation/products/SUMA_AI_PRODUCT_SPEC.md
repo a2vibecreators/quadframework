@@ -1,7 +1,7 @@
 # Suma API - Product Specification
 
-**Product Name:** Suma API
-**Domain:** suma.ai
+**Product Name:** Suma API (Ask Suma AI)
+**Domain:** asksuma.ai
 **Status:** Planning Phase (Q1 2026 Launch)
 **Last Updated:** January 9, 2026
 

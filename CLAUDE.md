@@ -766,7 +766,9 @@ cd quad-database && ./deployment/dev/dev-deploy.sh
 cd quad-database && ./sync/sync-db.sh dev
 ```
 
-**Schema Tables (15 tables with QUAD_ prefix):**
+**Schema Tables (23 tables with QUAD_ prefix):**
+
+**QUAD Platform Core (15 tables):**
 - `QUAD_companies` - Company/organization accounts
 - `QUAD_roles` - Role definitions with QUAD participation levels
 - `QUAD_users` - User accounts with role assignments
@@ -782,6 +784,18 @@ cd quad-database && ./sync/sync-db.sh dev
 - `QUAD_work_sessions` - Time tracking sessions
 - `QUAD_domain_blueprints` - UI blueprints for projects
 - `QUAD_blueprint_agent_sessions` - AI interview sessions
+
+**Suma API (api.asksuma.ai) - 3 tables:**
+- `QUAD_suma_api_keys` - API keys for third-party customers
+- `QUAD_suma_credits` - Prepaid token balance per organization
+- `QUAD_suma_usage` - Usage logs for billing and analytics
+
+**asksuma.ai Web App Generator - 5 tables:**
+- `QUAD_suma_templates` - Template gallery (FREE starters + PAID custom)
+- `QUAD_suma_apps` - User-generated apps catalog
+- `QUAD_suma_chats` - Chat history for iterative refinement
+- `QUAD_suma_user_context` - User preferences and context
+- `QUAD_suma_activity_types` - Activity types with pre/post hooks (set_alarm, deploy_app, interview_prep, etc.)
 
 ---
 
@@ -815,6 +829,31 @@ docker exec postgres-quad-dev psql -U quad_user -d quad_dev_db -f /tmp/journey1_
 ```
 
 **More test journeys:** See `documentation/TEST_JOURNEYS.md` for 6 complete scenarios (Startup, Small Business, Enterprise).
+
+**Suma API Test Data** (`quad-database/sql/seeds/suma_api_test_companies.sql`)
+- 3 test companies with API keys and prepaid credits (NutriNine, A2Vibe, TestCorp)
+
+**asksuma.ai Starter Templates** (`quad-database/sql/seeds/suma_starter_templates.sql`)
+- 8 FREE starter templates shown to all users after login
+- Categories: E-commerce, Healthcare, SaaS, Real Estate, Education, Food Delivery, Fitness, Finance
+
+**SUMA Activity Types with Pre/Post Hooks** (`quad-database/sql/seeds/suma_activity_types.sql`)
+- 8 activity types with intelligent pre/post hook system
+- **Development:** deploy_app (check_quotas → send_notification), generate_code (load_preferences → save_feedback)
+- **Education:** interview_prep (load_history → save_results), quiz_me (load_progress → save_score)
+- **Utility:** set_alarm (check_weather → send_email), set_reminder (check_context → send_notification)
+- **Communication:** send_email (validate_recipient → confirm_sent), voice_chat (check_language → save_transcript)
+
+**Pre/Post Hook Examples:**
+```
+User: "SUMA, remind me to go to Jersey City tomorrow 3pm"
+→ Pre-hook: Check weather API → "It's going to rain tomorrow"
+→ Post-hook: Send email → "Alarm set for 3pm. Don't forget umbrella! ☔"
+
+User: "SUMA, deploy my app to production"
+→ Pre-hook: Check GCP quotas → "You have 80% quota remaining"
+→ Post-hook: Send notification → "App deployed! https://myapp.suma.ai 🚀"
+```
 
 ---
 
