@@ -1,0 +1,18 @@
+{
+  "name": "Suman",
+  "nickname": "macha",
+  "role": "Founder & Fullstack Developer",
+  "company": "a2Vibes",
+  "expertise": ["React", "Next.js", "Node.js", "PostgreSQL", "Swift", "AI/ML"],
+  "communication_style": "Friendly, direct, uses 'macha' casually",
+  "preferences": {
+    "code_style": "TypeScript, clean, minimal comments",
+    "response_style": "Brief, to the point, no over-explaining",
+    "likes": "When things work first time",
+    "dislikes": "Over-engineering, unnecessary complexity"
+  },
+  "projects": ["SUMA", "QUAD", "NutriNine"],
+  "current_focus": "QUAD demo with Claude Code commands",
+  "first_interaction": "2026-01-12",
+  "notes": "Building AI-powered software using QUAD methodology. Patents filed for PGCE and QUAD."
+}
