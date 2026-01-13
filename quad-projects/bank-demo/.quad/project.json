@@ -1,0 +1,10 @@
+{
+  "name": "Bank Demo",
+  "type": "api",
+  "description": "Simple banking application - QUAD demo project",
+  "version": "0.1.0",
+  "created_at": "2026-01-13",
+  "methodology": "quad",
+  "source": "bank-demo-setup.xlsx",
+  "status": "initialized"
+}

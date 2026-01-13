@@ -1,0 +1,346 @@
+#!/bin/bash
+#
+# QUAD CLI
+# ========
+# Main command interface for QUAD operations
+#
+# Usage:
+#   quad init @org-setup.xlsx       Initialize from Excel
+#   quad dev deploy suma            Deploy to dev
+#   quad prod deploy suma           Deploy to prod
+#   quad question "..."             Ask with context
+#   quad team                       Show team
+#   quad help                       Show help
+#
+# Copyright (c) 2026 Gopi Suman Addanke. All Rights Reserved.
+
+VERSION="0.1.0"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PID_FILE="$SCRIPT_DIR/.quad-api.pid"
+LOG_FILE="$SCRIPT_DIR/.quad-api.log"
+
+# Check if API is running
+check_api() {
+    if ! curl -s http://localhost:3000/health > /dev/null 2>&1; then
+        echo "Warning: QUAD API not running. Start with: quad serve"
+        return 1
+    fi
+    return 0
+}
+
+# Activate virtual environment if exists
+activate_venv() {
+    if [ -f "$SCRIPT_DIR/venv/bin/activate" ]; then
+        source "$SCRIPT_DIR/venv/bin/activate"
+    fi
+}
+
+# Get API PID
+get_api_pid() {
+    if [ -f "$PID_FILE" ]; then
+        cat "$PID_FILE"
+    else
+        # Try to find by port
+        lsof -ti:3000 2>/dev/null | head -1
+    fi
+}
+
+case "$1" in
+    # ─────────────────────────────────────────────────────────
+    # Init Command
+    # ─────────────────────────────────────────────────────────
+    init|i)
+        activate_venv
+        shift
+        python3 "$SCRIPT_DIR/quad-init.py" "$@"
+        ;;
+
+    template|new)
+        activate_venv
+        OUTPUT="${2:-quad-org-setup.xlsx}"
+        echo "Creating QUAD template: $OUTPUT"
+        python3 "$SCRIPT_DIR/create-template.py" "$OUTPUT"
+        ;;
+
+    # ─────────────────────────────────────────────────────────
+    # Deploy Commands
+    # ─────────────────────────────────────────────────────────
+    dev)
+        activate_venv
+        if [ "$2" = "deploy" ]; then
+            python3 "$SCRIPT_DIR/quad-deploy.py" dev "$3"
+        else
+            echo "Usage: quad dev deploy <project>"
+            echo "Example: quad dev deploy suma"
+        fi
+        ;;
+
+    prod)
+        activate_venv
+        if [ "$2" = "deploy" ]; then
+            echo ""
+            echo "  ⚠️  PRODUCTION DEPLOYMENT"
+            echo "  ─────────────────────────"
+            read -p "  Are you sure you want to deploy to PROD? [y/N]: " confirm
+            if [[ "$confirm" =~ ^[Yy]$ ]]; then
+                python3 "$SCRIPT_DIR/quad-deploy.py" prod "$3"
+            else
+                echo "  Cancelled."
+            fi
+        else
+            echo "Usage: quad prod deploy <project>"
+            echo "Example: quad prod deploy suma"
+        fi
+        ;;
+
+    deploy)
+        echo "Usage: quad <env> deploy <project>"
+        echo ""
+        echo "Examples:"
+        echo "  quad dev deploy suma     Deploy SUMA to dev"
+        echo "  quad prod deploy suma    Deploy SUMA to prod"
+        echo "  quad dev deploy all      Deploy all to dev"
+        ;;
+
+    setup)
+        activate_venv
+        shift
+        python3 "$SCRIPT_DIR/quad-deploy.py" setup "$@"
+        ;;
+
+    # ─────────────────────────────────────────────────────────
+    # Context Commands (require API)
+    # ─────────────────────────────────────────────────────────
+    question|q)
+        check_api || exit 1
+        shift
+        python3 "$SCRIPT_DIR/quad-context-hook.py" "quad-question $*"
+        ;;
+
+    team|t)
+        check_api || exit 1
+        python3 "$SCRIPT_DIR/quad-context-hook.py" "quad-team"
+        ;;
+
+    availability|a)
+        check_api || exit 1
+        python3 "$SCRIPT_DIR/quad-context-hook.py" "quad-availability"
+        ;;
+
+    status|s)
+        check_api || exit 1
+        python3 "$SCRIPT_DIR/quad-context-hook.py" "quad-status"
+        ;;
+
+    # ─────────────────────────────────────────────────────────
+    # Server Commands
+    # ─────────────────────────────────────────────────────────
+    serve|server|start)
+        activate_venv
+        if check_api 2>/dev/null; then
+            echo "QUAD API already running on port 3000"
+            exit 0
+        fi
+        echo "Starting QUAD API server..."
+        cd "$SCRIPT_DIR"
+        nohup python3 main.py > "$LOG_FILE" 2>&1 &
+        API_PID=$!
+        echo $API_PID > "$PID_FILE"
+        sleep 2
+        if check_api 2>/dev/null; then
+            echo "✓ QUAD API started (PID: $API_PID)"
+            echo "  URL: http://localhost:3000"
+            echo "  Logs: quad logs"
+            echo "  Stop: quad stop"
+        else
+            echo "✗ Failed to start. Check logs: quad logs"
+        fi
+        ;;
+
+    stop)
+        echo "Stopping QUAD API server..."
+        PID=$(get_api_pid)
+        if [ -n "$PID" ]; then
+            kill $PID 2>/dev/null
+            rm -f "$PID_FILE"
+            sleep 1
+            if ! check_api 2>/dev/null; then
+                echo "✓ QUAD API stopped (was PID: $PID)"
+            else
+                echo "  Forcing stop..."
+                kill -9 $PID 2>/dev/null
+                echo "✓ QUAD API force stopped"
+            fi
+        else
+            echo "QUAD API not running"
+        fi
+        ;;
+
+    restart)
+        echo "Restarting QUAD API..."
+        $0 stop
+        sleep 1
+        $0 serve
+        ;;
+
+    logs|log)
+        if [ -f "$LOG_FILE" ]; then
+            if [ "$2" = "-f" ] || [ "$2" = "--follow" ]; then
+                tail -f "$LOG_FILE"
+            else
+                tail -50 "$LOG_FILE"
+            fi
+        else
+            echo "No log file found. Start server with: quad serve"
+        fi
+        ;;
+
+    # ─────────────────────────────────────────────────────────
+    # Info Commands
+    # ─────────────────────────────────────────────────────────
+    ps|status-server)
+        echo ""
+        echo "  QUAD Server Status"
+        echo "  ──────────────────"
+        PID=$(get_api_pid)
+        if [ -n "$PID" ] && kill -0 $PID 2>/dev/null; then
+            echo "  Status:  Running"
+            echo "  PID:     $PID"
+            echo "  URL:     http://localhost:3000"
+            # Show uptime if possible
+            if command -v ps &> /dev/null; then
+                UPTIME=$(ps -p $PID -o etime= 2>/dev/null | xargs)
+                [ -n "$UPTIME" ] && echo "  Uptime:  $UPTIME"
+            fi
+        else
+            echo "  Status:  Stopped"
+        fi
+        echo ""
+        ;;
+
+    info)
+        echo ""
+        echo "  QUAD Configuration"
+        echo "  ──────────────────"
+        echo "  Version:    $VERSION"
+        echo "  Script Dir: $SCRIPT_DIR"
+        echo "  PID File:   $PID_FILE"
+        echo "  Log File:   $LOG_FILE"
+        echo ""
+        echo "  Environment:"
+        echo "  DB_HOST:    ${DB_HOST:-localhost}"
+        echo "  DB_PORT:    ${DB_PORT:-14201}"
+        echo "  API_PORT:   ${PORT:-3000}"
+        echo ""
+        if [ -f "$SCRIPT_DIR/.env" ]; then
+            echo "  .env file:  Found"
+        else
+            echo "  .env file:  Not found"
+        fi
+        echo ""
+        ;;
+
+    version|--version|-v)
+        echo "QUAD CLI v$VERSION"
+        ;;
+
+    # ─────────────────────────────────────────────────────────
+    # Database Commands
+    # ─────────────────────────────────────────────────────────
+    db)
+        case "$2" in
+            connect|shell)
+                echo "Connecting to QUAD database..."
+                PGPASSWORD="${DB_PASSWORD:-quad_dev_pass}" psql \
+                    -h "${DB_HOST:-localhost}" \
+                    -p "${DB_PORT:-14201}" \
+                    -U "${DB_USER:-quad_user}" \
+                    -d "${DB_NAME:-quad_dev_db}"
+                ;;
+            status)
+                echo "Checking database connection..."
+                if PGPASSWORD="${DB_PASSWORD:-quad_dev_pass}" psql \
+                    -h "${DB_HOST:-localhost}" \
+                    -p "${DB_PORT:-14201}" \
+                    -U "${DB_USER:-quad_user}" \
+                    -d "${DB_NAME:-quad_dev_db}" \
+                    -c "SELECT 1" > /dev/null 2>&1; then
+                    echo "✓ Database connected"
+                else
+                    echo "✗ Database connection failed"
+                fi
+                ;;
+            *)
+                echo "Usage: quad db <command>"
+                echo ""
+                echo "Commands:"
+                echo "  quad db connect   Connect to database shell"
+                echo "  quad db status    Check database connection"
+                ;;
+        esac
+        ;;
+
+    # ─────────────────────────────────────────────────────────
+    # Help
+    # ─────────────────────────────────────────────────────────
+    help|h|--help|-h)
+        echo ""
+        echo "  QUAD CLI v$VERSION - Quick Unified Agentic Development"
+        echo "  ───────────────────────────────────────────────────────"
+        echo ""
+        echo "  INITIALIZATION:"
+        echo "    quad template [file]       Create new Excel template"
+        echo "    quad init @<excel>         Initialize project from Excel"
+        echo ""
+        echo "  DEPLOYMENT:"
+        echo "    quad dev deploy <project>  Deploy to development"
+        echo "    quad prod deploy <project> Deploy to production"
+        echo "    quad setup <gcp-project>   Setup GCP secrets"
+        echo ""
+        echo "  CONTEXT QUERIES: (requires API running)"
+        echo "    quad question <text>       Ask with org context"
+        echo "    quad team                  Show team members"
+        echo "    quad availability          Show availability"
+        echo "    quad status                Show project status"
+        echo ""
+        echo "  SERVER:"
+        echo "    quad serve                 Start API server (background)"
+        echo "    quad stop                  Stop API server"
+        echo "    quad restart               Restart API server"
+        echo "    quad logs [-f]             View API logs (-f to follow)"
+        echo "    quad ps                    Show server status"
+        echo ""
+        echo "  DATABASE:"
+        echo "    quad db connect            Connect to database shell"
+        echo "    quad db status             Check database connection"
+        echo ""
+        echo "  INFO:"
+        echo "    quad info                  Show configuration"
+        echo "    quad version               Show version"
+        echo "    quad help                  Show this help"
+        echo ""
+        echo "  Projects: suma, nutri, all"
+        echo ""
+        echo "  Examples:"
+        echo "    quad template my-org.xlsx         # Create new template"
+        echo "    quad init @my-org.xlsx            # Init from Excel"
+        echo "    quad serve                        # Start API"
+        echo "    quad dev deploy suma              # Deploy to dev"
+        echo "    quad question 'Who has capacity?' # Ask with context"
+        echo "    quad stop                         # Stop API"
+        echo ""
+        ;;
+
+    # ─────────────────────────────────────────────────────────
+    # Default
+    # ─────────────────────────────────────────────────────────
+    *)
+        if [ -z "$1" ]; then
+            echo "Usage: quad <command> [args]"
+            echo "Try 'quad help' for more information."
+        else
+            # Try as context query
+            check_api && python3 "$SCRIPT_DIR/quad-context-hook.py" "quad-$*"
+        fi
+        ;;
+esac
