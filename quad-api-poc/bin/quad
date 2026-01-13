@@ -245,6 +245,89 @@ case "$1" in
         ;;
 
     # ─────────────────────────────────────────────────────────
+    # Token Tracking Commands
+    # ─────────────────────────────────────────────────────────
+    stats|tokens)
+        LOG_FILE="$HOME/.quad/request-log.jsonl"
+        if [ ! -f "$LOG_FILE" ]; then
+            echo "No request log found. Start using QUAD commands to track."
+            exit 0
+        fi
+
+        echo ""
+        echo "  QUAD Token Statistics"
+        echo "  ──────────────────────"
+
+        if command -v jq &> /dev/null; then
+            # Count entries by type
+            TOTAL_REQUESTS=$(jq -s '[.[] | select(.phase=="pre")] | length' "$LOG_FILE")
+            QUAD_REQUESTS=$(jq -s '[.[] | select(.phase=="pre" and .is_quad==true)] | length' "$LOG_FILE")
+            NON_QUAD_REQUESTS=$(jq -s '[.[] | select(.phase=="pre" and .is_quad==false)] | length' "$LOG_FILE")
+            POST_COUNT=$(jq -s '[.[] | select(.phase=="post")] | length' "$LOG_FILE")
+
+            # Calculate percentage
+            if [ "$TOTAL_REQUESTS" -gt 0 ]; then
+                QUAD_PCT=$((QUAD_REQUESTS * 100 / TOTAL_REQUESTS))
+            else
+                QUAD_PCT=0
+            fi
+
+            echo "  REQUESTS BREAKDOWN:"
+            echo "    Total:           $TOTAL_REQUESTS"
+            echo "    QUAD enriched:   $QUAD_REQUESTS ($QUAD_PCT%)"
+            echo "    Regular:         $NON_QUAD_REQUESTS"
+            echo ""
+
+            echo "  INPUT (to Claude):"
+            TOTAL_USER_TOKENS=$(jq -s '[.[] | select(.phase=="pre") | .user_prompt.tokens_est] | add // 0' "$LOG_FILE")
+            QUAD_CONTEXT=$(jq -s '[.[] | select(.phase=="pre" and .is_quad==true) | .context_added.tokens_est] | add // 0' "$LOG_FILE")
+            TOTAL_ENHANCED=$(jq -s '[.[] | select(.phase=="pre") | .enhanced_prompt.tokens_est] | add // 0' "$LOG_FILE")
+            echo "    User typed:      ~$TOTAL_USER_TOKENS tokens"
+            echo "    QUAD context:    ~$QUAD_CONTEXT tokens (enrichment)"
+            echo "    Total sent:      ~$TOTAL_ENHANCED tokens"
+
+            if [ "$POST_COUNT" -gt 0 ]; then
+                echo ""
+                echo "  OUTPUT (from Claude):"
+                TOTAL_RESPONSE=$(jq -s '[.[] | select(.phase=="post") | .response.tokens_est] | add // 0' "$LOG_FILE")
+                echo "    Responses:       ~$TOTAL_RESPONSE tokens"
+            fi
+
+            echo ""
+            echo "  TOTAL:             ~$((TOTAL_ENHANCED + ${TOTAL_RESPONSE:-0})) tokens"
+            echo ""
+            echo "  Recent:"
+            tail -8 "$LOG_FILE" | jq -r '
+                if .phase == "pre" then
+                    if .is_quad then
+                        "  → [QUAD] " + .command + " (+" + (.context_added.tokens_est|tostring) + " context)"
+                    else
+                        "  →        " + (.user_prompt.text[:40] // "...") + " (" + (.user_prompt.tokens_est|tostring) + " tokens)"
+                    end
+                else
+                    "  ← response (" + (.response.tokens_est|tostring) + " tokens)"
+                end'
+        else
+            TOTAL=$(wc -l < "$LOG_FILE" | tr -d ' ')
+            echo "  Total entries: $TOTAL"
+            echo "  (Install jq for detailed stats)"
+            echo ""
+            tail -5 "$LOG_FILE"
+        fi
+        echo ""
+        ;;
+
+    stats-clear)
+        LOG_FILE="$HOME/.quad/request-log.jsonl"
+        if [ -f "$LOG_FILE" ]; then
+            rm "$LOG_FILE"
+            echo "✓ Request log cleared"
+        else
+            echo "No log file to clear"
+        fi
+        ;;
+
+    # ─────────────────────────────────────────────────────────
     # Database Commands
     # ─────────────────────────────────────────────────────────
     db)
@@ -313,6 +396,10 @@ case "$1" in
         echo "  DATABASE:"
         echo "    quad db connect            Connect to database shell"
         echo "    quad db status             Check database connection"
+        echo ""
+        echo "  TRACKING:"
+        echo "    quad stats                 Show token usage stats"
+        echo "    quad stats-clear           Clear request log"
         echo ""
         echo "  INFO:"
         echo "    quad info                  Show configuration"

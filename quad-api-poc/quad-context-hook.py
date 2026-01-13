@@ -26,11 +26,61 @@ import json
 import urllib.request
 import urllib.error
 from pathlib import Path
+from datetime import datetime
 
 # Configuration
+LOG_REQUESTS = os.getenv("QUAD_LOG_REQUESTS", "true").lower() == "true"
+REQUEST_LOG_FILE = Path.home() / ".quad" / "request-log.jsonl"
 API_URL = os.getenv("QUAD_API_URL", "http://localhost:3000")
 API_KEY = os.getenv("QUAD_API_KEY", "quad_dev_key_abc123")
 DOMAIN_SLUG = os.getenv("QUAD_DOMAIN", None)
+
+
+def estimate_tokens(text: str) -> int:
+    """Rough token estimate (4 chars = 1 token on average)"""
+    return len(text) // 4
+
+
+def log_request(user_prompt: str, enhanced_prompt: str, command: str = None, phase: str = "pre", is_quad: bool = False):
+    """Log request to ~/.quad/request-log.jsonl for tracking"""
+    if not LOG_REQUESTS:
+        return
+
+    REQUEST_LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    if phase == "pre":
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "phase": "pre",
+            "is_quad": is_quad,
+            "command": command or "unknown",
+            "user_prompt": {
+                "text": user_prompt[:200] + "..." if len(user_prompt) > 200 else user_prompt,
+                "chars": len(user_prompt),
+                "tokens_est": estimate_tokens(user_prompt)
+            },
+            "enhanced_prompt": {
+                "chars": len(enhanced_prompt),
+                "tokens_est": estimate_tokens(enhanced_prompt)
+            },
+            "context_added": {
+                "chars": len(enhanced_prompt) - len(user_prompt),
+                "tokens_est": estimate_tokens(enhanced_prompt) - estimate_tokens(user_prompt)
+            }
+        }
+    else:  # post
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "phase": "post",
+            "command": command or "response",
+            "response": {
+                "chars": len(enhanced_prompt),
+                "tokens_est": estimate_tokens(enhanced_prompt)
+            }
+        }
+
+    with open(REQUEST_LOG_FILE, "a") as f:
+        f.write(json.dumps(log_entry) + "\n")
 
 
 def load_config():
@@ -138,17 +188,35 @@ Configuration:
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: quad-context-hook.py <prompt>", file=sys.stderr)
+        print("Usage: quad-context-hook.py <prompt> [--post]", file=sys.stderr)
         sys.exit(1)
 
+    # Check for post-hook mode (called after response)
+    is_post = "--post" in sys.argv
     prompt = sys.argv[1]
 
-    # Check if this is a quad-* command
-    if prompt.strip().lower().startswith("quad-"):
+    if is_post:
+        # Post-hook: log the response
+        response_text = prompt  # In post-hook, this is the response
+        log_request("", response_text, "response", phase="post")
+        # Don't print anything in post-hook (passthrough)
+        return
+
+    # Pre-hook: Check if this is a quad-* command
+    is_quad = prompt.strip().lower().startswith(("quad-", "quad "))
+
+    if is_quad:
+        command = prompt.strip().split()[0].lower()
+        if command == "quad":
+            command = "quad-" + prompt.strip().split()[1].lower() if len(prompt.strip().split()) > 1 else "quad"
         enhanced = process_command(prompt)
+
+        # Log QUAD request with context
+        log_request(prompt, enhanced, command, phase="pre", is_quad=True)
         print(enhanced)
     else:
-        # Not a quad command, pass through unchanged
+        # Non-QUAD request - log but don't enrich
+        log_request(prompt, prompt, "general", phase="pre", is_quad=False)
         print(prompt)
 
 
