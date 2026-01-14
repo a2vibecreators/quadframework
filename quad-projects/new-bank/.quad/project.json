@@ -1,0 +1,67 @@
+{
+  "name": "NewBank",
+  "type": "fullstack",
+  "description": "Full-stack banking app with accounts, transactions, and dashboard",
+  "version": "0.1.0",
+  "created_at": "2026-01-13",
+  "created_by": "Gopi Suman Addanke",
+  "methodology": "quad",
+  "status": "initialized",
+
+  "tech_stack": {
+    "backend": {
+      "framework": "Spring Boot 3.2",
+      "language": "Java 21",
+      "database": "PostgreSQL 16"
+    },
+    "frontend": {
+      "framework": "Next.js 14",
+      "language": "TypeScript",
+      "styling": "Tailwind CSS"
+    }
+  },
+
+  "auth": {
+    "type": "simple",
+    "description": "Popup for name/role selection, no OAuth",
+    "roles": ["Admin", "Teller", "Customer", "Auditor"],
+    "persist_names": true
+  },
+
+  "features": [
+    {
+      "id": "F001",
+      "name": "User Selection",
+      "description": "Simple popup to select name and role",
+      "business_value": 8,
+      "complexity": 2,
+      "dependencies": []
+    },
+    {
+      "id": "F002",
+      "name": "Account Management",
+      "description": "Create, view, manage checking and savings accounts",
+      "business_value": 10,
+      "complexity": 5,
+      "dependencies": ["F001"]
+    },
+    {
+      "id": "F003",
+      "name": "Transactions",
+      "description": "Deposits, withdrawals, transfers between accounts",
+      "business_value": 10,
+      "complexity": 6,
+      "dependencies": ["F002"]
+    },
+    {
+      "id": "F004",
+      "name": "Dashboard",
+      "description": "Balance overview, recent activity, charts",
+      "business_value": 8,
+      "complexity": 4,
+      "dependencies": ["F002", "F003"]
+    }
+  ],
+
+  "pgce_order": ["F001", "F002", "F003", "F004"]
+}

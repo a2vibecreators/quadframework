@@ -162,12 +162,49 @@ def process_command(prompt: str) -> str:
     elif command == "quad-availability":
         result = get_context("Who has availability?", domain)
 
+    elif command == "quad-cleanup":
+        # Read current project context if exists
+        project_context = ""
+        quad_dir = Path.cwd() / ".quad"
+        if quad_dir.exists():
+            project_file = quad_dir / "project.json"
+            if project_file.exists():
+                try:
+                    with open(project_file) as f:
+                        project_context = f"Current project:\n{f.read()}\n"
+                except Exception:
+                    pass
+
+        return f"""[QUAD Cleanup Request]
+
+{project_context}
+Please help me clean up this conversation session:
+
+1. **Summarize** the key decisions and outcomes from our conversation
+2. **Save** the summary to `.quad/session-summary.md` with:
+   - Decisions made
+   - Current project state
+   - Pending tasks
+   - Important context to preserve
+3. **Tell me** to run `/compact` to reduce context size
+
+After saving the summary, future sessions will read `.quad/session-summary.md`
+to restore context without the full conversation history.
+
+[End QUAD Cleanup Request]"""
+
     elif command == "quad-help":
         return """QUAD Commands:
-  quad-question <question>  - Ask a question with org context
-  quad-team                 - Show team members and roles
+  quad-init <name>          - Initialize new project
+  quad-plan                 - Generate feature plan (PGCE)
+  quad-story                - Create user stories
+  quad-ticket               - Create development tickets
+  quad-write                - Generate code
+  quad-cleanup              - Summarize session & reduce context
+  quad-question <question>  - Ask with org context
+  quad-team                 - Show team members
   quad-status               - Show project status
-  quad-availability         - Show team availability
+  quad-availability         - Show availability
 
 Configuration:
   Set QUAD_API_URL, QUAD_API_KEY, QUAD_DOMAIN env vars
@@ -175,7 +212,19 @@ Configuration:
 
     else:
         # Unknown quad command, pass through with general context
-        result = get_context(prompt, domain)
+        # But first, check for session summary to restore context
+        session_context = ""
+        quad_dir = Path.cwd() / ".quad"
+        if quad_dir.exists():
+            summary_file = quad_dir / "session-summary.md"
+            if summary_file.exists():
+                try:
+                    with open(summary_file) as f:
+                        session_context = f"\n[Previous Session Context]\n{f.read()}\n[End Previous Session]\n\n"
+                except Exception:
+                    pass
+
+        result = get_context(session_context + prompt, domain)
 
     # Return enhanced prompt or error
     if result.get("success"):
